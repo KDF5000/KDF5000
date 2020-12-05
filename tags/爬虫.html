@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">爬虫</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">31</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/31/Python-Rq%e7%9a%84%e4%bd%bf%e7%94%a8.html">Python Rq的使用</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p><code>Rq</code>的介绍和安装可以参考<a href="http://kdf5000.github.io/2015/08/23/Ubuntu-14-04-%E4%B8%8B%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Python-rq%E6%A8%A1%E5%9D%97/">Ubuntu 14.04 下安装使用Python rq模块</a>，此文章详细的介绍了安装<code>Rq</code>的全部过程，文章最后给出了<code>Rq</code>官方文档的地址。</p>
+
+<p><code>Rq</code>官方文档详细的介绍了<code>Queues</code>, <code>Workers</code>，<code>Results Jobs</code>等每个组件的功能和使用，但是并没有指出这几个组件之间到底有什么关系，如果联合起来使用，对于像我这种菜鸟级的码农，一开始还真有点摸不着头脑，思考一番，懂了之后才发现原来是那么的简单&hellip;下面是我自己对<code>Rq</code>的整体认识图（windows 画图画的有点粗糙望见谅）</p>
+
+<p><img src="/media/archive/img_rq_model.png" alt="" /></p>
+
+<p>用白话解释就是：有一个大工厂，这个工厂有个大仓库（Redis），有一个或者几个管理员（CreateJob），一些工人(Worker)。管理员负责产生任务，把任务放到仓库里特定的位置（特定的Queue），然后工人自己去队列去任务，默默的完成任务，完成成功后按照要求放到特定的位置（可能是仓库也可能是其他地方）。如果任务比较多或者想在短期内完成任务，那么工厂就可以招聘更多的工人去完成这些任务。</p>
+
+<p>使用<code>Rq</code>模块最简单的就是只需要一个管理员，一个仓库，一个工人（工人都是一样的，可以复制很多出来）</p>
+
+<h4 id="建仓库">建仓库</h4>
+
+<p>仓库就是我们安装的时候使用的redis，具体建造过程参见<a href="http://kdf5000.github.io/2015/08/23/Ubuntu-14-04-%E4%B8%8B%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Python-rq%E6%A8%A1%E5%9D%97/">Ubuntu 14.04 下安装使用Python rq模块</a>中安装<code>Redis</code>一节</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/31/Python-Rq%e7%9a%84%e4%bd%bf%e7%94%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/12/%e7%88%ac%e8%99%ab%e5%ad%a6%e4%b9%a0%e8%b5%84%e6%96%99%e6%b1%87%e6%80%bb.html">爬虫学习资料汇总</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>收集写爬虫的相关技术资料以及有用的代码库</p>
+
+<h4 id="技术博客">技术博客</h4>
+
+<ul>
+<li><strong>Scrapy官方英文文档</strong>: <a href="http://doc.scrapy.org/en/latest/index.html">http://doc.scrapy.org/en/latest/index.html</a></li>
+<li><strong>Scrapy官方中文文档</strong>: <a href="http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html">http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html</a></li>
+<li><a href="http://www.tuicool.com/articles/ZbEFnya">使用Scrapy抓取数据</a></li>
+<li><a href="http://www.ituring.com.cn/article/114408#">Scrapy抓取豆瓣电影</a></li>
+<li><a href="http://www.zhihu.com/question/20899988">知乎：如何入门爬虫</a></li>
+<li><a href="http://www.tuicool.com/articles/7JVvaa">Scrapy爬虫笔记【8-Scrapy核心操作+爬豆瓣图片+数据库链接】</a></li>
+<li><a href="http://cuiqingcai.com/1052.html">Python爬虫学习系列教程</a></li>
+<li><a href="http://phantomjs.org/">PhantomJs</a> : 模拟浏览器解析js，js引擎</li>
+<li><a href="http://casperjs.org/">CasperJs</a>: 以及<code>phantomjs</code>的js引擎相比<code>Phantomjs</code>更加简洁易用</li>
+<li><a href="http://www.tuicool.com/articles/beeMNj/">PhantomJs快速入门</a></li>
+</ul>
+
+<h4 id="开源项目">开源项目</h4>
+
+<ul>
+<li><a href="https://github.com/chineking/cola">Cola</a> 一个高水平的分布式爬虫框架</li>
+<li><a href="https://github.com/grangier/python-goose">Goose </a> Html Content / Article Extractor</li>
+<li><a href="https://github.com/darkrho/scrapy-redis">scrapy-redis</a> 基于<code>Redis</code>和<code>Scrapy</code>的分布式爬虫框架</li>
+<li><a href="https://github.com/nvie/rq">nvie/rq</a> <code>Python</code>实现的一个简单的任务队列</li>
+<li><a href="http://billmill.org/bloomfilter-tutorial/">Bloom Filter</a>: 一个高效Url过滤，去重库</li>
+<li><a href="https://github.com/scrapy/scrapyd">Scrapyd</a>: 部署监控<code>scrapy</code>的工具</li>
+<li><a href="https://github.com/scrapy/scrapyd-client">scrapy-client</a>: 与<code>Scrapyd</code>结合发布调用<code>addversion.json</code>发布<code>Spider</code></li>
+<li><a href="https://github.com/scrapinghub/scrapyjs">ScrapyJs</a>: <code>scrapy</code>官方提供的<code>JS</code>解决方案</li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/12/%e7%88%ac%e8%99%ab%e5%ad%a6%e4%b9%a0%e8%b5%84%e6%96%99%e6%b1%87%e6%80%bb.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

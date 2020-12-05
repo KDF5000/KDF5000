@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">PHP</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e7%ad%96%e7%95%a5%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——策略模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="策略模式">策略模式</h4>
+
+<p>在此模式中，算法是从复杂类提取的，因而可以方便地替换。例如，如果要更改搜索引擎中排列页的方法，则策略模式是一个不错的选择。思考一下搜索引擎的几个部分 —— 一部分遍历页面，一部分对每页排列，另一部分基于排列的结果排序。在复杂的示例中，这些部分都在同一个类中。通过使用策略模式，您可将排列部分放入另一个类中，以便更改页排列的方式，而不影响搜索引擎的其余代码.</p>
+
+<p>类图如下：
+<img src="/media/archive/blog/image/strategy.png" alt="Alt text" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e7%ad%96%e7%95%a5%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%91%bd%e4%bb%a4%e9%93%be%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——命令链模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="命令链模式">命令链模式</h4>
+
+<p>命令链模式同样是为了解决耦合的问题，该模式将命令处理者和发号命令方分开，发号命令方不用知道谁处理该命令，以及以什么样的方式处理，它向所有已经注册的命令处理者发送命令，收到成功信息即可。</p>
+
+<p>具体实现的时候，需要定义一个统一的接口，然后命令处理者实现接口，然后命令发号者用一个list保存所有注册的命令处理者，每个命令处理者会处理特定的一个或者一些命令，当发令者发送命令时，遍历list向已经注册的命令处理者发送命令，收到一个正确处理的信息即说明改命令已经有人处理。</p>
+
+<p>类图如下：
+<img src="/media/archive/blog/image/commandchain.png" alt="Alt text" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%91%bd%e4%bb%a4%e9%93%be%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">22</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/22/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e8%a7%82%e5%af%9f%e8%80%85%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——观察者模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="观察者模式">观察者模式</h4>
+
+<p>观察者模式是解决组件(对象)之间紧耦合的一种方式，顾名思义，既然叫观察者模式，涉及到两个对象，一个观察者，一个被观察者。观察者模式想要实现的效果就是当被观察者发生改变的时候，要主动通知观察者，自己发生了改变，至于观察者得知消息后做什么操作，被观察者无从得知，也不需要知道。</p>
+
+<p>要实现这种模式，被观察的对象，要保存需要通知的观察者，这里称之为注册。然后当被观察者发生某个需要通知观察者的改变的时候，遍历已经注册的观察者，通知他们使用函数调用的方式。具体实现需要定义两个接口，用于观察者和被观察者实现，类图如下：
+<img src="/media/archive/blog/image/观察者模式.png" alt="Alt text" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/22/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e8%a7%82%e5%af%9f%e8%80%85%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/24/Ubuntu-14-04-%e5%ae%89%e8%a3%85PHP%e7%8e%af%e5%a2%83%e5%92%8c%e5%8f%8d%e5%90%91%e4%bb%a3%e7%90%86.html">Ubuntu 14.04 安装PHP环境和反向代理</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="安装apache">安装Apache</h4>
+<pre><code>$ sudo apt-get install apache2
+</code></pre>
+
+<h4 id="安装php">安装php</h4>
+<pre><code>$ sudo apt-get install php5 libapache2-mod-php5
+</code></pre>
+
+<h4 id="安装mysql">安装mysql</h4>
+<pre><code>$ sudo apt-get install mysql-server
+</code></pre>
+
+<h4 id="反向代理">反向代理</h4>
+
+<p>经过测试最小的配置。。。。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/24/Ubuntu-14-04-%e5%ae%89%e8%a3%85PHP%e7%8e%af%e5%a2%83%e5%92%8c%e5%8f%8d%e5%90%91%e4%bb%a3%e7%90%86.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">8</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/8/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%b7%a5%e5%8e%82%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——工厂模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>一直对设计模式有一种敬畏之心，每次想要看设计模式的时候就会想到<code>Erich Gamma</code>，<code>Richard Helm</code> ， <code>Ralph Johnson</code>， <code>John Vlissides</code>的黑皮<code>《设计模式》</code>，基本都望而止步，要把那本书看完可不是一时半会的，而且在没有项目经验的情况下，个人感觉基本都是纸上谈兵。</p>
+
+<p>今天在<code>IBM Developerworks</code>上看到一篇文章将<code>PHP</code>中常用的五种设计模式，感觉还不错，而且只有五种五种五种（重要的强调三遍）！先从简单的入手，把这五种消灭了再说。以后慢慢学习其他的设计模式。</p>
+
+<h4 id="工厂模式-factory-pattern">工厂模式（<code>Factory Pattern</code>）</h4>
+
+<p>工厂这个词的使用是非常形象，字面意思可以这样认为，这种模式下，我们有一个工厂，这个工厂生产很多一种或者几种产品（其实多种的情况是覆盖了一种的），但是每个产品怎么生产和包装的我们不知道，其实我们也不需要知道，知道的越多你就越迷糊，以后你的行为就受制于太多杂事，也就是我们常说的耦合度太高，因此我们就将所有的事情交给工厂负责，我们只用告诉工厂需要什么，工厂把产品交付给你就是了。一旦产品的工艺发生改变，工厂负责就好，你使用该产品的工艺不受影响。因此工厂模式可以大大的降低系统的耦合度，增强系统的稳定性，当然也会提高代码的复用率。</p>
+
+<p>在实际的程序设计中，工厂相当于一个对外的接口，那么这个接口的返回类型是确定的，那么我们怎么通过这个工厂来生产不同的产品发回给客户呢？很简单，做一个所有产品的“模子”就可以，这个“模子”有每个产品的所有特征，但是不能用，需要具体的产品实现这些特性，就是我们常说的<code>Interface</code>。
+使用类图表示如下：
+<img src="/media/archive/img_Factory_Pattern.png" alt="" /></p>
+
+<h5 id="php-的实现"><code>PHP</code>的实现</h5>
+
+<ul>
+<li><p>编写一个接口 <code>Product.php</code></p>
+<pre><code>&lt;?php
+/**
+* Created by PhpStorm.
+* User: Defei
+* Date: 2015/8/8
+* Time: 16:14
+*/
+ 
+interface Product{
+public function getName();
+}
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/8/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%b7%a5%e5%8e%82%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">31</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/31/%e4%bd%bf%e7%94%a8svn%e5%92%8cmarkdown%e7%ae%a1%e7%90%86%e9%a1%b9%e7%9b%ae%e6%96%87%e6%a1%a3.html">使用svn和markdown管理项目文档</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>文档管理，是每个项目非常重要又非常让人头疼的问题，每份文档可能会有不同的版本，而且可能还有有不同的人来共同编辑。除此还要考虑怎么才能方便的分享给项目组其他成员查看。也正是这些原因很多笔记记录软件推出了协同办公的功能，比如印象笔记，为知笔记等。但是把东西放在他们那里似乎不是很安全呵，毕竟是项目文档，都是比较私密的东西。也有一些团队协作平台提供了这个功能，不过他们都比较简单，只是上传下载文件。这两种方式似乎都不是很令人满意。</p>
+
+<p>最近做项目，内部使用<code>svn</code>管理代码。就想是不是也可以使用svn来管理文档（当然有的公司确实是使用svn管理文档的），等等，这只是解决了文档的多人协作和版本控制的功能。那么怎么才能实现大家更方便的查看文档呢？借鉴现在比较流行的<code>Jekyll</code>，<code>hexo</code>搭建博客的思路，使用<code>markdown</code>写博客，然后生成<code>html</code>。因此借鉴这个思路，使用<code>svn</code>管理项目文档，项目文档尽可能使用<code>markdown</code>编写，然后写一个脚本定时解析<code>md</code>文件生成<code>html</code>，搭建一个服务器，将生成的<code>html</code>部署到服务器，这样同一个局域网的组员就可以访问这些文档了。</p>
+
+<h4 id="搭建svn">搭建svn</h4>
+
+<p><code>svn</code> 分为服务端和客户端，搭建详细教程参考<a href="http://www.jb51.net/article/29005.htm"><code>windows下svn服务器的搭建</code></a></p>
+
+<h4 id="解析-md-文件生成-html">解析<code>md</code>文件生成<code>html</code></h4>
+
+<p>markdown本来就是一种轻量级的标记语言，有很多开源的解析markdown文件的项目。本文使用一个开源的<code>PHP</code>的开源项目<a href="https://github.com/erusev/parsedown">ParseDown</a>，用来解析markdown生成html文件，在此项目的基础上，封装了一个类，实现解析指定目录下所有markdown文件，生成html文件（包括子目录下的markdown文档，按照原来的目录存放）。</p>
+
+<p>下面是指定目录下所有的<code>md</code>文件生成<code>html</code>文件的源码：</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/31/%e4%bd%bf%e7%94%a8svn%e5%92%8cmarkdown%e7%ae%a1%e7%90%86%e9%a1%b9%e7%9b%ae%e6%96%87%e6%a1%a3.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">27</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/27/Laravel%e5%85%a5%e9%97%a8%e6%95%99%e7%a8%8b%e4%b9%8b%e4%b8%80-%e5%ae%89%e8%a3%85.html">Laravel入门教程之一--安装</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p><code>Laravel</code>是一套简洁、优雅的<code>PHP Web</code>开发框架(<code>PHP Web Framework</code>)。它可以让你从面条一样杂乱的代码中解脱出来；它可以帮你构建一个完美的网络<code>APP</code>，而且每行代码都可以简洁、富于表达力。
+在安装<code>Laravel</code>之前需要先安装<code>PHP</code>环境，    <code>Laravel</code>的安装是通过<a href="https://getcomposer.org/"><code>Composer</code></a>安装的，所以必须先安装<code>PHP</code>和<code>Composer</code>。</p>
+
+<h4 id="安装-php">安装<code>PHP</code></h4>
+
+<p>本教程使用最常用的<code>PHP</code>集成环境<code>XAMPP</code>，<code>XAMPP</code>已经集成了<code>Apache</code>，<code>PHP</code>，<code>MySQL</code>等开发环境，非常方便，而且搭建简单。
+从<code>XAMPP</code>的<a href="https://www.apachefriends.org/zh_cn/index.html">官网</a>下载安装包即可，本教程是在<code>Windows</code>下进行的，所以下载<code>Windows</code>版即可。
+下载完成后，进行安装，基本上是一路<code>Next</code>。安装完成后在开始里会出现一个<code>XAMPP</code>的文件夹，点击里面的<code>XAMPP Control Panel</code>既可启动<code>Xampp</code>的控制面板，<code>Apache</code>,<code>MySQL</code>等启动停止都可以在这里控制。如下图所示
+<img src="/media/archive/img_PHP_ENV_1.png" alt="" />
+启动<code>Apache</code>，在浏览器里输入<code>http://localhost</code>，如果出现如下页面则说明配置成功
+<img src="/media/archive/img_PHP_ENV_2.png" alt="" />
+本教程安装<code>PHP</code>的介绍到此为止，网上有很多关于<code>XAMPP</code>安装以及配置的教程，可以自行搜索。如果安装过程中出现问题，可以评论留言。</p>
+
+<h4 id="安装-composer">安装<code>Composer</code></h4>
+
+<p><code>Composer</code>是<code>PEAR</code>之后的一个很好用的包管理工具，也是安装<code>Laravel</code>的必备工具，详细的安装可以参考鄙人的博客<a href="http://kdf5000.github.io/2015/07/26/PHP%E4%BE%9D%E8%B5%96%E7%AE%A1%E7%90%86Ciomposer%E7%9A%84%E5%AE%89%E8%A3%85/">PHP依赖管理Composer</a>。</p>
+
+<h4 id="安装-laravel">安装<code>Laravel</code></h4>
+
+<p><code>Laravel</code>的安装有两种方法，一种是安装<code>Laravel</code>到本地环境，将<code>Laravel</code>加入系统变量，使用<code>Laravel</code>内置的命令创建项目。另一种是使用<code>Composer</code>的<code>create-project</code>命令创建项目。当然两种方式各有各的优点，第一种方法使用更加简单，第二种方法不需要安装<code>Laravel</code>环境
+。应该有其他比较大的差一点，暂时还不知道，等日后研究一下分享给大家，如果知道的大家分享一下。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/27/Laravel%e5%85%a5%e9%97%a8%e6%95%99%e7%a8%8b%e4%b9%8b%e4%b8%80-%e5%ae%89%e8%a3%85.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">26</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/26/PHP%e4%be%9d%e8%b5%96%e7%ae%a1%e7%90%86Ciomposer%e7%9a%84%e5%ae%89%e8%a3%85.html">PHP依赖管理Ciomposer的安装</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>对于现代语言，包管理基本上市标配，通过包管理可以大大提高项目的开发效率，也使得项目的结构更加的清晰。<code>Java</code>有<code>Maven</code>，<code>Python</code>有<code>PIP</code>，<code>Ruby</code>有<code>gem</code>，<code>NodeJs</code>有<code>PEAR</code>，不过<code>PEAR</code>坑不少：
+* 依赖处理容易出问题
+* 配置复杂
+* 难用的命令行接口</p>
+
+<p><code>Composer</code>的出现，是的<code>PHP</code>的依赖管理更加容易，相比<code>PEAR</code>简单易用，而且是开源的，提交自己的包夜很容易</p>
+
+<h4 id="安装-composer">安装<code>Composer</code></h4>
+
+<p><code>Composer</code>的需要<code>PHP 5.3.2+</code>才能运行</p>
+
+<h5 id="windows-下安装"><code>Windows</code>下安装</h5>
+
+<p>进入<code>Composer</code>的<a href="https://getcomposer.org/download/">官网</a>下载<code>Windows Installer</code>进行安装，安装的前提是你已经安装了<code>PHP</code>，安装过程中会让你选择<code>PHP</code>的可执行程序路径，也可以选择将<code>Composer</code>组件加入到右键快捷键，如下图所示
+<img src="/media/archive/img_composer_1.png" alt="" />
+安装成功后，打开命令行，执行<code>composer --version</code>，如果出现下图所示，则说明安装成功。
+<img src="/media/archive/img_composer_2.png" alt="" /></p>
+
+<p>修改<code>Composer</code>的配置文件，指定获取包的镜像服务地址。</p>
+
+<!--more -->
+
+<p>打开命令行，输入下面的命令即可。此方法是修改全局配置，也可以针对单个项目进行配置。参考<a href="http://pkg.phpcomposer.com/">http://pkg.phpcomposer.com/</a></p>
+<pre><code>composer config -g repositories.packagist composer http://packagist.phpcomposer.com
+</code></pre>
+
+<h5 id="类-unix-的安装">类<code>Unix</code>的安装</h5>
+
+<p>这里介绍一种全局安装的方法，其他放发可以参考<a href="http://docs.phpcomposer.com/00-intro.html">http://docs.phpcomposer.com/00-intro.html</a>。
+此方法将<code>Composer</code>放在系统的<code>PATH</code>里，这样就可一再任何地方使用<code>Composer</code>命令。</p>
+<pre><code>curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/26/PHP%e4%be%9d%e8%b5%96%e7%ae%a1%e7%90%86Ciomposer%e7%9a%84%e5%ae%89%e8%a3%85.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/PHP%e4%b8%8eRedis%e7%9a%84%e4%bb%bfTwitter%e5%ae%9e%e4%be%8b.html">PHP与Redis的仿Twitter实例</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>译者注：
+原文位于Redis官网<a href="http://redis.io/topics/twitter-clone">http://redis.io/topics/twitter-clone</a>
+Redis是NoSQL数据库中一个知名数据库，在新浪微博中亦有部署，适合固定数据量的热数据的访问。
+作为入门，这是一篇很好的教材，简单描述了如何使用KV数据库进行数据库的设计。新的项目www.xiayucha.com亦采用Redis + MySQL进行开发，考虑Redis文档比较少，故翻译了此文。
+其他参考资料：</p>
+
+<p><a href="http://redis.readthedocs.org/en/latest/index.html">Redis命令参考中文版(Redis Command Reference</a>
+<a href="http://try.redis-db.com/">Try Redis</a></p>
+
+<p>我会在此文中描述如何使用<code>PHP</code>以及仅使用<code>Redis</code>来设计实现一个简单的<code>Twitter</code>克隆。很多编程社区常认为 <code>KV</code> 储存是一个特别的数据库，在 <code>web</code> 应用中不能替代关系数据库。本文尝试证明这恰恰相反。这个<code>twitter</code>克隆名为<code>Retwis</code>，结构简单，性能优异，能很轻易地用<code>N</code><code>个web</code>服务器和<code>Redis</code>服务器以分布式架构。</p>
+
+<p>在此获取源码<a href="http://code.google.com/p/redis/downloads/list">http://code.google.com/p/redis/downloads/list</a>
+我们使用PHP作为例子是因为它能被每个人读懂，也能使用Ruby、Python、Erlang或其他语言获取同样(或者更佳)的效果。</p>
+
+<p>*注意*：<code>Retwis-RB</code>是一个由<code>Daniel Lucraft</code>用<code>Ruby</code>与<code>Sinatra</code>写的<code>Retwis</code>分支！此文全部代码在本页尾部的<code>Git repository</code>链接里。此文以PHP为例，但是<code>Ruby</code>程序员也能检出其他源码。他们很相似。注意<code>Retwis-J</code>是<code>Retwis</code>的一个分支，由<code>Costin Leau</code>以<code>Java</code>和<code>Spring</code>框架写成。源码能在<code>GitHub</code>找到，并且在<code>springsource.org</code>有综合的文档。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/PHP%e4%b8%8eRedis%e7%9a%84%e4%bb%bfTwitter%e5%ae%9e%e4%be%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/PHP%e4%b8%8b%e8%bd%bd%e6%96%87%e4%bb%b6.html">PHP下载文件</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="php实现下载功能">php实现下载功能</h3>
+<pre><code>&lt;?php
+$file = NAC_ROOT.'/ident/theme/'.$theme.'/images/logo_src.gif';
+        $fileTmp = pathinfo($file);
+        $fileExt = $fileTmp['extension'];
+        $saveFileName = ($this-&gt;themes[$theme].'.'.$fileExt);
+        $fp=fopen($file,&quot;r&quot;);
+        $file_size=filesize($file);
+        
+        //下载文件需要用到的头
+        Header(&quot;Content-type: application/octet-stream&quot;); 
+        Header(&quot;Accept-Ranges: bytes&quot;); 
+        Header(&quot;Accept-Length:&quot;.$file_size); 
+        Header(&quot;Content-Disposition: attachment; filename=&quot;.$saveFileName); 
+        $buffer=1024;
+        $file_count=0;
+        //向浏览器返回数据
+        while(!feof($fp) &amp;&amp; $file_count&lt;$file_size){
+            $file_con=fread($fp,$buffer);
+            $file_count+=$buffer;
+            echo $file_con;
+        }
+        fclose($fp);
+        exit;
+ ?&gt;
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/PHP%e4%b8%8b%e8%bd%bd%e6%96%87%e4%bb%b6.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/PHP%e7%94%9f%e6%88%90%e7%bc%a9%e7%95%a5%e5%9b%be.html">PHP生成缩略图</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>最近在做一个app,需要保存一些图片的缩略图,由于时间比较紧迫所以直接从网上找了一些开源 的生成缩略图的代码, 只要找到两个个人感觉还不错的代码,下面直接贴出代码,其实原理不是很难,但是要考虑各种情况还是要花费一些时间的.</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/PHP%e7%94%9f%e6%88%90%e7%bc%a9%e7%95%a5%e5%9b%be.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/%e6%8f%90%e9%ab%98PHP%e6%95%88%e7%8e%87%e7%9a%8450%e4%b8%aa%e7%bc%96%e7%a8%8b%e6%8a%80%e5%b7%a7.html">提高PHP效率的50个编程技巧</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ol>
+<li><p>用单引号代替双引号来包含字符串，这样做会更快一些。因为PHP会在双引号包围的字符串中搜寻变量， 单引号则不会，注意：只有echo能这么做，它是一种可以把多个字符串当作参数的”函数”(译注：PHP手册中说echo是语言结构，不是真正的函数，故 把函数加上了双引号)。</p></li>
+
+<li><p>如果能将类的方法定义成static，就尽量定义成static，它的速度会提升将近4倍。</p></li>
+
+<li><p>$row[&lsquo;id&rsquo;] 的速度是$row[id]的7倍。</p></li>
+
+<li><p>echo 比 print 快，并且使用echo的多重参数(译注：指用逗号而不是句点)代替字符串连接，比如echo $str1,$str2。</p></li>
+
+<li><p>在执行for循环之前确定最大循环数，不要每循环一次都计算最大值，最好运用foreach代替。</p></li>
+
+<li><p>注销那些不用的变量尤其是大数组，以便释放内存。</p></li>
+
+<li><p>尽量避免使用<strong>get，</strong>set，__autoload。</p></li>
+
+<li><p>require_once()代价昂贵。</p></li>
+</ol>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/%e6%8f%90%e9%ab%98PHP%e6%95%88%e7%8e%87%e7%9a%8450%e4%b8%aa%e7%bc%96%e7%a8%8b%e6%8a%80%e5%b7%a7.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/%e9%99%84%e8%bf%91%e7%9a%84%e4%ba%ba-PHP%e8%ae%a1%e7%ae%97%e4%b8%a4%e7%82%b9%e7%90%83%e9%9d%a2%e8%b7%9d%e7%a6%bb.html">附近的人-PHP计算两点球面距离</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><pre><code>public static double getDistance(double lat1,double longt1 , double lat2,double longt2
+            ) {
+        double PI = 3.14159265358979323; // 圆周率
+        double R = 6371229; // 地球的半径
+
+        double x, y, distance;
+        x = (longt2 - longt1) * PI * R
+                * Math.cos(((lat1 + lat2) / 2) * PI / 180) / 180;
+        y = (lat2 - lat1) * PI * R / 180;
+        distance = Math.hypot(x, y);
+
+        return distance;
+    }
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/%e9%99%84%e8%bf%91%e7%9a%84%e4%ba%ba-PHP%e8%ae%a1%e7%ae%97%e4%b8%a4%e7%82%b9%e7%90%83%e9%9d%a2%e8%b7%9d%e7%a6%bb.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>使用Docker单机搭建Hadoop完全分布式环境 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="使用Docker单机搭建Hadoop完全分布式环境">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">16</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/16/%e4%bd%bf%e7%94%a8Docker%e5%8d%95%e6%9c%ba%e6%90%ad%e5%bb%baHadoop%e5%ae%8c%e5%85%a8%e5%88%86%e5%b8%83%e5%bc%8f%e7%8e%af%e5%a2%83.html">使用Docker单机搭建Hadoop完全分布式环境</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/%e5%88%86%e5%b8%83%e5%bc%8f.html">分布式</a>
+                            
+                            <a class="tag label label-info" href="/tags/Docker.html">Docker</a>
+                            
+                            <a class="tag label label-info" href="/tags/Hadoop&amp;Hbase.html">Hadoop&amp;Hbase</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h4 id="0x01-hydra-hadoop">0x01 Hydra-hadoop</h4>
+
+<p>使用docker在单机部署hadoop和hbase的分布式环境，本项目具有一下特征：
+* 使用serf和dnsmasq 作为集群节点管理和dns解析
+* 可以自定义集群hadoop和hbase的配置，配置完后只需重新build镜像即可
+* ssh远程登录集群节点容器</p>
+
+<p><strong>项目地址</strong>：<a href="https://github.com/KDF5000/hydra-hadoop">https://github.com/KDF5000/hydra-hadoop</a></p>
+
+<h4 id="0x02-项目目录">0x02 项目目录</h4>
+
+<p><strong>serf-dnsmasq</strong>： serf和dnsmasq服务，用于管理集群节点的退出和添加，dnsmasq用于dns的解析
+**hadoop-fake: ** 实现一个伪分布式的hadoop环境
+<strong>hadoop-hydra:</strong> 基于<code>hadoop-fake</code>实现一个完全分布式的集群环境，master和slave均使用该镜像</p>
+
+<h4 id="0x03-使用说明">0x03 使用说明</h4>
+
+<p>默认本机已经安装了docker环境和git工具</p>
+
+<h5 id="0x01-clone">0x01 clone</h5>
+<pre><code>git clone https://github.com/KDF5000/hydra-hadoop
+</code></pre>
+
+<h5 id="0x02-创建镜像">0x02 创建镜像</h5>
+
+<p>按照下面的顺序执行相应操作
+* 进入serf-dnsmasq目录，执行</p>
+<pre><code>sudo docker build -t=&quot;kdf5000/serf-dnsmasq&quot; .
+</code></pre>
+
+<!--more-->
+
+<ul>
+<li><p>进入hadoop-fake目录，执行</p>
+<pre><code>sudo docker build -t=&quot;kdf5000/ubuntu-hadoop&quot; .
+</code></pre></li>
+
+<li><p>进入hadoop-hydra目录，执行</p>
+<pre><code>sudo docker build -t=&quot;kdf5000/hadoop-hydra&quot;
+</code></pre>
+
+<h5 id="创建集群">创建集群</h5>
+
+<p>进入项目根目录，执行</p>
+<pre><code>$./start-container.sh [num] //num可选，默认为3
+</code></pre>
+
+<p>默认时启动三个容器，一个作为master，两个slave，如果想要启动其他数目的容器，直接在后面添加数目即可</p></li>
+</ul>
+
+<h5 id="启动hadoop">启动hadoop</h5>
+
+<p>上一步，启动容器之后，回直接进入master的shell交互界面，可以使用下面的命令验证dns和serf服务是否正确</p>
+<pre><code>$serf members
+</code></pre>
+
+<p>如果出现下面的结果说明服务已经正确安装和启动</p>
+<pre><code>root@master:~# serf members
+master.kdf5000.com  172.17.0.2:7946  alive  
+slave1.kdf5000.com  172.17.0.3:7946  alive  
+slave2.kdf5000.com  172.17.0.4:7946  alive
+</code></pre>
+
+<p><strong>如果没有出现上面的结果，请仔细检查前面步骤是否有问题，否则下面步骤将不能正确执行</strong></p>
+
+<p>在master主机进入用户(root)目录，然后执行根目录下的脚本<code>start_service.sh</code>,将启动hadoop集群。
+使用<code>jps</code>验证是否启动成功，如果在master上出现下面信息说明启动成功</p>
+<pre><code>root@master:~# jps
+1598 HRegionServer
+393 NameNode
+909 NodeManager
+1415 HQuorumPeer
+6209 Jps
+666 SecondaryNameNode
+515 DataNode
+812 ResourceManager
+</code></pre>
+
+<p>使用下面命令进入slave主机，进行同样验证，出现下面信息及说明启动成功</p>
+<pre><code>root@master:~/# ssh slave1.kdf5000.com
+Warning: Permanently added 'slave1.kdf5000.com,172.17.0.3' (ECDSA) to the list of known hosts.
+Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 3.13.0-85-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+Last login: Sun May 15 13:29:30 2016 from master.kdf5000.com
+root@slave1:~# 
+root@slave1:~# jps
+1853 Jps
+293 NodeManager
+195 DataNode
+</code></pre>
+
+<h5 id="wordcount测试">wordcount测试</h5>
+
+<p>进入master主机的用户根目录，执行<code>wordcount.sh</code>脚本，观察执行过程，如果最后输出下面信息说明完全分布式hadoop环境搭建成功</p>
+<pre><code>wordcount output:
+16/05/15 14:01:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2    ello
+1    ocker
+1    adoop
+</code></pre>
+
+<hr />
+
+<p><strong>参考项目</strong>
+1. <a href="https://github.com/kiwenlau/hadoop-cluster-docker">https://github.com/kiwenlau/hadoop-cluster-docker</a></p>
+
+<ol>
+<li><p><a href="https://github.com/alvinhenrick/docker-serf">https://github.com/alvinhenrick/docker-serf</a></p></li>
+
+<li><p><a href="https://github.com/alvinhenrick/hadoop-mutinode">https://github.com/alvinhenrick/hadoop-mutinode</a></p></li>
+</ol>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">项目管理</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">31</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/31/%e4%bd%bf%e7%94%a8svn%e5%92%8cmarkdown%e7%ae%a1%e7%90%86%e9%a1%b9%e7%9b%ae%e6%96%87%e6%a1%a3.html">使用svn和markdown管理项目文档</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>文档管理，是每个项目非常重要又非常让人头疼的问题，每份文档可能会有不同的版本，而且可能还有有不同的人来共同编辑。除此还要考虑怎么才能方便的分享给项目组其他成员查看。也正是这些原因很多笔记记录软件推出了协同办公的功能，比如印象笔记，为知笔记等。但是把东西放在他们那里似乎不是很安全呵，毕竟是项目文档，都是比较私密的东西。也有一些团队协作平台提供了这个功能，不过他们都比较简单，只是上传下载文件。这两种方式似乎都不是很令人满意。</p>
+
+<p>最近做项目，内部使用<code>svn</code>管理代码。就想是不是也可以使用svn来管理文档（当然有的公司确实是使用svn管理文档的），等等，这只是解决了文档的多人协作和版本控制的功能。那么怎么才能实现大家更方便的查看文档呢？借鉴现在比较流行的<code>Jekyll</code>，<code>hexo</code>搭建博客的思路，使用<code>markdown</code>写博客，然后生成<code>html</code>。因此借鉴这个思路，使用<code>svn</code>管理项目文档，项目文档尽可能使用<code>markdown</code>编写，然后写一个脚本定时解析<code>md</code>文件生成<code>html</code>，搭建一个服务器，将生成的<code>html</code>部署到服务器，这样同一个局域网的组员就可以访问这些文档了。</p>
+
+<h4 id="搭建svn">搭建svn</h4>
+
+<p><code>svn</code> 分为服务端和客户端，搭建详细教程参考<a href="http://www.jb51.net/article/29005.htm"><code>windows下svn服务器的搭建</code></a></p>
+
+<h4 id="解析-md-文件生成-html">解析<code>md</code>文件生成<code>html</code></h4>
+
+<p>markdown本来就是一种轻量级的标记语言，有很多开源的解析markdown文件的项目。本文使用一个开源的<code>PHP</code>的开源项目<a href="https://github.com/erusev/parsedown">ParseDown</a>，用来解析markdown生成html文件，在此项目的基础上，封装了一个类，实现解析指定目录下所有markdown文件，生成html文件（包括子目录下的markdown文档，按照原来的目录存放）。</p>
+
+<p>下面是指定目录下所有的<code>md</code>文件生成<code>html</code>文件的源码：</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/31/%e4%bd%bf%e7%94%a8svn%e5%92%8cmarkdown%e7%ae%a1%e7%90%86%e9%a1%b9%e7%9b%ae%e6%96%87%e6%a1%a3.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

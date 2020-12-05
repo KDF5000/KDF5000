@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 7 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-7">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Ansible: 自动化管理服务器(2)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="ansible-命令参数">Ansible 命令参数</h3>
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>-v</td>
+<td>详细模式，如果命令执行成功，输出详细的结果</td>
+</tr>
+
+<tr>
+<td>-i Path</td>
+<td>指定host文件的路径，默认是/etc/ansible/hosts</td>
+</tr>
+
+<tr>
+<td>-f Num</td>
+<td>指定一个整数，默认是5，指定fork开启同步进程的个数</td>
+</tr>
+
+<tr>
+<td>-m Name</td>
+<td>指定使用的module名称，默认是command</td>
+</tr>
+
+<tr>
+<td>-M path</td>
+<td>指定module的目录。默认是/usr/share/ansible</td>
+</tr>
+
+<tr>
+<td>-a Module_Args</td>
+<td>指定module的参数</td>
+</tr>
+
+<tr>
+<td>-k</td>
+<td>提示输入ssh密码，而不是基于ssh的密钥认证</td>
+</tr>
+
+<tr>
+<td>-sudo</td>
+<td>指定使用sudo获得root权限</td>
+</tr>
+
+<tr>
+<td>-K</td>
+<td>提示输入sudo密码，与-sudo一起使用</td>
+</tr>
+
+<tr>
+<td>-u Username</td>
+<td>指定被控机器的执行用户</td>
+</tr>
+
+<tr>
+<td>-C</td>
+<td>测试此命令会改变什么内容，不会真正的去执行</td>
+</tr>
+</tbody>
+</table>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-1.html">Ansible: 自动化管理服务器(1)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h2 id="ansible配置">Ansible配置</h2>
+
+<p>Ansible 提供一种最简单的方式用于发布、管理和编排计算机系统的工具，你可在数分钟内搞定</p>
+
+<p>Ansible 是一个模型驱动的配置管理器，支持多节点发布、远程任务执行。默认使用 SSH 进行远程连接。无需在被管理节点上安装附加软件，可使用各种编程语言进行扩展</p>
+
+<p><img src="http://7xtgvp.com2.z0.glb.clouddn.com/blog/images/Ansible.png" alt="Ansible" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-1.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">1</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/1/2016%e5%b9%b4%e6%80%bb%e7%bb%93.html">2016年总结</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><blockquote>
+<p>这个世界的奇妙之处就在于，你永远不知道那些年龄比你小却比你努力的人，蕴藏多么巨大的能量，明明两年前刚见面还是一个略显青涩的邻家男孩，再见面已成了有口皆碑的专家大牛，惶惶乎一种朝为田舍郎，暮登天子堂的感觉油然而生，正是应了那句老话，士别三日，当刮目相待！</p>
+</blockquote>
+
+<p>2016年，我的本命年，从年初就露出了今年注定是不顺的一年的迹象。刚过完年就和最好的朋友因为一些问题发生了争吵，刚到学校用了四年的笔记本就彻底罢工，总之，一切都是那么地霉气。不过一年走完，回头想想，虽然遇到很多不开心的事情，也并不是那么的不堪，收获了很多，似乎自己也变的更加地成熟了一些。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/1/2016%e5%b9%b4%e6%80%bb%e7%bb%93.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">12</span>
+                            <span class="day">8</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/12/8/%e4%bd%bf%e7%94%a8iptables%e7%9a%84NAT%e5%8a%9f%e8%83%bd%e6%8e%a7%e5%88%b6%e5%86%85%e7%bd%91%e8%ae%be%e5%a4%87%e8%ae%bf%e9%97%ae%e5%a4%96%e7%bd%91.html">使用iptables的NAT功能控制内网设备访问外网</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>通过iptables的NAT功能控制内网上网。</p>
+
+<h5 id="前提条件">前提条件</h5>
+
+<p>一台能够上网的主机，并且和其他需要控制上网的主机在同一个内网。</p>
+
+<p>hw98: 172.18.11.98 可以上外网</p>
+
+<p>hw网段: 172.18.11.0/24</p>
+
+<p>目的：通过hw98装发内网内的其他机器数据包，从而实现上网控制的目的</p>
+
+<h4 id="步骤">步骤</h4>
+
+<p>hw98设置路由转发的功能</p>
+
+<ul>
+<li><p>开启内核的ip转发功能</p>
+<pre><code class="language-shell">$ echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+或者
+$ vim /etc/sysctl.conf
+# Controls IP packet forwarding
+net.ipv4.ip_forward = 1
+</code></pre></li>
+
+<li><p>添加确认包和关联包的通过</p>
+<pre><code class="language-shell">$ iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre></li>
+</ul>
+
+<!--more -->
+
+<ul>
+<li><p>设置iptables的nat表，添加FORWARD规则</p>
+<pre><code class="language-shell">$ iptables -t nat -A POSTROUTING -s 172.18.11.0/24 -j SNAT --to 172.18.11.98
+</code></pre></li>
+</ul>
+
+<p>内网内需要进行上网的机器</p>
+
+<ul>
+<li><p>删除默认的路由，如果没有就不用删除</p>
+<pre><code class="language-shell">$route del default gw *.*.*.*  #通过route 查看
+</code></pre></li>
+
+<li><p>添加hw98为默认路由</p>
+<pre><code class="language-shell">$route add default gw 172.18.11.98
+</code></pre></li>
+</ul>
+
+<p>上面内网的设置在重启网络的时候会被修改，所以最好的方法就是在网络配置里就行设置，在centos就是<code>/etc/sysconfig/network-scripts/ifcfg-eth0</code>，只用设置GATEWAY即可，如果有必要也可以设置一下DNS</p>
+<pre><code>GATEWAY=172.18.11.98
+DNS1=159.226.39.1
+</code></pre>
+
+<p><strong>说明：</strong>没有深入理解整个运行过程，其实可以通过hw98的iptables设置进行更加细致的访问控制，比如控制内网内特定的主机访问外网，这里是全部允许，也可以控制特定的端口等等。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/12/8/%e4%bd%bf%e7%94%a8iptables%e7%9a%84NAT%e5%8a%9f%e8%83%bd%e6%8e%a7%e5%88%b6%e5%86%85%e7%bd%91%e8%ae%be%e5%a4%87%e8%ae%bf%e9%97%ae%e5%a4%96%e7%bd%91.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/6.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/8.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

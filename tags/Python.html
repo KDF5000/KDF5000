@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">Python</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/11/12/%e4%bd%bf%e7%94%a8Python%e5%92%8cBitTorrentSync%e5%ae%9a%e6%9c%9f%e7%bb%99Kindle%e6%8e%a8%e9%80%81%e7%94%b5%e5%ad%90%e4%b9%a6.html">使用Python和BitTorrentSync定期给Kindle推送电子书</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="kindle伴侣">Kindle伴侣</h4>
+
+<p>最近发现一个很好用的Kindle电子书分享网站<a href="http://kindlefere.com/">Kindle伴侣</a>，资源丰富，除了提供各种热门图书免费下载，还提供了很多关于Kindle的使用技巧，里面个人最喜欢的功能就是每周一书，使用BitTorrent每周自动同步热门电子书。使用的是著名的同步软件Resilio Sync， 最开始是在自己电脑上安装了软件同步，但是要一直开着，感觉好麻烦，有时候电脑还要关了，影响同步。刚好手里有个闲置的树莓派，于是就想着用它来同步，然后通过邮件将电子书发送到kindle，这样就可以每周都看到热门的电子书了。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/11/12/%e4%bd%bf%e7%94%a8Python%e5%92%8cBitTorrentSync%e5%ae%9a%e6%9c%9f%e7%bb%99Kindle%e6%8e%a8%e9%80%81%e7%94%b5%e5%ad%90%e4%b9%a6.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">11</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/11/11/%e5%9b%9e%e6%ba%af%e6%b3%95%e8%a7%a30-1%e8%83%8c%e5%8c%85%e9%97%ae%e9%a2%98.html">回溯法解0/1背包问题</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>背包问题（Knap sack problem）是一种组合优化的NP完全问题。问题可以描述为：给定一组物品，每种物品都有自己的重量和价值，在限定的总重量内，我们如何选择，才能使得物品的总价值最高。问题的名称来源于如何选择最合适的物品放置于给定背包中。</p>
+
+<p>0/1背包问题是背包问题的一个特例,在选择物品时只有两种选择,选或不选.解决0/1背包问题就是一个寻找最优解的过程,可以使用动态规划的方法解决.当然最简单的方法就是枚举,列出所有的解,然后计算满足约束的解中最优的解,其实我们可以在枚举的过程中,通过一定的筛选方法去掉那些不可能的解.再进一步思考我们在枚举的过程中是否可以使用一个二叉树来表示选择的过程,这不就是决策树吗?!!通过一定的筛选其实就是剪枝的过程,那么到底满足什么条件时才进行剪枝呢?这个时候约束条件就派上用场了!</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/11/11/%e5%9b%9e%e6%ba%af%e6%b3%95%e8%a7%a30-1%e8%83%8c%e5%8c%85%e9%97%ae%e9%a2%98.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">10</span>
+                            <span class="day">18</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/10/18/%e5%bd%92%e5%b9%b6%e6%8e%92%e5%ba%8f%e5%92%8c%e5%bf%ab%e9%80%9f%e6%8e%92%e5%ba%8f.html">归并排序和快速排序比较</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="1-归并排序和快速排序">1 . 归并排序和快速排序</h4>
+
+<h5 id="1-1-归并排序">1.1 归并排序</h5>
+
+<p>归并排序的思想就是讲数组分为两部分然后对两部分进行排序,然后讲排序后的两部分进行合并,主要的难度在于合并部分,合并的时候需要重新开一个临时数组保存合并的结果,然后再复制到原数组.
+下面是归并排序的<code>python</code>实现</p>
+<pre><code># coding:utf-8
+__author__ = 'devin'
+
+'''
+data: array
+low,high: index of array
+'''
+def merge_sort(data, low, high):
+    if low &lt; high:
+        mid = (low + high)/2
+        merge_sort(data, low, mid)
+        merge_sort(data, mid+1, high)
+        merge(data, low, mid, high)
+
+def merge(data, low, mid, high):
+    temp = []
+    i = low
+    j = mid+1
+    while i &lt;= mid and j &lt;= high:
+        if data[i] &lt;= data[j]:
+            temp.append(data[i])
+            i += 1
+        else:
+            temp.append(data[j])
+            j += 1
+    if i &gt; mid:
+        while j &lt;= high:
+            temp.append(data[j])
+            j += 1
+    else:
+        while i &lt;= mid:
+            temp.append(data[i])
+            i += 1
+
+    i = low
+    j = 0
+    while i &lt;= high:
+        data[i] = temp[j]
+        i += 1
+        j += 1
+
+
+if __name__ == &quot;__main__&quot;:
+    data = [1, 3, 2, 6, 3, 7, 2, 12, 15, 11, 10, 131, 1]
+    merge_sort(data, 0, len(data) - 1)
+    print data
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/10/18/%e5%bd%92%e5%b9%b6%e6%8e%92%e5%ba%8f%e5%92%8c%e5%bf%ab%e9%80%9f%e6%8e%92%e5%ba%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">31</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/31/Python-Rq%e7%9a%84%e4%bd%bf%e7%94%a8.html">Python Rq的使用</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p><code>Rq</code>的介绍和安装可以参考<a href="http://kdf5000.github.io/2015/08/23/Ubuntu-14-04-%E4%B8%8B%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Python-rq%E6%A8%A1%E5%9D%97/">Ubuntu 14.04 下安装使用Python rq模块</a>，此文章详细的介绍了安装<code>Rq</code>的全部过程，文章最后给出了<code>Rq</code>官方文档的地址。</p>
+
+<p><code>Rq</code>官方文档详细的介绍了<code>Queues</code>, <code>Workers</code>，<code>Results Jobs</code>等每个组件的功能和使用，但是并没有指出这几个组件之间到底有什么关系，如果联合起来使用，对于像我这种菜鸟级的码农，一开始还真有点摸不着头脑，思考一番，懂了之后才发现原来是那么的简单&hellip;下面是我自己对<code>Rq</code>的整体认识图（windows 画图画的有点粗糙望见谅）</p>
+
+<p><img src="/media/archive/img_rq_model.png" alt="" /></p>
+
+<p>用白话解释就是：有一个大工厂，这个工厂有个大仓库（Redis），有一个或者几个管理员（CreateJob），一些工人(Worker)。管理员负责产生任务，把任务放到仓库里特定的位置（特定的Queue），然后工人自己去队列去任务，默默的完成任务，完成成功后按照要求放到特定的位置（可能是仓库也可能是其他地方）。如果任务比较多或者想在短期内完成任务，那么工厂就可以招聘更多的工人去完成这些任务。</p>
+
+<p>使用<code>Rq</code>模块最简单的就是只需要一个管理员，一个仓库，一个工人（工人都是一样的，可以复制很多出来）</p>
+
+<h4 id="建仓库">建仓库</h4>
+
+<p>仓库就是我们安装的时候使用的redis，具体建造过程参见<a href="http://kdf5000.github.io/2015/08/23/Ubuntu-14-04-%E4%B8%8B%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Python-rq%E6%A8%A1%E5%9D%97/">Ubuntu 14.04 下安装使用Python rq模块</a>中安装<code>Redis</code>一节</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/31/Python-Rq%e7%9a%84%e4%bd%bf%e7%94%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/28/Ubuntu-14-04-%e5%ae%89%e8%a3%85%e5%9b%be%e5%bd%a2%e7%9b%91%e6%8e%a7%e5%b7%a5%e5%85%b7Graphite.html">Ubuntu 14.04 安装图形监控工具Graphite</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="什么是-graphite">什么是<code>graphite</code>?</h3>
+
+<p>先看看百度百科是怎么介绍
+&gt;
+Graphite 是一个Python写的web应用，采用django框架，Graphite用来进行收集服务器所有的即时状态，用户请求信息，Memcached命中率，RabbitMQ消息服务器的状态，Unix操作系统的负载状态，Graphite服务器大约每分钟需要有4800次更新操作，Graphite采用简单的文本协议和绘图功能可以方便地使用在任何操作系统上。</p>
+
+<p>百度百科讲的还算是比较清楚了，<code>Graphite</code>是用来监控系统的， 比如操作系统，缓存服务系统等，但是监控的数据怎么得到呢？<code>Graphite</code>并不负责，它只负责显示，数据哪里来人家不care，你只要按照他的数据格式给它，<code>Graphite</code>就可以机智的用漂亮的页面显示给你，不过不用担心，<code>graphite</code>的安装的一系列套件，提供了<code>API</code>去传数据给它，而且数据如何存储的也不用我们担心，只管发数据给它就行。说的这么好，到底怎么安装呢？</p>
+
+<p>先别急，事情总不是那么完美，<code>Graphite</code>不支持<code>windows</code>，因此对于只使用<code>Windows</code>的<code>Coder</code>就有点小失落了，不过没关系，相信作为程序员都是有办法的，这些都是小事情。</p>
+
+<p>下面就进入<code>Graphite</code>的世界！</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/28/Ubuntu-14-04-%e5%ae%89%e8%a3%85%e5%9b%be%e5%bd%a2%e7%9b%91%e6%8e%a7%e5%b7%a5%e5%85%b7Graphite.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/23/Ubuntu-14-04-%e4%b8%8b%e5%ae%89%e8%a3%85%e4%bd%bf%e7%94%a8Python-rq%e6%a8%a1%e5%9d%97.html">Ubuntu 14.04 下安装使用Python rq模块</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p><code>rq</code> 是<code>Python</code>的一个第三方模块，使用<code>rq</code>可以方便快速的实现<code>Python</code>的队列操作，实现多态电脑的分布式架构。其中 *R*是<code>Redis</code>的意思，*Q*是<code>Queue</code>的首字母，<code>rq</code>使用<code>Redis</code>和<code>Queue</code>实现分布式，分别实现了<code>Master</code>和<code>Worker</code>，通过<code>Redis</code>存储任务队列。</p>
+
+<h4 id="ubuntu14-04-安装rq">Ubuntu14.04 安装rq</h4>
+
+<p>假设已经安装了<code>Python</code>和<code>pip</code>，本文通过`<code>pip</code>来安装<code>rq</code></p>
+<pre><code>$sudo pip install rq 
+</code></pre>
+
+<h4 id="安装-redis">安装<code>Redis</code></h4>
+
+<p><code>rq</code>模块使用<code>redis</code>保存队列信息，因此可以保证多台机器同时读取同一个队列，也就是多个`<code>worker</code>同时工作，这也就达到了我们的目的。在<code>Ubuntu</code> 下安装<code>Redis</code>比较简单，使用下面的命令即可，该命令除了安装 <code>Redis</code>外，也会好心地帮你安装了<code>redis-cli</code>。</p>
+<pre><code>$sudo apt-get install redis-server
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/23/Ubuntu-14-04-%e4%b8%8b%e5%ae%89%e8%a3%85%e4%bd%bf%e7%94%a8Python-rq%e6%a8%a1%e5%9d%97.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/12/%e7%88%ac%e8%99%ab%e5%ad%a6%e4%b9%a0%e8%b5%84%e6%96%99%e6%b1%87%e6%80%bb.html">爬虫学习资料汇总</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>收集写爬虫的相关技术资料以及有用的代码库</p>
+
+<h4 id="技术博客">技术博客</h4>
+
+<ul>
+<li><strong>Scrapy官方英文文档</strong>: <a href="http://doc.scrapy.org/en/latest/index.html">http://doc.scrapy.org/en/latest/index.html</a></li>
+<li><strong>Scrapy官方中文文档</strong>: <a href="http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html">http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html</a></li>
+<li><a href="http://www.tuicool.com/articles/ZbEFnya">使用Scrapy抓取数据</a></li>
+<li><a href="http://www.ituring.com.cn/article/114408#">Scrapy抓取豆瓣电影</a></li>
+<li><a href="http://www.zhihu.com/question/20899988">知乎：如何入门爬虫</a></li>
+<li><a href="http://www.tuicool.com/articles/7JVvaa">Scrapy爬虫笔记【8-Scrapy核心操作+爬豆瓣图片+数据库链接】</a></li>
+<li><a href="http://cuiqingcai.com/1052.html">Python爬虫学习系列教程</a></li>
+<li><a href="http://phantomjs.org/">PhantomJs</a> : 模拟浏览器解析js，js引擎</li>
+<li><a href="http://casperjs.org/">CasperJs</a>: 以及<code>phantomjs</code>的js引擎相比<code>Phantomjs</code>更加简洁易用</li>
+<li><a href="http://www.tuicool.com/articles/beeMNj/">PhantomJs快速入门</a></li>
+</ul>
+
+<h4 id="开源项目">开源项目</h4>
+
+<ul>
+<li><a href="https://github.com/chineking/cola">Cola</a> 一个高水平的分布式爬虫框架</li>
+<li><a href="https://github.com/grangier/python-goose">Goose </a> Html Content / Article Extractor</li>
+<li><a href="https://github.com/darkrho/scrapy-redis">scrapy-redis</a> 基于<code>Redis</code>和<code>Scrapy</code>的分布式爬虫框架</li>
+<li><a href="https://github.com/nvie/rq">nvie/rq</a> <code>Python</code>实现的一个简单的任务队列</li>
+<li><a href="http://billmill.org/bloomfilter-tutorial/">Bloom Filter</a>: 一个高效Url过滤，去重库</li>
+<li><a href="https://github.com/scrapy/scrapyd">Scrapyd</a>: 部署监控<code>scrapy</code>的工具</li>
+<li><a href="https://github.com/scrapy/scrapyd-client">scrapy-client</a>: 与<code>Scrapyd</code>结合发布调用<code>addversion.json</code>发布<code>Spider</code></li>
+<li><a href="https://github.com/scrapinghub/scrapyjs">ScrapyJs</a>: <code>scrapy</code>官方提供的<code>JS</code>解决方案</li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/12/%e7%88%ac%e8%99%ab%e5%ad%a6%e4%b9%a0%e8%b5%84%e6%96%99%e6%b1%87%e6%80%bb.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">11</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/11/Ubuntu%e4%b8%8bScrapy%e7%9a%84%e5%ae%89%e8%a3%85.html">Ubuntu下Scrapy的安装</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>最近在学习爬虫，早就听说<code>Python</code>写爬虫极爽（貌似pythoner说python都爽，不过也确实，python的类库非常丰富，不用重复造轮子），还有一个强大的框架<code>Scrapy</code>，于是决定尝试一下。</p>
+
+<p>要想使用<code>Scrapy</code>第一件事，当然是安装<code>Scrapy</code>，尝试了<code>Windows</code>和<code>Ubuntu</code>的安装，本文先讲一下 <code>Ubuntu</code>的安装，比<code>Windows</code>的安装简单太多了。。。抽时间也会详细介绍一下怎么在<code>Windows</code>下进行安装。</p>
+
+<p><a href="http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/install.html#ubuntu-9-10">官方介绍</a>，在安装<code>Scrapy</code>前需要安装一系列的依赖.
+*  <code>Python 2.7</code>： <code>Scrapy</code>是<code>Python</code>框架，当然要先安装<code>Python</code> ，不过由于<code>Scrapy</code>暂时只支持 <code>Python2.7</code>，因此首先确保你安装的是<code>Python 2.7</code>
+*  <code>lxml</code>：大多数<code>Linux</code>发行版自带了<code>lxml</code>
+*  <code>OpenSSL</code>：除了<code>windows</code>之外的系统都已经提供
+*  <code>Python Package</code>: pip and setuptools. 由于现在<code>pip</code>依赖<code>setuptools</code>,所以安装<code>pip</code>会自动安装<code>setuptools</code></p>
+
+<p>有上面的依赖可知，在非windows的环境下安装 Scrapy的相关依赖是比较简单的，只用安装<code>pip</code>即可。<code>Scrapy</code>使用<code>pip</code>完成安装。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/11/Ubuntu%e4%b8%8bScrapy%e7%9a%84%e5%ae%89%e8%a3%85.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.html">Python学习速记--正则表达式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="字符描述">字符描述</h4>
+
+<p>| 正则式| 字符|
+|:------:||:--------|
+|\s        |空白符|
+|\d        |数字 |
+|\w        |字母或者数字|
+|.           |任意字符        |
+|*          |任意多个字符(包括0个)|
+|+         |至少一个       |
+|?          |0个或1个      |
+|{n}       |n个               |
+|{n,m}   |n到m个         |
+|[]|         []里是精确值|</p>
+
+<h5 id="例子">例子</h5>
+
+<ul>
+<li><code>\d{3}\-\d{3-8}</code>匹配类似<code>010-12345678</code>的字符串</li>
+<li><code>[0-9a-zA-Z\_]</code>匹配一个数字，字母或者下划线</li>
+<li><code>[0-9a-zA-Z\_]+</code>匹配至少有一个数字，字母或者下划线</li>
+<li><code>[a-zA-Z\_][0-9a-zA-Z\_]*</code>字母或者下划线开头 后面接任意的数字，字母或者下划线</li>
+<li><code>[a-zA-Z\_][0-9a-zA-Z\_]{0,19}</code>字母或者下划线开头 后面接0-19个数字，字母或者下划线</li>
+<li><code>A|B</code> 匹配<code>A</code>或者<code>B</code></li>
+<li><code>^</code>标示行的开头,<code>^\d</code>表示以数字开头</li>
+<li><code>$</code>行的结束，<code>\d$</code>数字结尾</li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e7%ba%bf%e7%a8%8b.html">Python学习速记--多线程</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="多线程">多线程</h4>
+
+<p><code>Python</code>支持多线程，使用多线程也比较简单，直接使用<code>threading</code>模块即可</p>
+<pre><code>import time ,threading
+ 
+def my_thread():
+    print('新的线程%s'%threading.current_thread().name)
+    n = 0
+    while n&lt;5:
+        n = n + 1
+        print('线程%s --&gt;  %s'%(threading.current_thread().name,n))
+        time.sleep(1)
+    print('线程%s结束'% threading.current_thread().name)
+
+print('线程 %s 正在运行' % threading.current_thread().name)
+t = threading.Thread(target=my_thread, name='my_thread')
+t.start()
+t.join()
+print('线程 %s 结束' % threading.current_thread().name)
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e7%ba%bf%e7%a8%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e8%bf%9b%e7%a8%8b.html">Python学习速记--多进程</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="多进程">多进程</h4>
+
+<p><code>python</code>封装了操作系统底层的进程函数，<code>Linux</code>下使用<code>fork</code>开辟多进程，<code>windows</code>下使用<code>multiprocessing</code>模块使用多进程</p>
+
+<h5 id="windows-下使用多进程"><code>windows</code>下使用多进程</h5>
+
+<p>需要使用模块<code>multiproccessing</code>中的Process</p>
+<pre><code>from multiprocessing import Process
+import os
+
+def proc_run(name):
+    print('我是子进程%s(%s)' %(name,os.getpid()))
+
+if __name__ == '__main__':
+    print('即将启动一个子进程...')
+    child = Process(target=proc_run,args=('child',))
+    print(&quot;开始启动子进程&quot;)
+    child.start()
+    child.join() #等待子进程结束后再继续往下运行
+    print(&quot;子进程结束&quot;)
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e8%bf%9b%e7%a8%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%ba%8f%e5%88%97%e5%8c%96.html">Python学习速记--序列化</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="使用-pickle-模块序列化">使用<code>pickle</code>模块序列化</h4>
+<pre><code>#pickle序列化对象
+import pickle
+d = {'name':'tom','age':22}
+print(pickle.dumps(d))
+f = open('seria.txt','wb')
+pickle.dump(d,f)  #序列化到文件
+f.close()
+#反序列化
+f = open('seria.txt','rb')
+d2 = pickle.load(f)
+f.close()
+print(d2)
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%ba%8f%e5%88%97%e5%8c%96.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%93%8d%e4%bd%9c%e6%96%87%e4%bb%b6%e5%92%8c%e7%9b%ae%e5%bd%95.html">Python学习速记--操作文件和目录</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="操作文件和目录">操作文件和目录</h4>
+
+<p>python有一个os模块封装了操作与底层相关的函数，比如查看环境变量，系统名字，操作目录等</p>
+
+<h5 id="查看系统参数">查看系统参数</h5>
+<pre><code>import os
+#查看系统参数
+print(os.name) #系统名字
+print(os.environ) #查看环境变量
+print(os.environ.get('PATH')) #获取指定的环境变量值
+</code></pre>
+
+<h5 id="操作文件和目录-1">操作文件和目录</h5>
+
+<p>利用<code>os</code>模块提供的功能可以操控目录，包括查看，添加，删除，遍历</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%93%8d%e4%bd%9c%e6%96%87%e4%bb%b6%e5%92%8c%e7%9b%ae%e5%bd%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-IO%e6%93%8d%e4%bd%9c.html">Python学习速记--IO操作</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="文件读写">文件读写</h4>
+
+<h5 id="读取文本文件">读取文本文件</h5>
+<pre><code>#IO操作--文件读取
+f = open('test.txt','r') # 和c一样打开文件
+#print(f.read())  # read()读取所有内容
+
+#print(f.readline()) # readline 读取一行
+
+#print(f.readlines()) # 读取所有内容到list,每一行一个单位
+
+#异常处理
+try:
+    f = open('test1.txt','r')
+except IOError:
+    print('打开文件失败')
+finally:
+    if f:
+        f.close()
+
+#python提供了更简洁的方式
+with open('test.txt','r') as f:
+    print(f.read())
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-IO%e6%93%8d%e4%bd%9c.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1.html">Python学习速记--面向对象</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>python支持面向对象编程，定义一个类的方式如下:</p>
+<pre><code>class Student(object):
+    pass
+</code></pre>
+
+<p>其中class是类的声明，Student是类名，后面括号里的object是该类继承的类，即父类</p>
+<pre><code>#创建一个类
+stu_instance = Student('jack','male')
+print(stu_instance.name)
+stu_instance.print_info()
+
+#添加私有变量
+class Student2(object):
+    def __init__(self,name,sex):
+        self.__name = name
+        self.__sex = sex
+    def print_info(self):#self必须作为参数
+        print('name:',self.__name,'sex:',self.__sex)
+    
+    def set_name(self,name):
+        self.__name = name
+    def get_name(self):
+        return self__name
+
+    def set_sex(self,sex):
+        self.__sex = sex
+    def get_sex(self):
+        return self.__sex
+
+stu2 = Student2('jack','male')
+print(stu2._Student2__name) #可以这样访问私有变量
+stu2.print_info()
+print(stu2.get_sex())
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-python%e5%87%bd%e6%95%b0%e7%9b%b8%e5%85%b3.html">Python学习速记--python函数相关</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="python数据结构">python数据结构</h4>
+
+<ul>
+<li>list = [1,2,3] 方法：list.append(ele),list.insert(pos,ele),list.pop(),list.pop(pos)</li>
+<li>tuple = (1,2)或(1,2,[3,4])  方法：tuble元素不可变</li>
+<li>dict = {&lsquo;Tom&rsquo;:12,&lsquo;Michael&rsquo;:23}  方法：dict.get(ele),dict.pop(ele)</li>
+<li>set = set([1,2,3])  方法：add, remobe</li>
+</ul>
+
+<h4 id="函数">函数</h4>
+
+<p>函数名其实就是指向一个函数对象的引用，完全可以把函数名赋给一个变量，相当于给这个函数起了一个“别名”</p>
+<pre><code>&gt;&gt;&gt; a = abs #变量a指向abs函数
+&gt;&gt;&gt; a(-1) # 所以也可以通过a调用abs函数
+1
+</code></pre>
+
+<p>python中，自己定义一个函数使用def语句，依次写出函数名、括号、括号中的参数和冒号:，然后，在缩进块中编写函数体，函数的返回值用<code>return</code>语句返回。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-python%e5%87%bd%e6%95%b0%e7%9b%b8%e5%85%b3.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>PHP生成缩略图 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="PHP生成缩略图">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/PHP%e7%94%9f%e6%88%90%e7%bc%a9%e7%95%a5%e5%9b%be.html">PHP生成缩略图</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/PHP.html">PHP</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>最近在做一个app,需要保存一些图片的缩略图,由于时间比较紧迫所以直接从网上找了一些开源 的生成缩略图的代码, 只要找到两个个人感觉还不错的代码,下面直接贴出代码,其实原理不是很难,但是要考虑各种情况还是要花费一些时间的.</p>
+
+<!--more-->
+
+<h3 id="代码一">代码一</h3>
+<pre><code class="language-php">&lt;?php
+ 
+/**
+ * 生成缩略图
+ * @author yangzhiguo0903@163.com
+ * @param string     源图绝对完整地址{带文件名及后缀名}
+ * @param string     目标图绝对完整地址{带文件名及后缀名}
+ * @param int        缩略图宽{0:此时目标高度不能为0，目标宽度为源图宽*(目标高度/源图高)}
+ * @param int        缩略图高{0:此时目标宽度不能为0，目标高度为源图高*(目标宽度/源图宽)}
+ * @param int        是否裁切{宽,高必须非0}
+ * @param int/float  缩放{0:不缩放, 0&lt;this&lt;1:缩放到相应比例(此时宽高限制和裁切均失效)}
+ * @return boolean
+ */
+function img2thumb($src_img, $dst_img, $width = 75, $height = 75, $cut = 0, $proportion = 0)
+{
+    if(!is_file($src_img))
+    {
+        return false;
+    }
+    $ot = fileext($dst_img);
+    $otfunc = 'image' . ($ot == 'jpg' ? 'jpeg' : $ot);
+    $srcinfo = getimagesize($src_img);
+    $src_w = $srcinfo[0];
+    $src_h = $srcinfo[1];
+    $type  = strtolower(substr(image_type_to_extension($srcinfo[2]), 1));
+    $createfun = 'imagecreatefrom' . ($type == 'jpg' ? 'jpeg' : $type);
+ 
+    $dst_h = $height;
+    $dst_w = $width;
+    $x = $y = 0;
+
+    /**
+     * 缩略图不超过源图尺寸（前提是宽或高只有一个）
+     */
+    if(($width&gt; $src_w &amp;&amp; $height&gt; $src_h) || ($height&gt; $src_h &amp;&amp; $width == 0) || ($width&gt; $src_w &amp;&amp; $height == 0))
+    {
+        $proportion = 1;
+    }
+    if($width&gt; $src_w)
+    {
+        $dst_w = $width = $src_w;
+    }
+    if($height&gt; $src_h)
+    {
+        $dst_h = $height = $src_h;
+    }
+    if(!$width &amp;&amp; !$height &amp;&amp; !$proportion)
+    {
+        return false;
+    }
+    if(!$proportion)
+    {
+        if($cut == 0)
+        {
+            if($dst_w &amp;&amp; $dst_h)
+            {
+                if($dst_w/$src_w&gt; $dst_h/$src_h)
+                {
+                    $dst_w = $src_w * ($dst_h / $src_h);
+                    $x = 0 - ($dst_w - $width) / 2;
+                }
+                else
+                {
+                    $dst_h = $src_h * ($dst_w / $src_w);
+                    $y = 0 - ($dst_h - $height) / 2;
+                }
+            }
+            else if($dst_w xor $dst_h)
+            {
+                if($dst_w &amp;&amp; !$dst_h)  //有宽无高
+                {
+                    $propor = $dst_w / $src_w;
+                    $height = $dst_h  = $src_h * $propor;
+                }
+                else if(!$dst_w &amp;&amp; $dst_h)  //有高无宽
+                {
+                    $propor = $dst_h / $src_h;
+                    $width  = $dst_w = $src_w * $propor;
+                }
+            }
+        }
+        else
+        {
+            if(!$dst_h)  //裁剪时无高
+            {
+                $height = $dst_h = $dst_w;
+            }
+            if(!$dst_w)  //裁剪时无宽
+            {
+                $width = $dst_w = $dst_h;
+            }
+            $propor = min(max($dst_w / $src_w, $dst_h / $src_h), 1);
+            $dst_w = (int)round($src_w * $propor);
+            $dst_h = (int)round($src_h * $propor);
+            $x = ($width - $dst_w) / 2;
+            $y = ($height - $dst_h) / 2;
+        }
+    }
+    else
+    {
+        $proportion = min($proportion, 1);
+        $height = $dst_h = $src_h * $proportion;
+        $width  = $dst_w = $src_w * $proportion;
+    }
+ 
+    $src = $createfun($src_img);
+    $dst = imagecreatetruecolor($width ? $width : $dst_w, $height ? $height : $dst_h);
+    $white = imagecolorallocate($dst, 255, 255, 255);
+    imagefill($dst, 0, 0, $white);
+ 
+    if(function_exists('imagecopyresampled'))
+    {
+        imagecopyresampled($dst, $src, $x, $y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+    }
+    else
+    {
+        imagecopyresized($dst, $src, $x, $y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+    }
+    $otfunc($dst, $dst_img);
+    imagedestroy($dst);
+    imagedestroy($src);
+    return true;
+}
+function fileext($file)
+{
+    return pathinfo($file, PATHINFO_EXTENSION);
+}
+</code></pre>
+
+<h2 id="代码二">代码二</h2>
+<pre><code class="language-php">&lt;?php
+/**
+ * 功能：php生成缩略图片的类
+ */
+    class ResizeImage{
+        public $type;//图片类型
+        public $width;//实际宽度
+        public $height;//实际高度
+        public $resize_width;//改变后的宽度
+        public $resize_height;//改变后的高度
+        public $cut;//是否裁图
+        public $srcimg;//源图象 
+        public $dstimg;//目标图象地址
+        public $im;//临时创建的图象
+        public $quality;//图片质量
+        function resizeimage($img,$wid,$hei,$c,$dstpath,$quality=100){
+            $this-&gt;srcimg=$img;
+            $this-&gt;resize_width=$wid;
+            $this-&gt;resize_height=$hei;
+            $this-&gt;cut=$c;
+            $this-&gt;quality=$quality;
+            $this-&gt;type=strtolower(substr(strrchr($this-&gt;srcimg,'.'),1));//图片的类型
+            $this-&gt;initi_img();//初始化图象
+            $this -&gt; dst_img($dstpath);//目标图象地址
+            @$this-&gt;width=imagesx($this-&gt;im);
+            @$this-&gt;height=imagesy($this-&gt;im);
+            $this-&gt;newimg();//生成图象
+            @ImageDestroy($this-&gt;im);
+        }
+        function newimg(){
+            $resize_ratio=($this-&gt;resize_width)/($this-&gt;resize_height);//改变后的图象的比例
+            @$ratio=($this-&gt;width)/($this-&gt;height);//实际图象的比例
+            if(($this-&gt;cut)=='1'){//裁图
+                if($img_func==='imagepng'&amp;&amp;(str_replace('.','',PHP_VERSION)&gt;=512)){  //针对php版本大于5.12参数变化后的处理情况
+                    $quality=9;
+                }
+                if($ratio&gt;=$resize_ratio){//高度优先
+                    $newimg=imagecreatetruecolor($this-&gt;resize_width,$this-&gt;resize_height);
+                    imagecopyresampled($newimg,$this-&gt;im,0,0,0,0,$this-&gt;resize_width,$this-&gt;resize_height,(($this-&gt;height)*$resize_ratio),$this-&gt;height);
+                    imagejpeg($newimg,$this-&gt;dstimg,$this-&gt;quality);
+                }
+                if($ratio&lt;$resize_ratio){//宽度优先
+                    $newimg=imagecreatetruecolor($this-&gt;resize_width,$this-&gt;resize_height);
+                    imagecopyresampled($newimg,$this-&gt;im,0,0,0,0,$this-&gt;resize_width,$this-&gt;resize_height,$this-&gt;width,(($this-&gt;width)/$resize_ratio));
+                    imagejpeg($newimg,$this-&gt;dstimg,$this-&gt;quality);
+                }
+            }else{//不裁图
+                if($ratio&gt;=$resize_ratio){
+                    $newimg=imagecreatetruecolor($this-&gt;resize_width,($this-&gt;resize_width)/$ratio);
+                    imagecopyresampled($newimg,$this-&gt;im,0,0,0,0,$this-&gt;resize_width,($this-&gt;resize_width)/$ratio,$this-&gt;width,$this-&gt;height);
+                    imagejpeg($newimg,$this-&gt;dstimg,$this-&gt;quality);
+                }
+                if($ratio&lt;$resize_ratio){
+                    @$newimg=imagecreatetruecolor(($this-&gt;resize_height)*$ratio,$this-&gt;resize_height);
+                    @imagecopyresampled($newimg,$this-&gt;im,0,0,0,0,($this-&gt;resize_height)*$ratio,$this-&gt;resize_height,$this-&gt;width,$this-&gt;height);
+                    @imagejpeg($newimg,$this-&gt;dstimg,$this-&gt;quality);
+                }
+            }
+        }
+        function initi_img(){//初始化图象
+            if($this-&gt;type=='jpg' || $this-&gt;type=='jpeg'){
+                $this-&gt;im=imagecreatefromjpeg($this-&gt;srcimg);
+            }
+            if($this-&gt;type=='gif'){
+                $this-&gt;im=imagecreatefromgif($this-&gt;srcimg);
+            }
+            if($this-&gt;type=='png'){
+                $this-&gt;im=imagecreatefrompng($this-&gt;srcimg);
+            }
+            if($this-&gt;type=='wbm'){
+                @$this-&gt;im=imagecreatefromwbmp($this-&gt;srcimg);
+            }
+            if($this-&gt;type=='bmp'){
+                $this-&gt;im=$this-&gt;ImageCreateFromBMP($this-&gt;srcimg);
+            }
+        }
+        function dst_img($dstpath){//图象目标地址
+            $full_length=strlen($this-&gt;srcimg);
+            $type_length=strlen($this-&gt;type);
+            $name_length=$full_length-$type_length;
+            $name=substr($this-&gt;srcimg,0,$name_length-1);
+            $this-&gt;dstimg=$dstpath;
+            //echo $this-&gt;dstimg;
+        }
+         
+        function ImageCreateFromBMP($filename){ //自定义函数处理bmp图片
+            if(!$f1=fopen($filename,&quot;rb&quot;))returnFALSE;
+            $FILE=unpack(&quot;vfile_type/Vfile_size/Vreserved/Vbitmap_offset&quot;,fread($f1,14));
+            if($FILE['file_type']!=19778)returnFALSE;
+            $BMP=unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel'.
+                    '/Vcompression/Vsize_bitmap/Vhoriz_resolution'.
+                    '/Vvert_resolution/Vcolors_used/Vcolors_important',fread($f1,40));
+            $BMP['colors']=pow(2,$BMP['bits_per_pixel']);
+            if($BMP['size_bitmap']==0)$BMP['size_bitmap']=$FILE['file_size']-$FILE['bitmap_offset'];
+            $BMP['bytes_per_pixel']=$BMP['bits_per_pixel']/8;
+            $BMP['bytes_per_pixel2']=ceil($BMP['bytes_per_pixel']);
+            $BMP['decal']=($BMP['width']*$BMP['bytes_per_pixel']/4);
+            $BMP['decal']-=floor($BMP['width']*$BMP['bytes_per_pixel']/4);
+            $BMP['decal']=4-(4*$BMP['decal']);
+            if($BMP['decal']==4)$BMP['decal']=0;
+            $PALETTE=array();
+            if($BMP['colors']&lt;16777216)
+            {
+                $PALETTE=unpack('V'.$BMP['colors'],fread($f1,$BMP['colors']*4));
+            }
+            $IMG=fread($f1,$BMP['size_bitmap']);
+            $VIDE=chr(0);
+            $res=imagecreatetruecolor($BMP['width'],$BMP['height']);
+            $P=0;
+            $Y=$BMP['height']-1;
+            while($Y&gt;=0)
+            {
+                $X=0;
+                while($X&lt;$BMP['width'])
+                {
+                    if($BMP['bits_per_pixel']==24)
+                        $COLOR=unpack(&quot;V&quot;,substr($IMG,$P,3).$VIDE);
+                    elseif($BMP['bits_per_pixel']==16)
+                    {
+                        $COLOR=unpack(&quot;n&quot;,substr($IMG,$P,2));
+                        $COLOR[1]=$PALETTE[$COLOR[1]+1];
+                    }
+                    elseif($BMP['bits_per_pixel']==8)
+                    {
+                        $COLOR=unpack(&quot;n&quot;,$VIDE.substr($IMG,$P,1));
+                        $COLOR[1]=$PALETTE[$COLOR[1]+1];
+                    }
+                    elseif($BMP['bits_per_pixel']==4)
+                    {
+                        $COLOR=unpack(&quot;n&quot;,$VIDE.substr($IMG,floor($P),1));
+                        if(($P*2)%2==0)$COLOR[1]=($COLOR[1]&gt;&gt;4);else$COLOR[1]=($COLOR[1]&amp;0x0F);
+                        $COLOR[1]=$PALETTE[$COLOR[1]+1];
+                    }
+                    elseif($BMP['bits_per_pixel']==1)
+                    {
+                        $COLOR=unpack(&quot;n&quot;,$VIDE.substr($IMG,floor($P),1));
+                        if(($P*8)%8==0)$COLOR[1]=$COLOR[1]&gt;&gt;7;
+                        elseif(($P*8)%8==1)$COLOR[1]=($COLOR[1]&amp;0x40)&gt;&gt;6;
+                        elseif(($P*8)%8==2)$COLOR[1]=($COLOR[1]&amp;0x20)&gt;&gt;5;
+                        elseif(($P*8)%8==3)$COLOR[1]=($COLOR[1]&amp;0x10)&gt;&gt;4;
+                        elseif(($P*8)%8==4)$COLOR[1]=($COLOR[1]&amp;0x8)&gt;&gt;3;
+                        elseif(($P*8)%8==5)$COLOR[1]=($COLOR[1]&amp;0x4)&gt;&gt;2;
+                        elseif(($P*8)%8==6)$COLOR[1]=($COLOR[1]&amp;0x2)&gt;&gt;1;
+                        elseif(($P*8)%8==7)$COLOR[1]=($COLOR[1]&amp;0x1);
+                        $COLOR[1]=$PALETTE[$COLOR[1]+1];
+                    }
+                    else
+                        returnFALSE;
+                    imagesetpixel($res,$X,$Y,$COLOR[1]);
+                    $X++;
+                    $P+=$BMP['bytes_per_pixel'];
+                }
+                $Y--;
+                $P+=$BMP['decal'];
+            }
+            fclose($f1);
+            return$res;
+        }
+    }
+?&gt;
+</code></pre>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

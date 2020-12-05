@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>为应用程序添加缓存 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="为应用程序添加缓存">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/%e4%b8%ba%e5%ba%94%e7%94%a8%e7%a8%8b%e5%ba%8f%e6%b7%bb%e5%8a%a0%e7%bc%93%e5%ad%98.html">为应用程序添加缓存</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/%e7%bc%93%e5%ad%98.html">缓存</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1.html">系统设计</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h3 id="服务端添加缓存">服务端添加缓存</h3>
+
+<h4 id="1-背景">1. 背景</h4>
+
+<p>由于项目进度赶得比较紧，而且第一次自己设计系统的架构，刚开始考虑的并不完全，主要想着先把系统的功能实现了再说。因此刚开始设计系统的时候并没有考虑缓存的问题，但是对已一个web系统，缓存不仅可以大大的减少数据库的压力，也可以很大程度的提高系统的响应时间。现在系统的功能完成的基本差不多了，因此现在需要为系统添加缓存，但是由于系统功能已经完成的差不多了，代码写的也很多了，所以现在添加缓存确实显得比较困难了。
+    先说说我们当前系统的整体框架结构吧。
+    <img src="/media/archive/jiagou.png" alt="Alt text" />
+    从图中可以清楚的看出，我们目前采用的架构比较简单，所有的请求都通过<code>.htaccess</code>文件转发到<code>index.php</code>然后在<code>index.php</code>文件中启动转发函数，通过请求的将请求分配到特定的&rsquo;Server&rsquo;执行特定的<code>Action</code>，在此<code>Action</code>里调用一个服务从数据库里取出数据返回给客户端。下面是当前系统的类图(为了显示出调用的方法，所以有点不规范)。</p>
+
+<!--more-->
+
+<p><img src="/media/archive/Main.png" alt="Alt text" /></p>
+
+<h4 id="2-添加缓存">2. 添加缓存</h4>
+
+<p>添加缓存的方法有很多，最让人想到的就是直接在<code>dao</code>层添加，在从数据库取数据之前，首先先从缓存取，如果缓存没有的话再从数据库取，然后放到缓存里。另一种策略是在<code>service</code>层添加缓存，也就说从将从<code>dao</code>层取出的取出的数据进行拼装之后放到缓存里。
+    首先分析一下两种方案的优缺点：
+    第一种方案：
+    优点：首先在<code>dao</code>层添加缓存对每条<code>sql</code>的执行结果进行缓存，缓存的粒度比较小，缓存的命中率会比较高。
+    缺点：每个<code>sql</code>查询数据不一样，则可能本来是同一个信息，但是可能仅仅是多了一个字段确又多了一条缓存记录，这是很大的浪费，毕竟缓存的成本还是比较高的。其次如果直接在<code>dao</code>层进行缓存，有些地方其实是不想进行缓存的，那么这样就比较不方便控制了。
+    第二种方案：
+    优点：在<code>service</code>进行缓存，首先是在原来系统的基础上添加代码比较少，其次对拼装好的数据缓存由于<code>service</code>的参数一般变化不大，缓存的数据就会比较少，命中率也不错。
+    缺点：缓存的粒度比较大，命中率不会那么理想，而且缓存的重用性也比较差。
+    综合上面的分析基本可以知道无论是在<code>dao</code>层还是<code>service</code>层进行缓存都既有优点又有缺点，最后经过考虑结合两者的优点，抽象出一个缓存层，在缓存层里控制是否进行缓存，以及缓存的逻辑，同时将缓存的对象改为数据库对应的一个一个对象，这样缓存对象的重用性以及命中率都有很不错的效果。
+    下面是添加缓存后的类图：
+    <img src="/media/archive/cache2.jpg" alt="Alt text" />
+    在原来的框架基础上再<code>service</code>里直接调用<code>cacheServer</code>加载指定的<code>cache</code>，原来的<code>service</code>逻辑不用改变，只有叫原来调用<code>dao</code>的改为调用<code>cache</code>即可。
+    到此缓存基本已经添加完成，编码也完成了，使用起来目前感觉还可以，又不合适的地方希望读者可以多多交流。
+    最后感谢<a href="http://www.crackedzone.com/server-need-a-new-datastore-layar.html">http://www.crackedzone.com/server-need-a-new-datastore-layar.html</a>文章的博主，给了我很到的启发。</p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

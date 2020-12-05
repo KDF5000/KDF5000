@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Golang第三章:基础数据类型 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Golang第三章-基础数据类型">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e4%b8%89%e7%ab%a0-%e5%9f%ba%e7%a1%80%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Golang第三章:基础数据类型</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Golang.html">Golang</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.html">学习笔记</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h3 id="整型">整型</h3>
+
+<p>有符号：int8, int16, int32, int64, int
+无符号: uint8, unit16, uint32, uint64, uint</p>
+<pre><code class="language-go">var x uint8 = 1&lt;&lt;1 | 1&lt;&lt;5 //00100010
+var y uint8 = 1&lt;&lt;1 | 1&lt;&lt;2 //00000110
+fmt.Printf(&quot;%08b\n&quot;, x)   // &quot;00100010&quot;, the set {1, 5}
+fmt.Printf(&quot;%08b\n&quot;, y)   // &quot;00000110&quot;, the set {1, 2}
+
+fmt.Printf(&quot;%08b\n&quot;, x&amp;y)  // &quot;00000010&quot;, the intersection {1}
+fmt.Printf(&quot;%08b\n&quot;, x|y)  // &quot;00100110&quot;, the union {1, 2, 5} //或
+fmt.Printf(&quot;%08b\n&quot;, x^y)  // &quot;00100100&quot;, the symmetric difference {2, 5}不同为1
+fmt.Printf(&quot;%08b\n&quot;, x&amp;^y) // &quot;00100000&quot;, the difference {5} 如果y对应的位为1，则为0；否则为x的值
+</code></pre>
+
+<!-- more -->
+
+<p>下面的例子</p>
+<pre><code class="language-go">medals := []string{&quot;gold&quot;, &quot;silver&quot;, &quot;bronze&quot;}
+for i := len(medals) - 1; i &gt;= 0; i-- {
+    fmt.Println(medals[i]) // &quot;bronze&quot;, &quot;silver&quot;, &quot;gold&quot;
+}
+</code></pre>
+
+<p>如果i是一个无符号数，则i--永远不会小于0，因此将会出现out ot index的错误。所以len函数设计时候返回的是有符号的int</p>
+<pre><code class="language-go">o := 0666
+fmt.Printf(&quot;%d %[1]o %#[1]o\n&quot;, o) // &quot;438 666 0666&quot;
+x := int64(0xdeadbeef)
+fmt.Printf(&quot;%d %[1]x %#[1]x %#[1]X\n&quot;, x)
+// Output:
+// 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF
+</code></pre>
+
+<h3 id="浮点数">浮点数</h3>
+
+<p>两种：float32和float64
+max.MaxFloat32: 表示float32能表示的最大数。大约3.4e38
+max.MaxFloat64 大约1.8e308</p>
+
+<h3 id="布尔类型">布尔类型</h3>
+
+<p>布尔值不会隐式的转换为0或者1，需要自己转换。同样不像C语言中，大于0的整数就是true，必须显示的进行转换。</p>
+
+<h3 id="字符串">字符串</h3>
+
+<ul>
+<li>字符串的值不能改变，也就是说字符串只读</li>
+<li>各种编码，ASCII, Unicode, UTF-8</li>
+<li>字符串和Byte切片</li>
+</ul>
+
+<h3 id="常量">常量</h3>
+
+<p>常量表达式的值在编译期计算，不是在运行期，常量的值不可修改。</p>
+<pre><code class="language-go">const pi = 3.14159
+const(
+    e = 2.3232322222242424
+    p = 3.1415926533232323
+)
+</code></pre>
+
+<p>常量间的所有算术运算，逻辑运算和比较结果也是常量，对常量的类型转换或者以下函数的调用结果也是返回常量结果：len, cap, real, imag, complex和unsafe.Sizeof</p>
+
+<p>在一个const声明语句中，在第一个声明的常量所在行，iota将会被置0，然后在每一个有常量声明的行加一</p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

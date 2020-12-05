@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">设计模式</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e7%ad%96%e7%95%a5%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——策略模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="策略模式">策略模式</h4>
+
+<p>在此模式中，算法是从复杂类提取的，因而可以方便地替换。例如，如果要更改搜索引擎中排列页的方法，则策略模式是一个不错的选择。思考一下搜索引擎的几个部分 —— 一部分遍历页面，一部分对每页排列，另一部分基于排列的结果排序。在复杂的示例中，这些部分都在同一个类中。通过使用策略模式，您可将排列部分放入另一个类中，以便更改页排列的方式，而不影响搜索引擎的其余代码.</p>
+
+<p>类图如下：
+<img src="/media/archive/blog/image/strategy.png" alt="Alt text" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e7%ad%96%e7%95%a5%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%91%bd%e4%bb%a4%e9%93%be%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——命令链模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="命令链模式">命令链模式</h4>
+
+<p>命令链模式同样是为了解决耦合的问题，该模式将命令处理者和发号命令方分开，发号命令方不用知道谁处理该命令，以及以什么样的方式处理，它向所有已经注册的命令处理者发送命令，收到成功信息即可。</p>
+
+<p>具体实现的时候，需要定义一个统一的接口，然后命令处理者实现接口，然后命令发号者用一个list保存所有注册的命令处理者，每个命令处理者会处理特定的一个或者一些命令，当发令者发送命令时，遍历list向已经注册的命令处理者发送命令，收到一个正确处理的信息即说明改命令已经有人处理。</p>
+
+<p>类图如下：
+<img src="/media/archive/blog/image/commandchain.png" alt="Alt text" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%91%bd%e4%bb%a4%e9%93%be%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">22</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/22/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e8%a7%82%e5%af%9f%e8%80%85%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——观察者模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="观察者模式">观察者模式</h4>
+
+<p>观察者模式是解决组件(对象)之间紧耦合的一种方式，顾名思义，既然叫观察者模式，涉及到两个对象，一个观察者，一个被观察者。观察者模式想要实现的效果就是当被观察者发生改变的时候，要主动通知观察者，自己发生了改变，至于观察者得知消息后做什么操作，被观察者无从得知，也不需要知道。</p>
+
+<p>要实现这种模式，被观察的对象，要保存需要通知的观察者，这里称之为注册。然后当被观察者发生某个需要通知观察者的改变的时候，遍历已经注册的观察者，通知他们使用函数调用的方式。具体实现需要定义两个接口，用于观察者和被观察者实现，类图如下：
+<img src="/media/archive/blog/image/观察者模式.png" alt="Alt text" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/22/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e8%a7%82%e5%af%9f%e8%80%85%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">8</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/8/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%b7%a5%e5%8e%82%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——工厂模式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>一直对设计模式有一种敬畏之心，每次想要看设计模式的时候就会想到<code>Erich Gamma</code>，<code>Richard Helm</code> ， <code>Ralph Johnson</code>， <code>John Vlissides</code>的黑皮<code>《设计模式》</code>，基本都望而止步，要把那本书看完可不是一时半会的，而且在没有项目经验的情况下，个人感觉基本都是纸上谈兵。</p>
+
+<p>今天在<code>IBM Developerworks</code>上看到一篇文章将<code>PHP</code>中常用的五种设计模式，感觉还不错，而且只有五种五种五种（重要的强调三遍）！先从简单的入手，把这五种消灭了再说。以后慢慢学习其他的设计模式。</p>
+
+<h4 id="工厂模式-factory-pattern">工厂模式（<code>Factory Pattern</code>）</h4>
+
+<p>工厂这个词的使用是非常形象，字面意思可以这样认为，这种模式下，我们有一个工厂，这个工厂生产很多一种或者几种产品（其实多种的情况是覆盖了一种的），但是每个产品怎么生产和包装的我们不知道，其实我们也不需要知道，知道的越多你就越迷糊，以后你的行为就受制于太多杂事，也就是我们常说的耦合度太高，因此我们就将所有的事情交给工厂负责，我们只用告诉工厂需要什么，工厂把产品交付给你就是了。一旦产品的工艺发生改变，工厂负责就好，你使用该产品的工艺不受影响。因此工厂模式可以大大的降低系统的耦合度，增强系统的稳定性，当然也会提高代码的复用率。</p>
+
+<p>在实际的程序设计中，工厂相当于一个对外的接口，那么这个接口的返回类型是确定的，那么我们怎么通过这个工厂来生产不同的产品发回给客户呢？很简单，做一个所有产品的“模子”就可以，这个“模子”有每个产品的所有特征，但是不能用，需要具体的产品实现这些特性，就是我们常说的<code>Interface</code>。
+使用类图表示如下：
+<img src="/media/archive/img_Factory_Pattern.png" alt="" /></p>
+
+<h5 id="php-的实现"><code>PHP</code>的实现</h5>
+
+<ul>
+<li><p>编写一个接口 <code>Product.php</code></p>
+<pre><code>&lt;?php
+/**
+* Created by PhpStorm.
+* User: Defei
+* Date: 2015/8/8
+* Time: 16:14
+*/
+ 
+interface Product{
+public function getName();
+}
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/8/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e5%b7%a5%e5%8e%82%e6%a8%a1%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

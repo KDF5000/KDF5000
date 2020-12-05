@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Golang第七章:接口 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Golang第七章-接口">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">4</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/4/24/Golang%e7%ac%ac%e4%b8%83%e7%ab%a0-%e6%8e%a5%e5%8f%a3.html">Golang第七章:接口</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Golang.html">Golang</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.html">学习笔记</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><ul>
+<li>接口更像是一种约定，范式满足接口约定的形式的类型都可以作为该接口的实例</li>
+<li>接口类型具体描述了一系列方法的集合，一个实现了这些方法的具体类型是这个接口类型的实例</li>
+
+<li><p>接口类型可以进行组合成新的接口类型，这种也叫接口内嵌</p>
+<pre><code class="language-go">package io
+type Reader interface {
+Read(p []byte) (n int, err error)
+}
+type Closer interface {
+Close() error
+}
+//
+type ReadWriter interface {
+Reader
+Writer }
+type ReadWriteCloser interface {
+Reader
+Writer
+Closer }
+</code></pre></li>
+</ul>
+
+<!--more-->
+
+<ul>
+<li>一个类型如果拥有一个接口需要的所有方法，那么这个类型就实现了这个接口</li>
+
+<li><p>表达一个类型属于某个接口只要这个类型实现了这个接口</p>
+<pre><code class="language-go">var w io.Writer
+w = os.Stdout
+w = new(bytes.Buffer)
+w = time.Second
+// OK: *os.File has Write method
+// OK: *bytes.Buffer has Write method
+// compile error: time.Duration lacks Write method
+var rwc io.ReadWriteCloser
+rwc = os.Stdout         // OK: *os.File has Read, Write, Close methods
+rwc = new(bytes.Buffer) // compile error: *bytes.Buffer lacks Close method
+</code></pre></li>
+
+<li><p>一个具体类型赋值给一个接口类型的变量后，即使该具体类型有其他方法也不能调用</p></li>
+
+<li><p>interface{}空类型对实现它的类型没有任何要求，所以可以将任意一个值赋给空接口类型</p></li>
+
+<li><p>flag.Value可以为自己的数据类型位flag添加新的标记符号</p></li>
+</ul>
+
+<h3 id="sort-interface接口">sort.Interface接口</h3>
+
+<ul>
+<li>go语言的sort函数不会对具体的序列和它的元素做任何的假设</li>
+
+<li><p>排序算法通常需要知道的三个要素</p>
+
+<ul>
+<li>序列的长度 --Len() int</li>
+<li>两个元素比较的结果 - Less(i int, j int)bool</li>
+
+<li><p>交换两个元素的方式 -- Swap(i,j int)</p>
+<pre><code class="language-go">///
+package sort
+type Interface interface {
+Len() int
+Less(i, j int) bool // i, j are indices of sequence elements
+Swap(i, j int)
+}
+///////
+type StringSlice []string
+func (p StringSlice) Len() int           { return len(p) }
+func (p StringSlice) Less(i, j int) bool { return p[i] &lt; p[j] }
+func (p StringSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] 
+//调用
+sort.Sort(StringSlice(names))
+</code></pre></li>
+</ul></li>
+</ul>
+
+<p>### http.Handler接口
+* 在package http里</p>
+<pre><code class="language-go">package http
+type Handler interface {
+    ServeHTTP(w ResponseWriter, r *Request)
+}
+func ListenAndServe(address string, h Handler) error
+</code></pre>
+
+<ul>
+<li><p>一个最简单的例子</p>
+<pre><code class="language-go">func main() {
+db := database{&quot;shoes&quot;: 50, &quot;socks&quot;: 5}
+log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, db))
+}
+type dollars float32
+func (d dollars) String() string { return fmt.Sprintf(&quot;$%.2f&quot;, d) }
+type database map[string]dollars
+func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) { for item, price := range db {
+    fmt.Fprintf(w, &quot;%s: %s\n&quot;, item, price)
+}
+}
+</code></pre></li>
+
+<li><p>如果要想对不同url执行不同的操作，则可以在ServeHttp里通过req.URL.Path获得请url然后通过switch等方式判断执行不同的操作</p></li>
+
+<li><p>go也提供了请求多路ServeMux来简化URL和handler的对应</p>
+<pre><code class="language-go">func main() {
+db := database{&quot;shoes&quot;: 50, &quot;socks&quot;: 5}
+mux := http.NewServeMux()
+mux.Handle(&quot;/list&quot;, http.HandlerFunc(db.list))
+mux.Handle(&quot;/price&quot;, http.HandlerFunc(db.price))
+log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, mux))
+}
+type database map[string]dollars
+func (db database) list(w http.ResponseWriter, req *http.Request) {
+for item, price := range db {
+    fmt.Fprintf(w, &quot;%s: %s\n&quot;, item, price)
+}
+}
+func (db database) price(w http.ResponseWriter, req *http.Request) {
+item := req.URL.Query().Get(&quot;item&quot;)
+price, ok := db[item]
+if !ok {
+    w.WriteHeader(http.StatusNotFound) // 404
+    fmt.Fprintf(w, &quot;no such item: %q\n&quot;, item)
+    return
+}
+fmt.Fprintf(w, &quot;%s\n&quot;, price)
+}
+</code></pre>
+
+<p>其中http.HandlerFunc其实是一个实现了http.Handler ServeHttp方法的函数类型</p>
+<pre><code class="language-go">package http
+type HandlerFunc func(w ResponseWriter, r *Request)
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
+f(w, r)
+}
+</code></pre></li>
+
+<li><p>如果有很多handler，有可能需要放在不同的文件中，这个时候可以使用http包提供的默认的ServeMux示例DefaultServeMux和包级http.Handle和http.HandleFunc函数， 这个时候ListenAndServe函数的handler值为空就可以</p>
+<pre><code class="language-go">func main() {
+db := database{&quot;shoes&quot;: 50, &quot;socks&quot;: 5}
+http.HandleFunc(&quot;/list&quot;, db.list)
+http.HandleFunc(&quot;/price&quot;, db.price)
+log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, nil))
+}
+</code></pre></li>
+</ul>
+
+<h3 id="error接口">error接口</h3>
+
+<ul>
+<li><p>error接口</p>
+<pre><code class="language-go">type error interface {
+Error() string
+}
+</code></pre></li>
+
+<li><p>errors包的error的一个实现</p>
+<pre><code class="language-go">package errors
+func New(text string) error { return &amp;errorString{text} }
+type errorString struct { text string }
+func (e *errorString) Error() string { return e.text }
+</code></pre>
+
+<h3 id="类型断言">类型断言</h3></li>
+
+<li><p>x.(T)判断x是否是T类型，如果成功则返回x的的动态值，如果失败则跑出panic</p></li>
+</ul>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

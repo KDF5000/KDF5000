@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 13 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-13">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">7</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/11/7/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e5%ae%9e%e6%88%98-K-Means%e8%81%9a%e7%b1%bb%e7%ae%97%e6%b3%95.html">机器学习实战:K-Means聚类算法</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="k-means聚类算法">k-means聚类算法</h4>
+
+<blockquote>
+<p>优点: 容易实现
+缺点: 可能收敛到局部最小值,在大规模数据集上收敛较慢
+使用数据类型: 数值型护具</p>
+</blockquote>
+
+<p>k-均值是发现给定数据集的k个簇的算法.k有用户决定.每一个簇通过旗质心,即簇中所有点的中心描述.
+工作流程: 首先随机确定k个初始点作为其质心.然后讲护具集中的每个点分配到一个簇中,也就是分配到距其最近的质心对应的簇.这一步完成时后,每个簇的质心更新为该簇所有点的平均值.
+上述过程的伪代码如下:</p>
+<pre><code>创建k个点作为起始质心(随机选择)
+当任意一个点的簇分配结果改变时:
+    对数据集中的每个数据点
+         对每个质心
+              计算质心到数据点之间的距离
+         讲数据点分配到距其最近的簇
+    对每一个簇,计算簇中所有点的均值幷讲均值作为质心
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/11/7/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e5%ae%9e%e6%88%98-K-Means%e8%81%9a%e7%b1%bb%e7%ae%97%e6%b3%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">7</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/11/7/%e5%b8%b8%e7%94%a8%e6%8e%a8%e8%8d%90%e7%ae%97%e6%b3%95-%e7%ad%96%e7%95%a5-%e6%af%94%e8%be%83.html">常用推荐算法(策略)比较</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="常用的推荐算法比较">常用的推荐算法比较</h4>
+
+<p>在推荐系统简介中，我们给出了推荐系统的一般框架。很明显，推荐方法是整个推荐系统中最核心、最关键的部分，很大程度上决定了推荐系统性能的优劣。目前，主要的推荐方法包括：基于内容推荐、协同过滤推荐、基于关联规则推荐、基于效用推荐、基于知识推荐和组合推荐。</p>
+
+<h5 id="1-基于内容推荐">1. 基于内容推荐</h5>
+
+<p>基于内容的推荐（Content-based Recommendation）是信息过滤技术的延续与发展，它是建立在项目的内容信息上作出推荐的，而不需要依据用户对项目的评价意见，更多地需要用机 器学习的方法从关于内容的特征描述的事例中得到用户的兴趣资料。在基于内容的推荐系统中，项目或对象是通过相关的特征的属性来定义，系统基于用户评价对象 的特征，学习用户的兴趣，考察用户资料与待预测项目的相匹配程度。用户的资料模型取决于所用学习方法，常用的有决策树、神经网络和基于向量的表示方法等。 基于内容的用户资料是需要有用户的历史数据，用户资料模型可能随着用户的偏好改变而发生变化。</p>
+
+<p>基于内容推荐方法的优点是：</p>
+
+<ul>
+<li>不需要其它用户的数据，没有冷开始问题和稀疏问题。</li>
+<li>能为具有特殊兴趣爱好的用户进行推荐。</li>
+<li>能推荐新的或不是很流行的项目，没有新项目问题。</li>
+<li>通过列出推荐项目的内容特征，可以解释为什么推荐那些项目。</li>
+<li>已有比较好的技术，如关于分类学习方面的技术已相当成熟。</li>
+</ul>
+
+<p>缺点是要求内容能容易抽取成有意义的特征，要求特征内容有良好的结构性，并且用户的口味必须能够用内容特征形式来表达，不能显式地得到其它用户的判断情况。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/11/7/%e5%b8%b8%e7%94%a8%e6%8e%a8%e8%8d%90%e7%ae%97%e6%b3%95-%e7%ad%96%e7%95%a5-%e6%af%94%e8%be%83.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">10</span>
+                            <span class="day">18</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/10/18/%e5%bd%92%e5%b9%b6%e6%8e%92%e5%ba%8f%e5%92%8c%e5%bf%ab%e9%80%9f%e6%8e%92%e5%ba%8f.html">归并排序和快速排序比较</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="1-归并排序和快速排序">1 . 归并排序和快速排序</h4>
+
+<h5 id="1-1-归并排序">1.1 归并排序</h5>
+
+<p>归并排序的思想就是讲数组分为两部分然后对两部分进行排序,然后讲排序后的两部分进行合并,主要的难度在于合并部分,合并的时候需要重新开一个临时数组保存合并的结果,然后再复制到原数组.
+下面是归并排序的<code>python</code>实现</p>
+<pre><code># coding:utf-8
+__author__ = 'devin'
+
+'''
+data: array
+low,high: index of array
+'''
+def merge_sort(data, low, high):
+    if low &lt; high:
+        mid = (low + high)/2
+        merge_sort(data, low, mid)
+        merge_sort(data, mid+1, high)
+        merge(data, low, mid, high)
+
+def merge(data, low, mid, high):
+    temp = []
+    i = low
+    j = mid+1
+    while i &lt;= mid and j &lt;= high:
+        if data[i] &lt;= data[j]:
+            temp.append(data[i])
+            i += 1
+        else:
+            temp.append(data[j])
+            j += 1
+    if i &gt; mid:
+        while j &lt;= high:
+            temp.append(data[j])
+            j += 1
+    else:
+        while i &lt;= mid:
+            temp.append(data[i])
+            i += 1
+
+    i = low
+    j = 0
+    while i &lt;= high:
+        data[i] = temp[j]
+        i += 1
+        j += 1
+
+
+if __name__ == &quot;__main__&quot;:
+    data = [1, 3, 2, 6, 3, 7, 2, 12, 15, 11, 10, 131, 1]
+    merge_sort(data, 0, len(data) - 1)
+    print data
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/10/18/%e5%bd%92%e5%b9%b6%e6%8e%92%e5%ba%8f%e5%92%8c%e5%bf%ab%e9%80%9f%e6%8e%92%e5%ba%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">9</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/9/25/Ubuntu-%e4%b8%8b%e5%ae%89%e8%a3%85Ruby-On-Rails.html">Ubuntu 下安装Ruby On Rails</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="ruby-on-rails的配置">Ruby On Rails的配置</h3>
+
+<p><code>Rails</code>是一个优秀的<code>Ruby</code>框架.结合了<code>PHP</code>快速开发和<code>JAVA</code>程序规整的特点,使用<code>MVC</code>的设计模式,是一个用于开发数据库驱动的网络应用程序的完整框架.</p>
+
+<p><code>Ruby On Rails</code>的官网: <a href="https://www.ruby-lang.org">https://www.ruby-lang.org</a></p>
+
+<p>安装<code>Ruby On Rails</code>需要安装<code>Ruby</code>,<code>gem</code>,<code>Sqlite3</code>,和<code>Rails</code>. 本教程的平台使用的使用的<code>Ubuntu</code>,因此只介绍<code>Ubuntu</code>下的安装.</p>
+
+<h3 id="安装-ruby">安装<code>Ruby</code></h3>
+
+<p>安装<code>Ruby</code>可以参考<code>Ruby</code>的<a href="https://www.ruby-lang.org/en/documentation/installation/">官方教程</a></p>
+
+<p>再<code>Ubuntu</code>下可以使用<code>sudo apt-get install ruby-fully</code>进行快速的安装,但是使用这种方式安装的最新版本是<code>1.9.3</code>,而最新版本的<code>Ruby</code>是<code>2.2.3</code>,因此本教程使用编译源码进行安装.</p>
+
+<p>到<code>Ruby</code>下载最新的<a href="https://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.3.tar.gz">源码</a>,解压到指定的位置,进入解压后的目录,执行下面的命令:</p>
+<pre><code>$./configuren
+$ make 
+$ sudo make install
+</code></pre>
+
+<p>耐心的等待一段时间,执行下面的命令:</p>
+<pre><code>$ ruby -v
+</code></pre>
+
+<p>如果出现下图中的结果,说明安装成功了.</p>
+
+<p><img src="/media/archive/img_ruby-v.png" alt="" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/9/25/Ubuntu-%e4%b8%8b%e5%ae%89%e8%a3%85Ruby-On-Rails.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/12.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/14.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">JStorm</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">6</span>
+                            <span class="day">20</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/6/20/Jstrom%e5%ae%89%e8%a3%85%e9%97%ae%e9%a2%98%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88%e6%b1%87%e6%80%bb.html">Jstrom安装问题解决方案汇总</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="jstrom-2-1-1安装错误">jstrom 2.1.1安装错误</h4>
+
+<h5 id="the-hostname-which-supervisor-get-is-localhost"><strong>the hostname which  supervisor get is localhost</strong></h5>
+
+<p>查看[源码(<a href="https://github.com/alibaba/jstorm/blob/master/jstorm-core/src/main/java/com/alibaba/jstorm/schedule/FollowerRunnable.java)81行">https://github.com/alibaba/jstorm/blob/master/jstorm-core/src/main/java/com/alibaba/jstorm/schedule/FollowerRunnable.java)81行</a></p>
+<pre><code>this.data = data;
+        this.sleepTime = sleepTime;
+        boolean isLocaliP;
+        if (!ConfigExtension.isNimbusUseIp(data.getConf())) {
+            this.hostPort = NetWorkUtils.hostname() + &quot;:&quot; + String.valueOf(Utils.getInt(data.getConf().get(Config.NIMBUS_THRIFT_PORT)));
+            isLocaliP = NetWorkUtils.hostname().equals(&quot;localhost&quot;);
+        } else {
+            this.hostPort = NetWorkUtils.ip() + &quot;:&quot; + String.valueOf(Utils.getInt(data.getConf().get(Config.NIMBUS_THRIFT_PORT)));
+            isLocaliP = NetWorkUtils.ip().equals(&quot;127.0.0.1&quot;);
+        }
+        try {
+            if (isLocaliP) {
+                throw new Exception(&quot;the hostname which Nimbus get is localhost&quot;);
+            }
+        } catch (Exception e1) {
+            LOG.error(&quot;get nimbus host error!&quot;, e1);
+            throw new RuntimeException(e1);
+        }
+</code></pre>
+
+<p>可以看出Nimbus的ip设置不能为localhost和127.0.0.1，而启动nimbus server的脚本start.sh如下，使用的是<code>hostname -i</code>然后匹配storm.yaml文件找到用户设置的地址，而<code>hostname -i</code>输出的时候主机名对应的ip地址，因为不能用127.0.0.1和localhost,因此只能将主机名映射到本机ip地址，所以就要在/etc/hosts文件添加映射关系，例如本机的主机名为kdf5000，ip地址为10.30.5.64，　则需要添加下面信息</p>
+<pre><code>10.30.5.64　kdf5000
+</code></pre>
+
+<p>重新启动即可。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/6/20/Jstrom%e5%ae%89%e8%a3%85%e9%97%ae%e9%a2%98%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88%e6%b1%87%e6%80%bb.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

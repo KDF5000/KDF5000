@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>使用Python和BitTorrentSync定期给Kindle推送电子书 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="使用Python和BitTorrentSync定期给Kindle推送电子书">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/11/12/%e4%bd%bf%e7%94%a8Python%e5%92%8cBitTorrentSync%e5%ae%9a%e6%9c%9f%e7%bb%99Kindle%e6%8e%a8%e9%80%81%e7%94%b5%e5%ad%90%e4%b9%a6.html">使用Python和BitTorrentSync定期给Kindle推送电子书</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Python.html">Python</a>
+                            
+                            <a class="tag label label-info" href="/tags/Kindle.html">Kindle</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h4 id="kindle伴侣">Kindle伴侣</h4>
+
+<p>最近发现一个很好用的Kindle电子书分享网站<a href="http://kindlefere.com/">Kindle伴侣</a>，资源丰富，除了提供各种热门图书免费下载，还提供了很多关于Kindle的使用技巧，里面个人最喜欢的功能就是每周一书，使用BitTorrent每周自动同步热门电子书。使用的是著名的同步软件Resilio Sync， 最开始是在自己电脑上安装了软件同步，但是要一直开着，感觉好麻烦，有时候电脑还要关了，影响同步。刚好手里有个闲置的树莓派，于是就想着用它来同步，然后通过邮件将电子书发送到kindle，这样就可以每周都看到热门的电子书了。</p>
+
+<!--more-->
+
+<p><img src="/media/archive/blog/image/kindle-0.png" alt="kindle-0" /></p>
+
+<h4 id="resilio-sync服务搭建">Resilio Sync服务搭建</h4>
+
+<p>Linux下的安装方法可以参考官网：<a href="https://help.getsync.com/hc/en-us/articles/206178924">https://help.getsync.com/hc/en-us/articles/206178924</a></p>
+
+<p>下面的方法适合Raspbian，你可以按照官网的说明安装在任何一台可以上网的服务器上。</p>
+
+<p><strong>Step1:</strong> 下载deb安装包</p>
+<pre><code class="language-shell">$ wget https://download-cdn.getsync.com/2.0.128/PiWD/bittorrent-sync-pi-server_2.0.128_armhf.deb
+</code></pre>
+
+<p><strong>Step2:</strong> 安装Sync包</p>
+<pre><code class="language-shell">$ sudo dpkg -i bittorrent-sync-pi-server_2.0.128_armhf.deb
+</code></pre>
+
+<p><strong>Step3:</strong>访问Sync Web UI</p>
+
+<p>通过浏览器访问<a href="http://yourrespbianip:8888">http://yourrespbianip:8888</a> ,其中是你respian的ip地址或者你托管的服务器地址，你应该看到下面的界面</p>
+
+<p><img src="/media/archive/blog/image/kindle-1.png" alt="kindle-1" /></p>
+
+<p>然后到<a href="http://kindlefere.com/">Kindle伴侣</a>随便点一个[每周一书]可以找到使用bittorrentSync同步的同步key，通过web页面添加到你自己的sync服务器即可。记得你选择的文件夹要有写入权限，我是直接给的777。</p>
+
+<h4 id="监控进程">监控进程</h4>
+
+<p>这里使用Python作为监控程序监控上面Sync服务器的同步文件夹，一旦出现新的指定格式（如MOBI)的文件，则将会向指定的kindle邮箱发送新增加的电子书，邮箱的设置需要到amazon自己设置，想必用过kindle的应该不陌生。</p>
+
+<p>代码可以从github下载：<a href="https://github.com/KDF5000/WeeklyBook">https://github.com/KDF5000/WeeklyBook</a> , 然后修改<code>server.py</code>里面的kindle邮箱，以及授权的邮箱</p>
+
+<blockquote>
+<p>EXT_LIST = [&lsquo;mobi&rsquo;] #想要发送的邮件格式
+HOST_NAME = &lsquo;smtp.cstnet.cn&rsquo; #授权邮箱的smtp服务器
+HOST_PORT = 25 #smtp服务器端口
+USER_NAME = &lsquo;kongdefei@ict.ac.cn&rsquo; #授权邮箱的用户名
+USER_PASS = &lsquo;*********************&rsquo;
+KINDLE_MAILS = [&lsquo;kdf5000@kindle.cn&rsquo;] #接收电子书的kindle邮箱，可以在亚马逊查看
+FROM_NAME = &lsquo;kongdefei@ict.ac.cn&rsquo; #发送邮件的from名字，建议使用发送的邮箱地址</p>
+</blockquote>
+
+<h5 id="后台启动">后台启动</h5>
+
+<p>进入下载的文件夹，执行下面的命令</p>
+<pre><code class="language-shell">$nohup python server.py /home/ubuntu/kongdefei/SyncBook &gt; sync.out 2&gt;&amp;1 &amp;
+</code></pre>
+
+<p>其中<code>/home/ubuntu/kongdefei/SyncBook</code>是sync同步的文件夹，sync.out是server.py的输出日志，该程序将会在后台持续运行监控<code>/home/ubuntu/kongdefei/SyncBook</code>下面是否有新的电子书的出现。</p>
+
+<p>至此，你就可以享受你心爱的kindle每周定时收到一本优秀的电子书了。
+顺便晒一下树莓派[憨笑]
+<img src="/media/archive/blog/image/raspberry.jpeg" alt="" /></p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

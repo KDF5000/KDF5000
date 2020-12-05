@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">分布式系统，存储系统，对象存储</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">14</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/11/14/%e5%88%86%e5%b8%83%e5%bc%8f%e5%ad%98%e5%82%a8%e7%b3%bb%e7%bb%9f%e5%af%b9%e6%af%94.html">分布式存储系统对比</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="ceph">ceph</h3>
+
+<p>Ceph是一个统一的分布式存储系统，提供了对象存储，块存储和文件存储三种模式，在架构上没有中心节点，提供了无限的扩展性。</p>
+
+<blockquote>
+<p>Ceph is a unified, distributed storage system designed for excellent performance, reliability and scalability</p>
+</blockquote>
+
+<p>Ceph核心是使用CRUSH算法通过计算获取数据存储的位置，无需中心节点，提供了高度的可靠性和可扩展性。
+<img src="http://docs.ceph.com/docs/master/_images/stack.png" alt="" />
+ceph的的块存储，文件存储都是基于其实现的对象存储系统RADOS。下面是RADOS的系统架构
+<img src="/media/archive/blog/images/876E9FA342C9C0341021EDC0E7611B22.jpg?imageView2/0/w/600" alt="1510306287044.jpg" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/11/14/%e5%88%86%e5%b8%83%e5%bc%8f%e5%ad%98%e5%82%a8%e7%b3%bb%e7%bb%9f%e5%af%b9%e6%af%94.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

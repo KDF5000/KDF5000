@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Ansible: 自动化管理服务器(2) - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Ansible-自动化管理服务器-2">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Ansible: 自动化管理服务器(2)</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Linux.html">Linux</a>
+                            
+                            <a class="tag label label-info" href="/tags/DevOps.html">DevOps</a>
+                            
+                            <a class="tag label label-info" href="/tags/Ansible.html">Ansible</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h3 id="ansible-命令参数">Ansible 命令参数</h3>
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>-v</td>
+<td>详细模式，如果命令执行成功，输出详细的结果</td>
+</tr>
+
+<tr>
+<td>-i Path</td>
+<td>指定host文件的路径，默认是/etc/ansible/hosts</td>
+</tr>
+
+<tr>
+<td>-f Num</td>
+<td>指定一个整数，默认是5，指定fork开启同步进程的个数</td>
+</tr>
+
+<tr>
+<td>-m Name</td>
+<td>指定使用的module名称，默认是command</td>
+</tr>
+
+<tr>
+<td>-M path</td>
+<td>指定module的目录。默认是/usr/share/ansible</td>
+</tr>
+
+<tr>
+<td>-a Module_Args</td>
+<td>指定module的参数</td>
+</tr>
+
+<tr>
+<td>-k</td>
+<td>提示输入ssh密码，而不是基于ssh的密钥认证</td>
+</tr>
+
+<tr>
+<td>-sudo</td>
+<td>指定使用sudo获得root权限</td>
+</tr>
+
+<tr>
+<td>-K</td>
+<td>提示输入sudo密码，与-sudo一起使用</td>
+</tr>
+
+<tr>
+<td>-u Username</td>
+<td>指定被控机器的执行用户</td>
+</tr>
+
+<tr>
+<td>-C</td>
+<td>测试此命令会改变什么内容，不会真正的去执行</td>
+</tr>
+</tbody>
+</table>
+
+<!--more-->
+
+<h3 id="ansible的常用模块">Ansible的常用模块</h3>
+
+<h4 id="shell模块">shell模块</h4>
+
+<p>使用shell来执行命令，如</p>
+<pre><code class="language-shell">$ ansible all -m shell -a &quot;mkdir kongdefei&quot;
+</code></pre>
+
+<p>将会在每一个客户机上创建kongdefei的目录</p>
+
+<h4 id="copy模块">copy模块</h4>
+
+<p>实现主控机向客户机复制文件，类似scp的功能，比如复制主控机器的/etc/hosts到客户端机</p>
+<pre><code class="language-shell">$ansible all -m copy -a &quot;src=/etc/hosts dest=/tmp/hosts&quot;
+</code></pre>
+
+<h4 id="file模块">file模块</h4>
+
+<p>该模块称之为文件属性模块，可以创建，删除，修改文件属性等操作</p>
+<pre><code class="language-shell">#创建文件
+$ansible all -m file -a &quot;dest=/tmp/a.txt state=touch&quot;
+#更改文件的用户和权限
+$ansible all -m file -a &quot;dest=/tmp/a.txt mode=600 owener=www-data group=root&quot;
+#创建目录
+$ansible all -m file -a &quot;dest=/tmp/kongdefei owner=kongdefei group=root state=directory&quot;
+#删除文件或者目录
+$ansible all -m file -a &quot;dest=/tmp/kongdefei state=absent&quot;
+</code></pre>
+
+<p><strong>注：</strong>state的其他选项：link(链接)、hard(硬链接)</p>
+
+<h4 id="stat模块">stat模块</h4>
+
+<p>获取指定文件的状态信息，比如atime, ctime, mtime, md5, uid, gid等</p>
+<pre><code class="language-shell">$ ansible all -m stat -a &quot;path=/home/kongdefei/tidb/tidb-latest-linux-amd64.tar.gz&quot;
+</code></pre>
+
+<p>返回</p>
+<pre><code class="language-shell">172.16.1.96 | SUCCESS =&gt; {
+    &quot;changed&quot;: false, 
+    &quot;stat&quot;: {
+        &quot;atime&quot;: 1484225125.1479475, 
+        &quot;checksum&quot;: &quot;b3afe00a995630184d98194c1a61d6f8fced1f05&quot;, 
+        &quot;ctime&quot;: 1484225125.5839477, 
+        &quot;dev&quot;: 2049, 
+        &quot;executable&quot;: false, 
+        &quot;exists&quot;: true, 
+        &quot;gid&quot;: 0, 
+        &quot;gr_name&quot;: &quot;root&quot;, 
+        &quot;inode&quot;: 27787277, 
+        &quot;isblk&quot;: false, 
+        &quot;ischr&quot;: false, 
+        &quot;isdir&quot;: false, 
+        &quot;isfifo&quot;: false, 
+        &quot;isgid&quot;: false, 
+        &quot;islnk&quot;: false, 
+        &quot;isreg&quot;: true, 
+        &quot;issock&quot;: false, 
+        &quot;isuid&quot;: false, 
+        &quot;md5&quot;: &quot;1de3012618bc0c1d1e42534d365a8ca5&quot;, 
+        &quot;mode&quot;: &quot;0644&quot;, 
+        &quot;mtime&quot;: 1484225124.8959477, 
+        &quot;nlink&quot;: 1, 
+        &quot;path&quot;: &quot;/home/kongdefei/tidb/tidb-latest-linux-amd64.tar.gz&quot;, 
+        &quot;pw_name&quot;: &quot;root&quot;, 
+        &quot;readable&quot;: true, 
+        &quot;rgrp&quot;: true, 
+        &quot;roth&quot;: true, 
+        &quot;rusr&quot;: true, 
+        &quot;size&quot;: 51645042, 
+        &quot;uid&quot;: 0, 
+        &quot;wgrp&quot;: false, 
+        &quot;woth&quot;: false, 
+        &quot;writeable&quot;: true, 
+        &quot;wusr&quot;: true, 
+        &quot;xgrp&quot;: false, 
+        &quot;xoth&quot;: false, 
+        &quot;xusr&quot;: false
+    }
+...
+</code></pre>
+
+<h4 id="管理软件模块">管理软件模块</h4>
+
+<p>指像yum, apt等管理包的软件</p>
+<pre><code class="language-shell">#安装nginx软件包
+$ansible web -m yum -a &quot;name=nginx state=present&quot;
+$ansible web -m apt -a &quot;name=nginx state=present&quot;
+
+#安装包到一个特定的版本
+$ansible web -m yum -a &quot;name=nginx-1.6.2 state=present&quot;
+$ansible web -m apt -a &quot;name=nginx-1.6.2 state=present&quot;
+
+#指定某个源仓库安装某软件包
+$ansible web -m yum -a &quot;name=php55w enablerepo=remi state=present&quot;
+
+#更新一个软件包是最新版本
+$ansible web -m yum -a &quot;name=nginx state=latest&quot;
+$ansible web -m apt -a &quot;name=nginx state=latest&quot;
+
+#卸载一个软件
+$ansible web -m yum -a &quot;name=nginx state=absent&quot;
+$ansible web –m apt -a &quot;name=nginx state=absent&quot;
+</code></pre>
+
+<p>Ansible 支持很多操作系统的软件包管理，使用时 -m 指定相应的软件包管理工具模块，如果没有这样的模块，可以自己定义类似的模块或者使用 command 模块来安装软件包</p>
+
+<h4 id="user模块">User模块</h4>
+
+<p>用户模块主要用于创建，更改，删除用户</p>
+<pre><code class="language-shell">#创建一个用户
+$ansible all -m user -a &quot;name=hadoop password=123456&quot;
+
+#删除用户
+ansible all -m user -a &quot;name=hadoop state=absent&quot;
+</code></pre>
+
+<h4 id="service模块">service模块</h4>
+
+<p>主要是控制被控机的各种service。</p>
+<pre><code class="language-shell">#启动,重启，停止httpd服务
+$ansible all -m service -a &quot;name=httpd state=started(restarted|stopped)&quot;
+</code></pre>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Python学习速记--面向对象 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Python学习速记-面向对象">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1.html">Python学习速记--面向对象</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Python.html">Python</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.html">学习笔记</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>python支持面向对象编程，定义一个类的方式如下:</p>
+<pre><code>class Student(object):
+    pass
+</code></pre>
+
+<p>其中class是类的声明，Student是类名，后面括号里的object是该类继承的类，即父类</p>
+<pre><code>#创建一个类
+stu_instance = Student('jack','male')
+print(stu_instance.name)
+stu_instance.print_info()
+
+#添加私有变量
+class Student2(object):
+    def __init__(self,name,sex):
+        self.__name = name
+        self.__sex = sex
+    def print_info(self):#self必须作为参数
+        print('name:',self.__name,'sex:',self.__sex)
+    
+    def set_name(self,name):
+        self.__name = name
+    def get_name(self):
+        return self__name
+
+    def set_sex(self,sex):
+        self.__sex = sex
+    def get_sex(self):
+        return self.__sex
+
+stu2 = Student2('jack','male')
+print(stu2._Student2__name) #可以这样访问私有变量
+stu2.print_info()
+print(stu2.get_sex())
+</code></pre>
+
+<!--more-->
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

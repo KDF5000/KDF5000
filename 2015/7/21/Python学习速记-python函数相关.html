@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Python学习速记--python函数相关 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Python学习速记-python函数相关">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-python%e5%87%bd%e6%95%b0%e7%9b%b8%e5%85%b3.html">Python学习速记--python函数相关</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Python.html">Python</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.html">学习笔记</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h4 id="python数据结构">python数据结构</h4>
+
+<ul>
+<li>list = [1,2,3] 方法：list.append(ele),list.insert(pos,ele),list.pop(),list.pop(pos)</li>
+<li>tuple = (1,2)或(1,2,[3,4])  方法：tuble元素不可变</li>
+<li>dict = {&lsquo;Tom&rsquo;:12,&lsquo;Michael&rsquo;:23}  方法：dict.get(ele),dict.pop(ele)</li>
+<li>set = set([1,2,3])  方法：add, remobe</li>
+</ul>
+
+<h4 id="函数">函数</h4>
+
+<p>函数名其实就是指向一个函数对象的引用，完全可以把函数名赋给一个变量，相当于给这个函数起了一个“别名”</p>
+<pre><code>&gt;&gt;&gt; a = abs #变量a指向abs函数
+&gt;&gt;&gt; a(-1) # 所以也可以通过a调用abs函数
+1
+</code></pre>
+
+<p>python中，自己定义一个函数使用def语句，依次写出函数名、括号、括号中的参数和冒号:，然后，在缩进块中编写函数体，函数的返回值用<code>return</code>语句返回。</p>
+
+<!--more-->
+<pre><code>#自己定义函数
+def my_abs(x):
+    if not isinstance(x,(int,float)):
+        raise TypeError('参数类型不匹配')
+    if x&gt;0:
+        return x
+    else:
+        return -x;
+</code></pre>
+
+<p>python 中的函数可以返回多个值，返回的return语句中直接用<code>,</code>隔开即可，接收变量同样<code>,</code>隔开，如下：</p>
+<pre><code>#返回多个值
+import math # 导入math包 
+
+def move(x, y, step, angle=0):
+    nx = x + step * math.cos(angle)
+    ny = y - step * math.sin(angle)
+    return nx, ny
+nx,ny = move(0,0,10)
+print(nx,ny)
+#其实返回的还是一个值，是一个tuple
+r1 = move(0,0,10)
+print(r1)
+</code></pre>
+
+<p>其实返回值是一个tuple</p>
+
+<h4 id="函数参数">函数参数</h4>
+
+<p>python支持默认参数，放在后面，而且默认参数必须指向不可对象，否则该默认参数的值在多次调用改变参数变量的值是默认参数的值也会放生变化。如下</p>
+<pre><code>def add_end(L=[]):
+    L.append('end')
+    return L;
+print(add_end()) # L的默认值是[]
+print(add_end()) # L的默认值是['end'],所以结果是['end','end']
+#修改如下，将默认参数设置为不可变对象，None
+def add_end_2(L=None):
+    if L is None:
+        L = []
+    L.append('end')
+    return L
+print(add_end_2()) #L的默认值是None
+print(add_end_2()) #L的默认值是None
+</code></pre>
+
+<h5 id="可变参数">可变参数</h5>
+
+<p>pytho如何实现可变参数呢？
+* 可以将list或tuple类型作为参数，这样就实现了输入可变参数，但是调用的时候必须先组装一个list或者tuple
+* 以<code>*param</code>的形式作为参数，这样调用的时候有几个参数就写几个参数
+对比如下：</p>
+<pre><code>#list形式的可变参数
+def fun_params(list):
+    sum = 0
+    for num in list:
+        sum = sum + num
+    return sum
+print(fun_params([1,2,3])) #参数必须是个list
+# “指针”形式的可变参数
+def fun_params_2(*numbers):
+    sum = 0
+    for num in numbers:
+        sum = sum + num
+    return sum
+print(fun_params_2(1,2,3)) #参数不用组装list,直接有个参数就写几个参数,其实内部参数numbers接收的是一个tuple
+</code></pre>
+
+<p>对于已经有的list，如何调用第二种像是的可变参数函数呢？如下代码</p>
+<pre><code>list = [1,2,3]
+print(fun_params_2(*list))#只用在list或者tuple变量前加一个*即可
+</code></pre>
+
+<p>*总结*：对于可变参数，允许输入0个或者任意多个参数，内部都是组装成一个tuple</p>
+
+<h5 id="关键字参数">关键字参数</h5>
+
+<p>可变参数允许你传入0个或任意个参数，这些可变参数在函数调用时自动组装为一个tuple。而关键字参数允许你传入0个或任意个含参数名的参数，这些关键字参数在函数内部自动组装为一个dict</p>
+<pre><code>#关键字参数
+def dict_fun(name,age,**kw):
+    print('name:',name,'age:',age,'other:',kw)
+dict_fun('jack',23,city='beijing',sex='male')#以键值对的方式调用
+#dict形式的调用
+dict_demo = {'city':'bijing','sex':'male'}
+dict_fun('jack',23,**dict_demo)#dict形式的调用,dict变量前加两个**
+</code></pre>
+
+<h5 id="明名关键字参数">明名关键字参数</h5>
+
+<p>和关键字参数不同的是，命名关键字参数制定了关键字参数的个数和名字，如下</p>
+<pre><code>#命名关键字参数
+def kw_fun(name,age,*,city='Beijing',job):
+    print(name,age,city,job)
+kw_fun('tom',23,job=&quot;engineer&quot;)
+</code></pre>
+
+<p>还不知道什么时候会使用，，，</p>
+
+<h5 id="组合参数">组合参数</h5>
+
+<p>在Python中定义函数，可以用必选参数、默认参数、可变参数、关键字参数和命名关键字参数，这5种参数都可以组合使用，除了可变参数无法和命名关键字参数混合。但是请注意，参数定义的顺序必须是：必选参数、默认参数、可变参数/命名关键字参数和关键字参数。</p>
+<pre><code>
+def f1(a, b, c=0, *args, **kw):
+    print('a =', a, 'b =', b, 'c =', c, 'args =', args, 'kw =', kw)
+f1(1,2,3,4,5,name='jack')
+
+def f2(a, b, c=0, *, d,e, **kw):
+    print(a,  b,c, d, e,kw)
+
+f2(1,2,3,d=4,e=5,name='jack')
+
+
+args = [1,2,3,4]
+ext = {'name':'jack'}
+f1(*args,**ext)
+
+</code></pre>
+
+<h3 id="总结">总结</h3>
+
+<p><code>Python</code>的函数具有非常灵活的参数形态，既可以实现简单的调用，又可以传入非常复杂的参数。
+默认参数一定要用不可变对象，如果是可变对象，程序运行时会有逻辑错误！
+要注意定义可变参数和关键字参数的语法：
+<code>*args</code>是可变参数，<code>args</code>接收的是一个<code>tuple</code>；
+<code>**kw</code>是关键字参数，<code>kw</code>接收的是一个<code>dict</code>。
+以及调用函数时如何传入可变参数和关键字参数的语法：
+可变参数既可以直接传入：<code>func(1, 2, 3)</code>，又可以先组装<code>list</code>或<code>tuple</code>，再通过<code>*args</code>传入：<code>func(*(1, 2, 3))</code>；
+关键字参数既可以直接传入：<code>func(a=1, b=2)</code>，又可以先组装<code>dict</code>，再通过<code>**kw</code>传入：<code>func(**{'a': 1, 'b': 2})</code>。
+使用<code>*args</code>和<code>**kw</code>是<code>Python</code>的习惯写法，当然也可以用其他参数名，但最好使用习惯用法。
+命名的关键字参数是为了限制调用者可以传入的参数名，同时可以提供默认值。
+定义命名的关键字参数不要忘了写分隔符*，否则定义的将是位置参数。</p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

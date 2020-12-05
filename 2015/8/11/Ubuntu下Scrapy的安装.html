@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Ubuntu下Scrapy的安装 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Ubuntu下Scrapy的安装">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">11</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/11/Ubuntu%e4%b8%8bScrapy%e7%9a%84%e5%ae%89%e8%a3%85.html">Ubuntu下Scrapy的安装</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Python.html">Python</a>
+                            
+                            <a class="tag label label-info" href="/tags/Scrapy.html">Scrapy</a>
+                            
+                            <a class="tag label label-info" href="/tags/Linux.html">Linux</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>最近在学习爬虫，早就听说<code>Python</code>写爬虫极爽（貌似pythoner说python都爽，不过也确实，python的类库非常丰富，不用重复造轮子），还有一个强大的框架<code>Scrapy</code>，于是决定尝试一下。</p>
+
+<p>要想使用<code>Scrapy</code>第一件事，当然是安装<code>Scrapy</code>，尝试了<code>Windows</code>和<code>Ubuntu</code>的安装，本文先讲一下 <code>Ubuntu</code>的安装，比<code>Windows</code>的安装简单太多了。。。抽时间也会详细介绍一下怎么在<code>Windows</code>下进行安装。</p>
+
+<p><a href="http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/install.html#ubuntu-9-10">官方介绍</a>，在安装<code>Scrapy</code>前需要安装一系列的依赖.
+*  <code>Python 2.7</code>： <code>Scrapy</code>是<code>Python</code>框架，当然要先安装<code>Python</code> ，不过由于<code>Scrapy</code>暂时只支持 <code>Python2.7</code>，因此首先确保你安装的是<code>Python 2.7</code>
+*  <code>lxml</code>：大多数<code>Linux</code>发行版自带了<code>lxml</code>
+*  <code>OpenSSL</code>：除了<code>windows</code>之外的系统都已经提供
+*  <code>Python Package</code>: pip and setuptools. 由于现在<code>pip</code>依赖<code>setuptools</code>,所以安装<code>pip</code>会自动安装<code>setuptools</code></p>
+
+<p>有上面的依赖可知，在非windows的环境下安装 Scrapy的相关依赖是比较简单的，只用安装<code>pip</code>即可。<code>Scrapy</code>使用<code>pip</code>完成安装。</p>
+
+<!--more-->
+
+<h4 id="检查-scrapy-依赖是否安装">检查<code>Scrapy</code>依赖是否安装</h4>
+
+<p>你可能会不放心自己的电脑是否已经安装了，上面说的已经存在的依赖，那么你可以使用下面的方法检查一下，本文使用的是<code>Ubuntu 14.04</code>。</p>
+
+<h5 id="检查-python-的版本">检查<code>Python</code>的版本</h5>
+<pre><code>$ python --version
+</code></pre>
+
+<p>如果看到下面的输出，说明<code>Python</code>的环境已经安装，我这里显示的是<code>Python 2.7.6</code>，版本也是<code>2.7</code>的满足要求。如果没有出现下面的信息，那么请读者自行百度安装<code>Python</code>，本文不介绍<code>Python</code>的安装（网上一搜一堆）。
+<img src="/media/archive/img_scrapy_python.png" alt="" /></p>
+
+<h5 id="检查-lxml-和-openssl-是否安装">检查<code>lxml</code>和<code>OpenSSL</code>是否安装</h5>
+
+<p>假设已经安装了<code>Python</code>，在控制台输入<code>python</code>，进入<code>Python</code>的交互环境。
+<img src="/media/archive/img_scrapy_lxml_ssl.png" alt="" /></p>
+
+<p>然后分别输入<code>import lxml</code>和<code>import OpenSSL</code>如果没有报错，说明两个依赖都已经安装。
+<img src="/media/archive/img_scrapy_lxml_openssl.png" alt="" /></p>
+
+<h4 id="安装-python-dev-和-libevent">安装<code>python-dev</code>和<code>libevent</code></h4>
+
+<p><code>python-dev</code>是<code>linux</code>上开发<code>python</code>比较重要的工具，以下的情况你需要安装
+* 你需要自己安装一个源外的python类库, 而这个类库内含需要编译的调用python api的c/c++文件
+* 你自己写的一个程序编译需要链接libpythonXX.(a|so)</p>
+
+<p><code>libevent</code>是一个时间出发的高性能的网络库，很多框架的底层都使用了<code>libevent</code></p>
+
+<p>上面两个库是需要安装的，不然后面后报错。使用下面的指令安装</p>
+<pre><code>$sudo apt-get install python-dev
+$sudo apt-get install libevent-dev
+</code></pre>
+
+<h4 id="安装-pip">安装<code>pip</code></h4>
+
+<p>因为<code>Scrapy</code>可以使用<code>pip</code>方便的安装，因此我们需要先安装<code>pip</code>，可以使用下面的指令安装<code>pip</code></p>
+<pre><code>$ sudo apt-get install python-pip
+</code></pre>
+
+<h4 id="使用-pip-安装-scrapy">使用<code>pip</code>安装<code>Scrapy</code></h4>
+
+<p>使用下面的指令安装<code>Scrapy</code>。</p>
+<pre><code>$ sudo pip install scrapy
+</code></pre>
+
+<p>记住一定要获得<code>root</code>权限，否则会出现下面的错误。
+<img src="/media/archive/img_scrapy_exception.png" alt="" /></p>
+
+<p>至此<code>scrapy</code>安装完成，使用下面的命令检查<code>Scrapy</code>是否安装成功。</p>
+<pre><code>$ scrapy version
+</code></pre>
+
+<p>显示如下结果说明安装成功，此处的安装版本是<code>1.02</code>
+<img src="/media/archive/img_scrapy_version.png" alt="" /></p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

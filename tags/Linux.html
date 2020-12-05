@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">Linux</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">17</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/17/mmap%e5%86%85%e5%ad%98%e6%98%a0%e5%b0%84.html">mmap内存映射</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h2 id="相关知识">相关知识</h2>
+
+<p>内存映射是个很有用，也很有意思的思想。我们都知道操作系统分为用户态和内核态，用户态是不能直接和物理设备打交道的，如果想把硬盘的一块区域读到用户态，则需要两次拷贝(硬盘-&gt;内核-&gt;用户)，但是内存映射的设计只需要发生一次的拷贝，大大的提高了读取数据的效率。那么内存映射的原理和内核是如何实现的呢？</p>
+
+<p>因为内存映射涉及到虚拟内存的管理，虚拟内存到物理内存的映射，因此在详细介绍内存映射前先普及(回忆)一下相关的概念。</p>
+
+<h3 id="cpu的架构">CPU的架构</h3>
+
+<p>目前CPU架构主要分为三种：SMP, NUMA, MPP，详细的介绍参考<a href="http://kdf5000.com/2017/02/17/CPU架构/">CPU架构</a>。这里主要关注MMU和TLB在CPU中的角色和位置。
+<img src="/media/archive/blog/images/2017/cpu.png" alt="CPU" />
+上图是Intel的i7处理器一个核的架构图，图中可以看出每一个CPU核都已一个自己的MMU和TLB。</p>
+
+<h3 id="linux进程和线程">Linux进程和线程</h3>
+
+<p>关于Linux进程和线程的话题想必大家都不陌生，这也是面试时候经常被问到的问题，后续我会专门写一篇博文介绍Linux线程和进程的区别，已经内核是如何实现的。这里我们只需要知道下面几个概念即可：
+* 操作系统本身也是一个进程
+* 操作系统内核层面没有线程的概念，只有进程的概念，因此线程在内核看来也是一个进程，只是比较特殊
+* 线程的实现是glibc实现的(pthread)，包括创建，管理等</p>
+
+<h3 id="虚拟地址">虚拟地址</h3>
+
+<p>虚拟地址是面向进程的一套虚拟内存的地址，为了更好的管理内存，并且能够保证内存对程序员而言是透明的，也就是写程序的时候对每一个程序来说都是一样的地址空间，因此提出了虚拟内存的概念，对应的就是虚拟地址。这里我们不关注具体的细节，为了后面的讲解，我们简单的了解一下虚拟内存在内核层面是怎么进行管理的。
+<img src="/media/archive/blog/images/2017/vm_manage.png" alt="CPU" />
+这张图右侧的进程虚拟器对于每一个进程都是一样的，就是上面说的虚拟空间，然后对于进程，内核对每一个进程都维护了一个task_struch的结构，其中有三个重要的成员，pgd指向改进程的页表首地址，然后mmap和mm_rb都是用来管理vm的结构，vm是虚拟内存管理的基本单元，含有内存的类型，起始和结束地址，mmap是线性表实现的，mm_rb则使用红黑树进行管理，分别适用不同的场景。</p>
+
+<h3 id="mmu">MMU</h3>
+
+<p>MMU(Memory Management Unit),内存管理单元，主要负责CPU内存访问的时候将虚拟地址转换为物理地址的单元。也就是说CPU想要访问内存必须先经过MMU的转换，获得真正的物理地址，才能读写物理内存的数据。其实MMU只是一个简单的计算单元，它通过虚拟地址查找页表，找到对应的物理地址，然后返回给CPU。在查找页表的过程中可能发生多次的物理内存访问，这取决于系统采用页表管理系统是几级的，目前Linux的页表是四级的，因此需要查询四次页表，每一次查询都会获得一个物理地址指向下一级页表的内存地址，知道最后获得实际要访问的内存物理地址。
+<img src="/media/archive/blog/images/2017/mmu.png" alt="CPU" />
+从图中可以看出，当CPU得到一个虚拟地址去访问内存的时候会先将虚拟地址发送到MMU(1)，然后MMU会先从TLB查询是否存在这个虚拟地址到物理地址的缓存，如果存在则直接返回给CPU，如果没有则会根据虚拟地址讲过计算获得物理内存中页表项的地址然后读取得到PTE(Linux可能要读取四次)，PTE就是物理内存地址或者硬盘存储地址。然后MMU会将该PTE缓存在TLB中，最后使用这个物理地址再次访问物理内存或者硬盘地址获得要访问的内容。</p>
+
+<h2 id="内存映射">内存映射</h2>
+
+<h3 id="mmap">mmap</h3>
+
+<p>基础知识介绍完毕，那么到底什么是内存映射呢，映射让我们不禁都会想起数学上的映射关系，是的就是那个意思，这里是讲设备或者硬盘存储的一块空间映射到物理内存，然后操作这块物理内存就是在操作实际的硬盘空间，不需要经过内核态传递。比如你的硬盘上有一个文件，你可以使用linux系统提供的mmap接口，讲这个文件映射到进程一块虚拟地址空间，这块空间会对应一块物理内存，当你读写这块物理空间的时候，就是在读取实际的磁盘文件，就是这么直接，这么高效。通常诸如共享库的加载都是通过内存映射的方式加载到物理内存的。</p>
+
+<p>mmap本身其实是一个很简单的操作，在进程的页表中添加一个页表项，该页表项是物理内存的地址。调用mmap的时候，内核会在改进程的虚拟空间的映射区域查找一块满足需求的空间用于映射该文件，然后生成该虚拟地址的页表项，改页表项此时的有效位(标志是否已经在物理内存中)为0，页表项的内容是文件的磁盘地址，此时mmap的任务已经完成。
+<img src="/media/archive/blog/images/2017/mmap.png" alt="CPU" />
+当mmap建立完页表的映射后，就可以操作改块内存了，进行的所有改动都会自动写会磁盘文件。第一次访问该块内存的时候，因为页表项的有效位还是0，就会发生缺页中断，然后CPU会使用该页表项的内容也就是磁盘的文件地址，讲该地址指向的内容加载到物理内存，并需改页表项的内容为该物理地址，有效位置为1.
+<img src="/media/archive/blog/images/2017/mmap_pgfault.png" alt="CPU" /></p>
+
+<h3 id="munmap">munmap</h3>
+
+<p>有映射必然有解除映射，系统提供了一个munmap的接口去解除指定地址的映射关系。munmap主要的功能是清除页表项，解除这个映射关系，但是这个过程中会涉及到缓存的刷新，虚拟内存vm的删除，TLB的一致性(tlb shootdown操作)，这里就不再详细讲解。</p>
+
+<h3 id="附件">附件</h3>
+
+<p><a src="/media/archive/blog/images/2017/内存映射.pptx">1. 内存映射</a></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/17/mmap%e5%86%85%e5%ad%98%e6%98%a0%e5%b0%84.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Ansible: 自动化管理服务器(2)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="ansible-命令参数">Ansible 命令参数</h3>
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>-v</td>
+<td>详细模式，如果命令执行成功，输出详细的结果</td>
+</tr>
+
+<tr>
+<td>-i Path</td>
+<td>指定host文件的路径，默认是/etc/ansible/hosts</td>
+</tr>
+
+<tr>
+<td>-f Num</td>
+<td>指定一个整数，默认是5，指定fork开启同步进程的个数</td>
+</tr>
+
+<tr>
+<td>-m Name</td>
+<td>指定使用的module名称，默认是command</td>
+</tr>
+
+<tr>
+<td>-M path</td>
+<td>指定module的目录。默认是/usr/share/ansible</td>
+</tr>
+
+<tr>
+<td>-a Module_Args</td>
+<td>指定module的参数</td>
+</tr>
+
+<tr>
+<td>-k</td>
+<td>提示输入ssh密码，而不是基于ssh的密钥认证</td>
+</tr>
+
+<tr>
+<td>-sudo</td>
+<td>指定使用sudo获得root权限</td>
+</tr>
+
+<tr>
+<td>-K</td>
+<td>提示输入sudo密码，与-sudo一起使用</td>
+</tr>
+
+<tr>
+<td>-u Username</td>
+<td>指定被控机器的执行用户</td>
+</tr>
+
+<tr>
+<td>-C</td>
+<td>测试此命令会改变什么内容，不会真正的去执行</td>
+</tr>
+</tbody>
+</table>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-1.html">Ansible: 自动化管理服务器(1)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h2 id="ansible配置">Ansible配置</h2>
+
+<p>Ansible 提供一种最简单的方式用于发布、管理和编排计算机系统的工具，你可在数分钟内搞定</p>
+
+<p>Ansible 是一个模型驱动的配置管理器，支持多节点发布、远程任务执行。默认使用 SSH 进行远程连接。无需在被管理节点上安装附加软件，可使用各种编程语言进行扩展</p>
+
+<p><img src="http://7xtgvp.com2.z0.glb.clouddn.com/blog/images/Ansible.png" alt="Ansible" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-1.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">12</span>
+                            <span class="day">8</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/12/8/%e4%bd%bf%e7%94%a8iptables%e7%9a%84NAT%e5%8a%9f%e8%83%bd%e6%8e%a7%e5%88%b6%e5%86%85%e7%bd%91%e8%ae%be%e5%a4%87%e8%ae%bf%e9%97%ae%e5%a4%96%e7%bd%91.html">使用iptables的NAT功能控制内网设备访问外网</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>通过iptables的NAT功能控制内网上网。</p>
+
+<h5 id="前提条件">前提条件</h5>
+
+<p>一台能够上网的主机，并且和其他需要控制上网的主机在同一个内网。</p>
+
+<p>hw98: 172.18.11.98 可以上外网</p>
+
+<p>hw网段: 172.18.11.0/24</p>
+
+<p>目的：通过hw98装发内网内的其他机器数据包，从而实现上网控制的目的</p>
+
+<h4 id="步骤">步骤</h4>
+
+<p>hw98设置路由转发的功能</p>
+
+<ul>
+<li><p>开启内核的ip转发功能</p>
+<pre><code class="language-shell">$ echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+或者
+$ vim /etc/sysctl.conf
+# Controls IP packet forwarding
+net.ipv4.ip_forward = 1
+</code></pre></li>
+
+<li><p>添加确认包和关联包的通过</p>
+<pre><code class="language-shell">$ iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre></li>
+</ul>
+
+<!--more -->
+
+<ul>
+<li><p>设置iptables的nat表，添加FORWARD规则</p>
+<pre><code class="language-shell">$ iptables -t nat -A POSTROUTING -s 172.18.11.0/24 -j SNAT --to 172.18.11.98
+</code></pre></li>
+</ul>
+
+<p>内网内需要进行上网的机器</p>
+
+<ul>
+<li><p>删除默认的路由，如果没有就不用删除</p>
+<pre><code class="language-shell">$route del default gw *.*.*.*  #通过route 查看
+</code></pre></li>
+
+<li><p>添加hw98为默认路由</p>
+<pre><code class="language-shell">$route add default gw 172.18.11.98
+</code></pre></li>
+</ul>
+
+<p>上面内网的设置在重启网络的时候会被修改，所以最好的方法就是在网络配置里就行设置，在centos就是<code>/etc/sysconfig/network-scripts/ifcfg-eth0</code>，只用设置GATEWAY即可，如果有必要也可以设置一下DNS</p>
+<pre><code>GATEWAY=172.18.11.98
+DNS1=159.226.39.1
+</code></pre>
+
+<p><strong>说明：</strong>没有深入理解整个运行过程，其实可以通过hw98的iptables设置进行更加细致的访问控制，比如控制内网内特定的主机访问外网，这里是全部允许，也可以控制特定的端口等等。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/12/8/%e4%bd%bf%e7%94%a8iptables%e7%9a%84NAT%e5%8a%9f%e8%83%bd%e6%8e%a7%e5%88%b6%e5%86%85%e7%bd%91%e8%ae%be%e5%a4%87%e8%ae%bf%e9%97%ae%e5%a4%96%e7%bd%91.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/11/12/auditd%e7%9a%84%e4%bd%bf%e7%94%a8.html">auditd的使用</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>linux系统中用户空间的组件，负责系统安全审计，将审计的记录写入磁盘</p>
+
+<h4 id="安装">安装</h4>
+
+<p>ubuntu可以直接使用apt-get安装，centos使用yum安装</p>
+
+<p>安装后有下面相关的工具：</p>
+
+<ul>
+<li><strong>auditctl :</strong> 即时控制审计守护进程的行为的工具，比如如添加规则等等。</li>
+<li><strong>/etc/audit/audit.rules :</strong> 记录审计规则的文件。</li>
+<li><strong>aureport :</strong> 查看和生成审计报告的工具。</li>
+<li><strong>ausearch :</strong> 查找审计事件的工具</li>
+<li><strong>auditspd :</strong> 转发事件通知给其他应用程序，而不是写入到审计日志文件中。</li>
+<li><strong>autrace :</strong> 一个用于跟踪进程的命令。</li>
+<li><strong>/etc/audit/auditd.conf :</strong> auditd工具的配置文件。</li>
+</ul>
+
+<p>首次安装auditd后，审计规则是空的，使用下面的命令查看</p>
+<pre><code class="language-shell">$auditctl -l
+</code></pre>
+
+<!-- more -->
+
+<h4 id="添加auditd规则">添加auditd规则</h4>
+
+<p>监控文件和目录的更改</p>
+<pre><code class="language-shell">$sudo auditctl -w /etc/passwd -p rwxa
+</code></pre>
+
+<p>选项：</p>
+
+<ul>
+<li>-w path: 指定监控的路径，上面指定监控的文件路径/etc/passwd</li>
+<li>-p: 指定出发审计的文件/目录的访问权限</li>
+<li>rwxa: 指定的触发条件，r读，w写，x执行权限，a属性</li>
+</ul>
+
+<p>如果不加-p参数，-w参数后面指定的是目录，则将会对指定目录所有访问进行监控。默认的权限是rwax，可以使用<code>auditctl -l</code>查看已经添加的规则</p>
+
+<p><img src="/media/archive/blog/image/auditd-0.png" alt="" /></p>
+
+<h4 id="查看审计日志">查看审计日志</h4>
+
+<p>使用ausearch可以查看auditd的审计日志。比如上面已经对/etc/passwd文件添加了审计，那么使用下面的命令可以查看审计日志。</p>
+<pre><code class="language-shell">$sudo ausearch - f/etc/passwd
+</code></pre>
+
+<p><code>-f</code>需要查找的审计目标的日志</p>
+
+<p>输出可能如下</p>
+
+<blockquote>
+<hr />
+
+<p>time-&gt;Wed Sep 21 15:07:51 2016
+type=PATH msg=audit(1474441671.907:881): item=1 name=&ldquo;/root/kongdefei/.test.swp&rdquo; inode=44826697 dev=08:03 mode=0100600 ouid=0 ogid=0 rdev=00:00
+type=PATH msg=audit(1474441671.907:881): item=0 name=&ldquo;/root/kongdefei/&rdquo; inode=80856866 dev=08:03 mode=040755 ouid=0 ogid=0 rdev=00:00
+type=CWD msg=audit(1474441671.907:881):  cwd=&ldquo;/root/kongdefei&rdquo;
+type=SYSCALL msg=audit(1474441671.907:881): arch=c000003e syscall=87 success=yes exit=0 a0=699f130 a1=1 a2=1 a3=2 items=2 ppid=18763 pid=18798 auid=4294967295 uid=0 gid=0 euid=0 s
+uid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts1 ses=4294967295 comm=&ldquo;vi&rdquo; exe=&ldquo;/bin/vi&rdquo; key=(null)</p>
+</blockquote>
+
+<ul>
+<li>time: 审计时间</li>
+<li>name: 审计对象</li>
+<li>cwd: 当前路径</li>
+<li>sys call：系统调用</li>
+<li>auid: 设计用户id</li>
+<li>uid和gid：访问文件的用户id和用户组id,uid=0 gid=0表明是root用户</li>
+<li>comm: 用户访问文件的命令</li>
+<li>exe: 上面命令的执行文件路径</li>
+</ul>
+
+<p>上面内容表示/root/kongdefei/.test.swp文件被root用户使用vi命令编辑过</p>
+
+<h4 id="查看审计报告">查看审计报告</h4>
+
+<p>一旦定义规则后，他会自动运行，过一段时间后，可以使用auditd的工具aureport生成简要的日志报告。直接使用下面命令即可</p>
+<pre><code class="language-shell">$sudo aureport
+</code></pre>
+
+<p><img src="/media/archive/blog/image/auditd-1.png" alt="" /></p>
+
+<p>可以看出有51次授权失败，102次登录。可以使用下面命令查看授权失败的详细信息</p>
+<pre><code class="language-shell">$sudo aureport -au
+</code></pre>
+
+<p><img src="/media/archive/blog/image/auditd-4.png" alt="" /></p>
+
+<p>凡是no（如2，5）的都是授权失败。可以看出是root用户ssh登录的时候失败。</p>
+
+<p><code>-m</code>可以查看所有账户修改相关的事件</p>
+<pre><code class="language-shell">$sudo aureport -m
+</code></pre>
+
+<p><img src="/media/archive/blog/image/auditd-2.png" alt="" /></p>
+
+<h4 id="auditd配置文件">auditd配置文件</h4>
+
+<p>上面使用-w添加审计规则只是暂时的，系统重启后就会消失，可以修改/etc/audit/audit.rules文件是规则持久有效。上面添加的规则可以直接写入/etc/audit/audit.rules文件中</p>
+
+<p>如下：</p>
+
+<p><img src="/media/archive/blog/image/auditd-3.png" alt="" /></p>
+
+<p>然后重启auditd即可</p>
+<pre><code class="language-shell">$ service auditd restart #或者/etc/init.d/auditd restart
+</code></pre>
+
+<h4 id="总结">总结</h4>
+
+<p>Auditd是Linux上的一个审计工具。你可以阅读auidtd文档获取更多使用auditd和工具的细节。例如，输入 <strong>man auditd</strong> 去看auditd的详细说明，或者键入 <strong>man ausearch</strong> 去看有关 ausearch 工具的详细说明。</p>
+
+<p><strong>请谨慎创建规则</strong>。太多规则会使得日志文件急剧增大！</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/11/12/auditd%e7%9a%84%e4%bd%bf%e7%94%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">4</span>
+                            <span class="day">30</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/4/30/awk%e7%9a%84%e4%bd%bf%e7%94%a8%e5%85%a5%e9%97%a8.html">awk的使用入门</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="简介">简介</h4>
+
+<p><code>awk</code>是一个强大的文本分析工具，在对数据分析生成报告时，特别枪弹。<code>awk</code>的原理是把文件以行读入，以指定的分隔符对每行分片，提供一些函数或者自己写程序逻辑，可以对每片进行出来。</p>
+
+<h4 id="使用方法">使用方法</h4>
+<pre><code>awk [options] 'script' var=value file(s) 
+awk [options] -f scriptfile var=value file(s)
+</code></pre>
+
+<h5 id="常用命令选项">常用命令选项</h5>
+
+<ul>
+<li><strong>-F field_separator</strong> 制定每行文本的域分隔符，可以是字符串也可以是正则表达式</li>
+<li><strong>-v var=value</strong> 赋值一个用户变量，将外部变量值传入awk</li>
+<li><strong>-f</strong> 制定awk脚本文件</li>
+</ul>
+
+<h4 id="awk的模式和操作">awk的模式和操作</h4>
+
+<p>awk 脚本，也就是上一节中的script部分，格式遵循下面的形式
+&gt; awk &ldquo;pattern action&rdquo;  files</p>
+
+<h5 id="模式-pattern">模式(Pattern)</h5>
+
+<p>模式可以是下面的任意一个:
+* /正则表达式/: 使用//包围的正则表达式
+* 关系表达式：使用运算符进行操作，可以是字符串或数字的比较测试
+* 模式匹配表达式： 用运算符<code>~</code>(匹配)和<code>~!</code>(不匹配)
+*  BEGIN语句块，pattern匹配块，END语句块</p>
+
+<!-- more -->
+
+<h5 id="操作">操作</h5>
+
+<p>操作有一个或者多个命令，函数，表达式组成，有换行符或者分毫分开，必须位于大括号内部，主要有下面操作：
+* 变量或数组赋值
+* 输出命令
+* 内置函数
+* 控制流程语句</p>
+
+<p>awk操作中的变量或者数组可以直接使用，不用进行初始化，其他语法和c风格比较像</p>
+
+<h4 id="入门实例">入门实例</h4>
+
+<p>假设last -n 5的输出如下：</p>
+<pre><code>hadoop@kdf5000:~$ last -n 5
+hadoop   pts/9        :1               Sat Apr 30 15:18   still logged in   
+hadoop   pts/22       :1               Sat Apr 30 14:49 - 14:49  (00:00)    
+hadoop   :1           :1               Sat Apr 30 14:48   still logged in   
+hust-lh  :0           :0               Sat Apr 30 14:46   still logged in   
+hadoop   pts/1        :0               Sat Apr 30 14:03 - 14:46  (00:43)    
+</code></pre>
+
+<p>如果只显示最近登陆的5个账号</p>
+<pre><code>hadoop@hust-lh:~$ last -n 5 | awk '{print $1}'
+hadoop
+hadoop
+hadoop
+hust-lh
+hadoop
+</code></pre>
+
+<p>awk工作流程是这样的：读入有<code>\n</code>换行符分割的一条记录，然后将记录按指定的域分隔符划分域，填充域，<code>$0</code> 则表示所有域,<code>$1</code>表示第一个域,<code>$n</code>表示第n个域。默认域分隔符是&rdquo;空白键&rdquo; 或 &ldquo;[tab]键&rdquo;,所以<code>$1</code>表示登录用户，<code>$3</code>表示登录用户ip,以此类推。</p>
+
+<p>如果只是显示/etc/passwd的账户</p>
+<pre><code>hadoop@hust-lh:~$ cat /etc/passwd |awk  -F ':'  '{print $1}'  
+root
+daemon
+bin
+sys
+sync
+games
+man
+</code></pre>
+
+<p>这种是<code>awk+action</code>的示例，每行都会执行<code>action{print $1}</code>。<code>-F</code>指定域分隔符为<code>':'</code>。
+如果只是显示<code>/etc/passwd</code>的账户和账户对应的<code>shell</code>,而账户与<code>shell</code>之间以逗号分割,而且在所有行添加列名<code>name</code>,<code>shell</code>,在最后一行添加<code>&quot;blue,/bin/nosh&quot;</code>。</p>
+<pre><code>hadoop@hust-lh:~$ cat /etc/passwd |awk  -F ':'  'BEGIN {print &quot;name,shell&quot;}  {print $1&quot;,&quot;$7} END {print &quot;blue,/bin/nosh&quot;}'
+name,shell
+root,/bin/bash
+daemon,/usr/sbin/nologin
+bin,/usr/sbin/nologin
+sys,/usr/sbin/nologin
+sync,/bin/sync
+blue,/bin/nosh
+</code></pre>
+
+<p>awk工作流程是这样的：先执行<code>BEGING</code>，然后读取文件，读入有<code>\n</code>换行符分割的一条记录，然后将记录按指定的域分隔符划分域，填充域，<code>$0</code>则表示所有域,<code>$1</code>表示第一个域,<code>$n</code>表示第<code>n</code>个域,随后开始执行模式所对应的动作<code>action</code>。接着开始读入第二条记录······直到所有的记录都读完，最后执行<code>END</code>操作。</p>
+
+<p>搜索/etc/passwd有root关键字的所有行</p>
+<pre><code>hadoop@hust-lh:~$ awk -F: '/root/' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+</code></pre>
+
+<p>这种是<code>pattern</code>的使用示例，匹配了<code>pattern</code>(这里是<code>root</code>)的行才会执行<code>action</code>(没有指定<code>action</code>，默认输出每行的内容)。</p>
+
+<p>搜索支持正则，例如找<code>root</code>开头的: <code>awk -F: '/^root/' /etc/passwd</code>
+搜索/etc/passwd有root关键字的所有行，并显示对应的<code>shell</code></p>
+<pre><code>hadoop@hust-lh:~$ awk -F: '/root/{print $7}' /etc/passwd          
+/bin/bash
+</code></pre>
+
+<p>这里指定了action{print $7}</p>
+
+<h4 id="脚本编程">脚本编程</h4>
+
+<p>awk可是将脚本写到文件中，然后使用-f调用脚本文件
+下面是一个统计一个文件中对应的单词出现的次数，文件的每一行有两个字段，一个是单词，一个是次数，每个单词可能出现多次，求每个单词后面每个数组的和
+下面是输入文件示例：</p>
+<pre><code>hello 1
+world 2
+hello 2
+world 1
+haha  4
+demo  3
+</code></pre>
+
+<p>脚本如下：</p>
+<pre><code>#!/bin/awk
+BEGIN{
+    print &quot;word&quot;, &quot;count&quot;
+    count=0
+}
+{
+    word[$1] = word[$1] + $2;
+    count = count + $2
+}
+END{
+   for (v in word){
+      print v, word[v]
+   }
+   print &quot;Total Count:&quot;, count
+}
+</code></pre>
+
+<p>执行脚本</p>
+<pre><code>hadoop@hust-lh:~/BigData/Homework/Hw2/GraphLite/GraphLite-0.20/res$ awk -f count.awk word
+word count
+demo 3
+haha 4
+hello 3
+world 3
+Total Count: 13
+</code></pre>
+
+<p>其实和c语言的风格时一样的，程序控制语句支持if, for, while, do while。</p>
+
+<h5 id="awk内置变量">awk内置变量</h5>
+
+<p>下面是awk的内置变量，这些变量时可以直接在脚本里使用的
+&gt;
+ARGC ：命令行参数个数
+ARGV  ：命令行参数排列
+ENVIRON   ：支持队列中系统环境变量的使用
+FILENAME   ：awk浏览的文件名
+FNR     ： 浏览文件的记录数
+FS    ：设置输入域分隔符，等价于命令行 -F选项
+NF  ：浏览记录的域的个数
+NR：已读的记录数
+OFS ：输出域分隔符
+ORS ：输出记录分隔符
+RS ：控制记录分隔符</p>
+
+<h4 id="结语">结语</h4>
+
+<p><code>awk</code>是一个非常强大好用的文本处理工具，<code>awk</code>的更多使用方法参考<a href="http://www.gnu.org/software/gawk/manual/gawk.html">http://www.gnu.org/software/gawk/manual/gawk.html</a></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/4/30/awk%e7%9a%84%e4%bd%bf%e7%94%a8%e5%85%a5%e9%97%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/28/Ubuntu-14-04-%e5%ae%89%e8%a3%85%e5%9b%be%e5%bd%a2%e7%9b%91%e6%8e%a7%e5%b7%a5%e5%85%b7Graphite.html">Ubuntu 14.04 安装图形监控工具Graphite</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="什么是-graphite">什么是<code>graphite</code>?</h3>
+
+<p>先看看百度百科是怎么介绍
+&gt;
+Graphite 是一个Python写的web应用，采用django框架，Graphite用来进行收集服务器所有的即时状态，用户请求信息，Memcached命中率，RabbitMQ消息服务器的状态，Unix操作系统的负载状态，Graphite服务器大约每分钟需要有4800次更新操作，Graphite采用简单的文本协议和绘图功能可以方便地使用在任何操作系统上。</p>
+
+<p>百度百科讲的还算是比较清楚了，<code>Graphite</code>是用来监控系统的， 比如操作系统，缓存服务系统等，但是监控的数据怎么得到呢？<code>Graphite</code>并不负责，它只负责显示，数据哪里来人家不care，你只要按照他的数据格式给它，<code>Graphite</code>就可以机智的用漂亮的页面显示给你，不过不用担心，<code>graphite</code>的安装的一系列套件，提供了<code>API</code>去传数据给它，而且数据如何存储的也不用我们担心，只管发数据给它就行。说的这么好，到底怎么安装呢？</p>
+
+<p>先别急，事情总不是那么完美，<code>Graphite</code>不支持<code>windows</code>，因此对于只使用<code>Windows</code>的<code>Coder</code>就有点小失落了，不过没关系，相信作为程序员都是有办法的，这些都是小事情。</p>
+
+<p>下面就进入<code>Graphite</code>的世界！</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/28/Ubuntu-14-04-%e5%ae%89%e8%a3%85%e5%9b%be%e5%bd%a2%e7%9b%91%e6%8e%a7%e5%b7%a5%e5%85%b7Graphite.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">11</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/11/Ubuntu%e4%b8%8bScrapy%e7%9a%84%e5%ae%89%e8%a3%85.html">Ubuntu下Scrapy的安装</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>最近在学习爬虫，早就听说<code>Python</code>写爬虫极爽（貌似pythoner说python都爽，不过也确实，python的类库非常丰富，不用重复造轮子），还有一个强大的框架<code>Scrapy</code>，于是决定尝试一下。</p>
+
+<p>要想使用<code>Scrapy</code>第一件事，当然是安装<code>Scrapy</code>，尝试了<code>Windows</code>和<code>Ubuntu</code>的安装，本文先讲一下 <code>Ubuntu</code>的安装，比<code>Windows</code>的安装简单太多了。。。抽时间也会详细介绍一下怎么在<code>Windows</code>下进行安装。</p>
+
+<p><a href="http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/install.html#ubuntu-9-10">官方介绍</a>，在安装<code>Scrapy</code>前需要安装一系列的依赖.
+*  <code>Python 2.7</code>： <code>Scrapy</code>是<code>Python</code>框架，当然要先安装<code>Python</code> ，不过由于<code>Scrapy</code>暂时只支持 <code>Python2.7</code>，因此首先确保你安装的是<code>Python 2.7</code>
+*  <code>lxml</code>：大多数<code>Linux</code>发行版自带了<code>lxml</code>
+*  <code>OpenSSL</code>：除了<code>windows</code>之外的系统都已经提供
+*  <code>Python Package</code>: pip and setuptools. 由于现在<code>pip</code>依赖<code>setuptools</code>,所以安装<code>pip</code>会自动安装<code>setuptools</code></p>
+
+<p>有上面的依赖可知，在非windows的环境下安装 Scrapy的相关依赖是比较简单的，只用安装<code>pip</code>即可。<code>Scrapy</code>使用<code>pip</code>完成安装。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/8/11/Ubuntu%e4%b8%8bScrapy%e7%9a%84%e5%ae%89%e8%a3%85.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

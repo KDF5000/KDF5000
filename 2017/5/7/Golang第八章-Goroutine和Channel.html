@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Golang第八章: Goroutine和Channel - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Golang第八章-Goroutine和Channel">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">7</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/5/7/Golang%e7%ac%ac%e5%85%ab%e7%ab%a0-Goroutine%e5%92%8cChannel.html">Golang第八章: Goroutine和Channel</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Golang.html">Golang</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.html">学习笔记</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>并发编程模型
+ - 顺序通信进程(Communicating Sequential Processes) CSP
+  值会在不同的实例(goroutine)中传递
+ - 多线程共享内存</p>
+
+<p><!--more --></p>
+
+<h3 id="goroutines">Goroutines</h3>
+
+<ul>
+<li>Go语言中每一个并发的执行单元叫做一个goroutine</li>
+<li>Go语言中主函数即在一个单独的goroutine中运行</li>
+<li>所有的goroutine在主函数返回时，都会直接打断，程序退出</li>
+</ul>
+
+<p>简单的clock程序<a href="ch8/clock.go">clock.go</a></p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;flag&quot;
+    &quot;fmt&quot;
+    &quot;io&quot;
+    &quot;log&quot;
+    &quot;net&quot;
+    &quot;time&quot;
+)
+
+var (
+    host string
+    port int
+)
+
+func init() {
+    flag.StringVar(&amp;host, &quot;host&quot;, &quot;localhost&quot;, &quot;clock server host&quot;)
+    flag.IntVar(&amp;port, &quot;port&quot;, 8000, &quot;clock server port&quot;)
+    flag.Parse()
+}
+
+func handleCon(c net.Conn) {
+    defer c.Close()
+    // for {
+    _, err := io.WriteString(c, time.Now().Format(&quot;15:04:05\n&quot;))
+    if err != nil {
+        return
+    }
+    time.Sleep(1 * time.Second)
+    // }
+}
+
+func main() {
+    server := fmt.Sprintf(&quot;%s:%d&quot;, host, port)
+    listener, err := net.Listen(&quot;tcp&quot;, server)
+    if err != nil {
+        log.Fatal(err)
+    }
+    for {
+        conn, err := listener.Accept() // 会阻塞
+        if err != nil {
+            log.Print(err)
+            continue
+        }
+        go handleCon(conn)
+    }
+}
+</code></pre>
+
+<p><a href="ch8/netcat.go">client.go</a>：</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;io&quot;
+    &quot;log&quot;
+    &quot;net&quot;
+    &quot;os&quot;
+    &quot;sync&quot;
+)
+
+func main() {
+    servers := []string{&quot;localhost:8001&quot;, &quot;localhost:8002&quot;, &quot;localhost:8003&quot;}
+    var wg sync.WaitGroup
+    for _, s := range servers {
+        wg.Add(1)
+        go func(serv string) {
+            conn, err := net.Dial(&quot;tcp&quot;, serv)
+            if err != nil {
+                log.Fatal(err)
+            }
+
+            if _, err := io.Copy(os.Stdout, conn); err != nil {
+                log.Fatal(err)
+            }
+            conn.Close()
+            wg.Done()
+        }(s)
+    }
+    wg.Wait()
+}
+</code></pre>
+
+<h3 id="channels">Channels</h3>
+
+<ul>
+<li>goroutine是并发单元，可以通channels实现他们之间的通信</li>
+
+<li><p>创建一个channel</p>
+<pre><code class="language-go">ch := make(chan int)
+</code></pre>
+
+<p>channel是一个底层数据结构的引用，当作为参数传递是，是传递的一个引用</p></li>
+
+<li><p>两个channel可以用==运算比较，如果两个channel引用的是相同的对象，那么比较的结果为真，channel的零值是nil</p></li>
+
+<li><p>关闭一个channel后，继续发送会产生panic，但是可以继续接收，此时将不会阻塞，立即返回一个零值</p></li>
+
+<li><p>没有办法直接测试一个channel是否被关闭，但是接收操作有一个变体形式，它可以多接收一个结果，多接收的第二个结果是一个布尔值Ok, true表示成功从channel接收到了值，false便是已经关闭 并且里面没有值可以接收</p>
+<pre><code class="language-go">x,ok := &lt;- ch
+if !ok{
+    //do something
+}
+//使用range简化
+for x := range ch{
+    //do something
+}
+</code></pre></li>
+
+<li><p>channel 可以不用显式的关闭，当他没有被引用时go语言的垃圾回收会自动回收</p></li>
+
+<li><p>单向channel</p>
+
+<ul>
+<li>chan&lt;- int 只用来发送。 向channel发送数据</li>
+<li>&lt;- chan int 只接收。接收channel的数据</li>
+<li>关闭channel用于断言不再向channel发送数据，因此对于一个只接收的channel调用close将是一个编译错误</li>
+</ul></li>
+
+<li><p>可以将一个双向的channel赋值给单向channel变量，会做隐式的转换。但是不能将一个单向的channel转换为双向的channel</p></li>
+</ul>
+
+<h3 id="基于select的多路复用">基于select的多路复用</h3>
+
+<ul>
+<li>select会等待case中能够执行的case时去执行，当条件满足时，才会去通信并执行case之后的语句</li>
+<li>一个没有任何case的select语句写作select{}，会永远等待下去</li>
+
+<li><p>如果多个case同时就绪，select会随机选择一个执行，这样来保证每一个channel都有相等的被select执行的机会,下面的例子中channel的缓冲设为1，这样每次循环的时候ch的状态为空或者满，偶数的时候恰好为空，奇数时候为满，所以输出0，2，4，6，8。如果缓冲区设为大于1的数，那么select就会随机选择，结果就不确定了。</p>
+<pre><code class="language-go">func main() {
+    ch := make(chan int, 1)
+    for i := 0; i &lt; 10; i++ {
+        select {
+        case x := &lt;-ch:
+            fmt.Println(x)
+        case ch &lt;- i:
+            //
+        }
+    }
+}
+</code></pre></li>
+
+<li><p>Time.Tick函数表现的像是它创建一个在循环中调用time.Sleep的goroutine每次被唤醒时发送一个事件，依然会不断的尝试向channel中发送值，如果没有接受方去接受，那么就会造成goroutine泄露，因此只有当程序整个生命周期都需要这个时间时我们使用它才比较合适，否则建议使用下面的模式：</p>
+<pre><code class="language-go">ticker := time.NewTicker(1 * time.Second)
+&lt;-ticker.C    // receive from the ticker's channel
+ticker.Stop() // cause the ticker's goroutine to terminate
+</code></pre></li>
+
+<li><p>对一个nil的channel发送和接受操作会永远阻塞，在select语句中操作nil的channel永远都不会被select到</p></li>
+</ul>
+
+<h3 id="实例-并发的目录遍历">实例 - 并发的目录遍历</h3>
+
+<p>下面是一个并发遍历目录的实例</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;flag&quot;
+    &quot;fmt&quot;
+    &quot;io/ioutil&quot;
+    &quot;os&quot;
+    &quot;path/filepath&quot;
+    &quot;sync&quot;
+    &quot;time&quot;
+)
+
+func walkDir(dir string, wg *sync.WaitGroup, filesize chan&lt;- int64) {
+    defer wg.Done()
+    for _, entry := range dirents(dir) {
+        if entry.IsDir() {
+            wg.Add(1)
+            subdir := filepath.Join(dir, entry.Name())
+            go walkDir(subdir, wg, filesize)
+        } else {
+            filesize &lt;- entry.Size()
+        }
+    }
+}
+
+var sema = make(chan struct{}, 20) //最多打开20个目录
+
+func dirents(dir string) []os.FileInfo {
+    sema &lt;- struct{}{}
+    defer func() { &lt;-sema }()
+    entries, err := ioutil.ReadDir(dir)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, &quot;du1: %v\n&quot;, err)
+        return nil
+    }
+    return entries
+}
+
+var verbose = flag.Bool(&quot;v&quot;, false, &quot;show verbose progress messages&quot;)
+
+func main() {
+    flag.Parse()
+    roots := flag.Args()
+    if len(roots) == 0 {
+        roots = []string{&quot;.&quot;}
+    }
+    filesizes := make(chan int64)
+    var wg sync.WaitGroup
+    for _, dir := range roots {
+        wg.Add(1)
+        go walkDir(dir, &amp;wg, filesizes)
+    }
+
+    go func() {
+        wg.Wait()
+        close(filesizes)
+    }()
+    var tick &lt;-chan time.Time
+    if *verbose {
+        tick = time.Tick(500 * time.Millisecond)
+    }
+    var nfiles, nsize int64
+loop:
+    for {
+        select {
+        case size, ok := &lt;-filesizes:
+            if !ok {
+                break loop
+            }
+            nfiles++
+            nsize += size
+        case &lt;-tick:
+            fmt.Printf(&quot;%d files %1.fG\n&quot;, nfiles, float64(nsize)/1e9)
+        }
+    }
+}
+</code></pre>
+
+<h3 id="并发的退出">并发的退出</h3>
+
+<ul>
+<li>Go语言不提供在一个goroutine里终止另一个goroutine的方法，由于这样会导致goroutine之间共享变量落在未定义的状态上。</li>
+<li>可以通过关闭一个channel进行广播关闭所有goroutine</li>
+</ul>
+
+<h3 id="一个简单的聊天程序">一个简单的聊天程序</h3>
+
+<p><a href="https://github.com/KDF5000/gopl/blob/master/src/ch8/chat.go">聊天服务器</a>+<a href="https://github.com/KDF5000/gopl/blob/master/src/ch8/echoclient.go">客户端</a></p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

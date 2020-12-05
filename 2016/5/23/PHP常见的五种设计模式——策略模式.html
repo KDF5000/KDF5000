@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>PHP常见的五种设计模式——策略模式 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="PHP常见的五种设计模式——策略模式">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/23/PHP%e5%b8%b8%e8%a7%81%e7%9a%84%e4%ba%94%e7%a7%8d%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e2%80%94%e2%80%94%e7%ad%96%e7%95%a5%e6%a8%a1%e5%bc%8f.html">PHP常见的五种设计模式——策略模式</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/PHP.html">PHP</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f.html">设计模式</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h4 id="策略模式">策略模式</h4>
+
+<p>在此模式中，算法是从复杂类提取的，因而可以方便地替换。例如，如果要更改搜索引擎中排列页的方法，则策略模式是一个不错的选择。思考一下搜索引擎的几个部分 —— 一部分遍历页面，一部分对每页排列，另一部分基于排列的结果排序。在复杂的示例中，这些部分都在同一个类中。通过使用策略模式，您可将排列部分放入另一个类中，以便更改页排列的方式，而不影响搜索引擎的其余代码.</p>
+
+<p>类图如下：
+<img src="/media/archive/blog/image/strategy.png" alt="Alt text" /></p>
+
+<!--more-->
+
+<p>php实现:</p>
+<pre><code>&lt;?php
+/**
+ * strategy 
+ * @author KDF5000
+ * @since 2016-5-24 22:51
+ */
+
+interface IStrategy{
+    public function filter($name);
+}
+
+class FindAfterStrategy implements IStrategy{
+
+    private $_name;
+    public function __construct($name){
+        $this-&gt;_name = $name;
+    }
+
+    public function filter($name){
+        return strcmp($this-&gt;_name, $name) &lt;= 0;
+    }
+
+}
+
+class RandomStrategy implements IStrategy{
+
+    public function filter($name){
+        return rand(0,1) &gt;= 0.5;
+    }
+}
+
+class UserList{
+
+    private $_list = array();
+
+    public function __construct($names){
+        if($names != null){
+            foreach ($names as $name) {
+                # code...
+                $this-&gt;_list[] = $name;
+            }
+        }
+    }
+
+    public function add($name){
+        $this-&gt;_list[] = $name;
+    }
+
+    public function find($filter){
+        $res = array();
+        foreach ($this-&gt;_list as $name) {
+            # code...
+            if($filter-&gt;filter($name)){
+                $res[] = $name;
+            }
+        }
+        return $res;
+    }
+}
+
+$user_list = new UserList(array('Jack','Tom', 'Mike', 'Devin'));
+$res_1 = $user_list-&gt;find(new FindAfterStrategy(&quot;M&quot;));
+$res_2 = $user_list-&gt;find(new RandomStrategy());
+
+var_dump($res_1);
+var_dump($res_2);
+
+?&gt;
+</code></pre>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

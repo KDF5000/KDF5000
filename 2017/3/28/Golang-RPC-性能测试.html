@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Golang RPC 性能测试 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Golang-RPC-性能测试">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/28/Golang-RPC-%e6%80%a7%e8%83%bd%e6%b5%8b%e8%af%95.html">Golang RPC 性能测试</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Golang.html">Golang</a>
+                            
+                            <a class="tag label label-info" href="/tags/RPC.html">RPC</a>
+                            
+                            <a class="tag label label-info" href="/tags/Benchmark.html">Benchmark</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e6%80%a7%e8%83%bd%e6%b5%8b%e8%af%95.html">性能测试</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>最近刚好要使用Golang的RPC，因此对Golang标准库的RPC进行了一下测试，看看其性能到底如何。RPC服务端和客户端的实现完全使用RPC的<code>net/rpc</code>标准库，没有经过特殊的优化，主要针对下面三个场景进行测试。测试之前需要先说明一下，Go的rpc连接是支持并发请求的，就是说一个一个连接可以并发的发送很多个请求，不像http协议一问一答的模式。</p>
+
+<h3 id="测试环境">测试环境</h3>
+
+<p>操作系统：Centos 6.8 (Linux 2.6.32)
+内存：32G
+核数：双CPU, 一共12核
+CPU型号：Intel&reg; Xeon&reg; CPU E5645  @ 2.40GHz
+Golang: 1.7.4</p>
+
+<!--more-->
+
+<h3 id="场景">场景</h3>
+
+<p>测试的场景主要是下面两个指标
+* QPS指标
+ * 单个个连接保证一个并发，随着该并发请求数增加，QPS的变化
+ * 单个连接(Client), 单个并发请求10w, 随着并发数的增加，QPS的变化
+ * 单个连接并发数固定(第一个测试的最优值)，增加连接数，QPS的变化</p>
+
+<ul>
+<li>单机Server的并发数(同时连接数)
+
+<ul>
+<li>单机Server, 测试所能接收的连接数</li>
+</ul></li>
+</ul>
+
+<p>QPS指标测试中，第一个设置是为了测试单个连接的并发数</p>
+
+<h3 id="实现">实现</h3>
+
+<p>Server端的实现使用tcp协议，监听4200端口，循环等待连接，每当检测到请求时，启动一个goroutine去处理该连接，注册的服务执行一个简单的乘法操作。</p>
+<pre><code class="language-go">//Service
+type Args struct {
+    A, B int
+}
+
+type Quotient struct {
+    Quo, Rem int
+}
+
+type Arith int
+
+func (t *Arith) Multiply(args Args, reply *int) error {
+    *reply = args.A * args.B
+    return nil
+}
+
+func (t *Arith) Divide(args Args, quo *Quotient) error {
+    if args.B == 0 {
+        return errors.New(&quot;Divided by zero!&quot;)
+    }
+    quo.Quo = args.A / args.B
+    quo.Rem = args.A % args.B
+    return nil
+}
+//////////////////////////////////////////////////
+//Server
+runtime.GOMAXPROCS(4)
+arith := new(service.Arith)
+server := rpc.NewServer()
+log.Printf(&quot;Register service:%v\n&quot;, arith)
+server.Register(arith)
+
+log.Printf(&quot;Listen tcp on port %d\n&quot;, 4200)
+l, e := net.Listen(&quot;tcp&quot;, &quot;:4200&quot;)
+
+if e != nil {
+    log.Fatal(&quot;Listen error:&quot;, e)
+}
+log.Println(&quot;Ready to accept connection...&quot;)
+conCount := 0
+go func() {
+    for {
+        conn, err := l.Accept()
+        if err != nil {
+            log.Fatal(&quot;Accept Error:,&quot;, err)
+            continue
+        }
+        conCount++
+        log.Printf(&quot;Receive Client Connection %d\n&quot;, conCount)
+        go server.ServeConn(conn)
+    }
+}()
+</code></pre>
+
+<p>Client端的创建多个连接(Client), 然后每个连接指定不同的并发数，每个并发启动一个goroutine发送指定数量的request，该请求执行一个简单的乘法操作，最后统计整个过程的QPS。</p>
+
+<h3 id="部署">部署</h3>
+
+<p>QPS指标的测试使用两台上述配置的服务器，然后设置相关的内核参数，主要是允许最大打开的文件数，可使用的端口范围，tcp缓存大小等,操作如下：</p>
+<pre><code class="language-shell">sysctl -w fs.file-max=10485760 #系统允许的文件描述符数量10m
+sysctl -w net.ipv4.tcp_rmem=1024 #每个tcp连接的读取缓冲区1k，一个连接1k
+sysctl -w net.ipv4.tcp_wmem=1024 #每个tcp连接的写入缓冲区1k
+
+sysctl -w net.ipv4.ip_local_port_range='1024 65535' #修改默认的本地端口范围
+sysctl -w net.ipv4.tcp_tw_recycle=1  #快速回收time_wait的连接
+sysctl -w net.ipv4.tcp_tw_reuse=1
+sysctl -w net.ipv4.tcp_timestamps=1
+
+#用户单进程的最大文件数，用户登录时生效
+echo '* soft nofile 1048576' &gt;&gt; /etc/security/limits.conf 
+echo '* hard nofile 1048576' &gt;&gt; /etc/security/limits.conf 
+ulimit -n 1048576 #用户单进程的最大文件数 当前会话生效
+</code></pre>
+
+<p>对于Server连接数的测试，使用多台机器，尽量保证同时进行连接同一个server</p>
+
+<h3 id="测试结果">测试结果</h3>
+
+<h4 id="qps指标">QPS指标</h4>
+
+<ul>
+<li><p>单个连接保证一个并发，随着该一个并发请求数增加，QPS的变化
+<img src="/media/archive/blog/images/单个连接请求数.png" alt="单个连接请求数.png" />
+这个测试可以评估单个连接单并发的情况下，能过处理的最多请求数。随着请求数的增加，QPS一直下降，但是下降到6k左右的时候讲保持这个值不再改变，从图中可以大概在请求量大概在10k以后qps将不再改变，也就是说按照现在这个频率(无休止持续请求),client的处理能力大概就是6k/s，可以根据这个指标控制请求的频率。</p></li>
+
+<li><p>单个连接(Client), 单个并发请求10w, 随着并发数的增加，QPS的变化
+<img src="/media/archive/blog/images/单个连接并发数.png" alt="单个连接并发数.png" />
+这个测试可以指导客户端在设计单个连接的并发请求数时候怎么选择最佳的并发数。从测试结果可以看出，单个连接随着并发数的增加，QPS(RPS)并不是线性增长的，基本上增加到100个并发数就基本不再增加了，说明对于单个连接最大的QPS大概是6w多点。而且对于单个连接来说，并发数最好不要超过150。</p></li>
+
+<li><p>单个连接并发数固定(第一个测试的最优值)，增加连接数，QPS的变化
+<img src="/media/archive/blog/images/固定并发连接数.png" alt="固定并发连接数.png" />
+这里设置单个连接数的并发数为100，每个并发的请求量位10w, 从结果可以看出随着连接数的增加，Qps也是在不断增加的,但是当增加到100个连接数后，Qps基本不再变化，维持在47w左右，这个值相对还是比较大的，这说明Go的RPC client和Server的性能还是不错的。</p></li>
+</ul>
+
+<h4 id="单机server的并发数-同时连接数">单机Server的并发数(同时连接数)</h4>
+
+<ul>
+<li>单机Server, 测试同时能接收的连接数
+因为这个涉及到多台部署了Client的服务器进行同时请求，暂时手里服务器资源还不够，过段时间腾出来一些机器了补充起来，<strong>如果有单机可以模拟(单机局限于端口数)的方案望转告</strong>。</li>
+</ul>
+
+<h3 id="总结">总结</h3>
+
+<p>上面的前三个实验主要关注Client端的性能，因为自己对服务端的压测指标，业务场景还不是非常明确，所以对Server端的压测试还不够充分，以后会逐步的补充起来。从测试结果来看，Go RPC的Client的性能还是不错的。</p>
+
+<ul>
+<li>单连接的满负载Qps大概是6k</li>
+<li>单连接的并发数最好不要超过150</li>
+<li>单个机器的的连接数最好不要超过100</li>
+</ul>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

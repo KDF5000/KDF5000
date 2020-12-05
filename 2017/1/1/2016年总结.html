@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>2016年总结 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="2016年总结">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">1</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/1/2016%e5%b9%b4%e6%80%bb%e7%bb%93.html">2016年总结</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/%e5%b9%b4%e5%ba%a6%e6%80%bb%e7%bb%93.html">年度总结</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><blockquote>
+<p>这个世界的奇妙之处就在于，你永远不知道那些年龄比你小却比你努力的人，蕴藏多么巨大的能量，明明两年前刚见面还是一个略显青涩的邻家男孩，再见面已成了有口皆碑的专家大牛，惶惶乎一种朝为田舍郎，暮登天子堂的感觉油然而生，正是应了那句老话，士别三日，当刮目相待！</p>
+</blockquote>
+
+<p>2016年，我的本命年，从年初就露出了今年注定是不顺的一年的迹象。刚过完年就和最好的朋友因为一些问题发生了争吵，刚到学校用了四年的笔记本就彻底罢工，总之，一切都是那么地霉气。不过一年走完，回头想想，虽然遇到很多不开心的事情，也并不是那么的不堪，收获了很多，似乎自己也变的更加地成熟了一些。</p>
+
+<!--more-->
+
+<h3 id="初心">初心</h3>
+
+<p>因为2015年在怀柔的半年上课，对学校的课程彻底的失去了兴趣，每日匆匆忙忙的去上课，看似日程满满，然而每门课又都是那么的无味，有的课内容挺好，但是怎么就感觉都是浅尝辄止，似乎老师也是匆匆忙忙。当然也是存在一些不错的课程的，比如俆君老师的网络数据挖掘，讲课总是那么激情，每个主题都以工业界为背景，也许是因为在来计算所前一直在工业界的缘故吧；陈世敏老师(清华本科，CMU博士)的大数据系统于大规模数据分析，陈老师年纪轻轻就是“百人计划”入选者，在系统方面也有着其独特的见解和眼光。总之，对上课完全失去了兴趣，因此在与导师的沟通下，逐渐的开始融入实验室的工作，希望能够早日找到自己感兴趣的方向。</p>
+
+<p>为什么读研?  读研的想法最初是产生于大二的时候种子班的经历，种子班当时号称项目引导教学，真实讲理论和实践相结合。但是体验过之后，想一想更像是提前进入了公司实习，几乎完全忽略了理论知识的学习，比如当时一周学完模电，然后自己做了一个小音响，电路都是现成的只是焊焊板子。这样真的有用吗？当然现在种子班依然看着很成功，其历届毕业的学生也都遍布互联网各个大公司。至于好不好，这有涉及到另一个问题---大学教育的意义何在。从那个时候就下决心，这不是我想要的生活，我不甘心就这么像个技工似毕业直接去工作。我要读研，要在一个方向深入分析，做出可以拿得出手的成果(当时真的好天真)，从此努力学习文化课，争取大四能够拿到保研名额。当然，从大二开始，加权也是一年比一年好，最后大四顺利的成为了当年年度年级第一，也争取到了保研名额，成功保送到了计算所。</p>
+
+<p>今年一年的实验室工作，对我们组的工作有了更深的了解，才意识到自己是多么的天真，读研并不是想象中的那样，也曾有过休学的念头，也曾无比的反感老板安排的杂碎的任务，但是想一想这是多么的可笑。人生本来就是这样，如果一切都按照你心中想的那样发展，真的就是你喜欢的吗？生活需要挑战，需要锻炼自己平衡工作和兴趣的能力。这一年的磕磕碰碰，调研了安全，设计了一个基于大数据技术的安全系统，深入研究了多核操作系统RainForest，终于找到了自己的兴趣所在，也算的上幸运。</p>
+
+<h3 id="收获">收获</h3>
+
+<ul>
+<li><p>从研一入学没再问家里要一分钱，学费，生活费都是自己实习，奖学金以及研究生工资所得</p></li>
+
+<li><p>用自己的积蓄买了Mac Pro，一辆一千多的山地车</p></li>
+
+<li><p>从研一到现在做了几个团队项目和个人项目，提高了自己分析问题和组织团队的能力</p>
+
+<ul>
+<li><a href="http://huntcode.herokuapp.com">HuntCode</a></li>
+</ul>
+
+<p>类似于Demo8, Next的形式，HuntCode专注于开源项目的分享，将你所知道的优秀开源项目分享出去，让其他人可以在这里发现酷炫的开源项目，同时也能推广自己或者其他人的优秀项目</p>
+
+<p>​</p>
+
+<p><img src="/media/archive/image/blog/huntcode.png" alt="HuntCode" /></p>
+
+<ul>
+<li><a href="https://github.com/KDF5000/HydraHbaseCache">HydraHbaseCache</a></li>
+</ul>
+
+<p>解决Hbase热点数据响应速度缓慢的问题，使用Redis在HBase上面建一层分布式缓存最后提供一个新的Client SDK</p>
+
+<p><strong>项目地址：</strong><a href="https://github.com/KDF5000/HydraHbaseCache">https://github.com/KDF5000/HydraHbaseCache</a></p>
+
+<p><img src="/media/archive/image/blog/hbase.png" alt="hbase" /></p>
+
+<ul>
+<li><a href="http://kdf5000.com/2016/11/12/使用Python和BitTorrentSync定期给Kindle推送电子书/">Kindle伴侣</a></li>
+</ul>
+
+<p>使用Python开发，利用Bittorrent和Resilio Sync，自动发送电子书到Kindle，目前部署在树莓派上稳定运行</p>
+
+<p><strong>项目地址:</strong><a href="https://github.com/KDF5000/WeeklyBook">https://github.com/KDF5000/WeeklyBook</a></p>
+
+<p><img src="/media/archive/image/blog/raspberry.jpeg" alt="raspberry" /></p>
+
+<ul>
+<li>基于大数据技术的安全防御系统</li>
+</ul>
+
+<p>为了解决现在流向的IDS，单机性能瓶颈以及提高单纯的规则引擎检测异常事件的鲁棒性，利用现在大数据技术设计了一个安全防御系统，目前尚未实现，2017年上半年的首要任务。</p>
+
+<p><img src="/media/archive/image/blog/Security2.png" alt="Security2" /></p>
+
+<ul>
+<li><a href="https://github.com/KDF5000/ICTAuth">ICTAuth</a>: 命令行认证ICT网络，适用于没有图形化界面的情况下连接网络，比如树莓派，目前用于树莓派，保证IPV6 Nginx代理24小时不断网的要求。</li>
+</ul></li>
+
+<li><p><a href="https://pdos.csail.mit.edu/6.824/">MIT6.824 Spring 2016</a>断断续续做到了Lab3-Part B， 学习了Golang，简直爱上了它，然后实现了简易版hadoop的map,reduce，实现了Raft，实现了一个简单的kvserver。</p></li>
+
+<li><p>获得了华为硕士生奖学金</p></li>
+
+<li><p>跟着师兄投了一篇ASPLOS的论文，虽然被拒了，现在继续做，明年准备投SOSP</p></li>
+</ul>
+
+<h3 id="未完成">未完成</h3>
+
+<p>其实没完成的事情有很多，比如计划年底完成MIT6.824课程的，但是由于实验室事情，一直拖延，不过还是自己的时间管理能力太差，新的一年一定要提高自己的时间安排能力，还有学习C++和java的计划也还未进行。还有很多想读的书没有读，比如菊与刀，时间简史等，还有就是今年读的书都是小说题材，明年要多读一些其他题材的书籍，尽量扩充自己的知识面。同时明年就要找工作了，还要适当的刷题，学习一些基础知识，比如操作系统，网络，设计模式。</p>
+
+<h3 id="总结">总结</h3>
+
+<p>2016是一个充满了霉气和挑战的一年，跌跌撞撞总算是结束了。这一年似乎也思考了很多问题，比如</p>
+
+<ul>
+<li>为什么读研？自己到底喜欢什么？</li>
+<li>惶惶恐恐在担忧什么？</li>
+<li>什么才是真正的朋友？怎么才能让友谊长久？</li>
+<li>为什么总是觉得自己比别人差?这种落差感到底来自哪里？</li>
+</ul>
+
+<p>每一个问题都曾困扰自己很久，也曾导致自己一度想要休学，也与好朋友争论不休。不管如何，都要感谢2016，感谢身边的每一个人，感谢你们让我的经历丰富多彩，感谢你们让我变得更加坚强和成熟。2017要做的事情还有很多，想开头的引用，比你优秀的人都那么努力，你还有什么理由不努力？哪怕永远追不上，也比做一个行尸走肉强！</p>
+
+<blockquote>
+<p>This is a new year. A new beginning. And things will change.</p>
+</blockquote>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

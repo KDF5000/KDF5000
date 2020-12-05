@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">机器学习</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">8</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/11/8/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e5%ae%9e%e6%88%98-%e4%ba%8c%e5%88%86k-%e5%9d%87%e5%80%bc%e8%81%9a%e7%b1%bb%e7%ae%97%e6%b3%95.html">机器学习实战:二分k-均值聚类算法</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>前面介绍过k-means聚类算法,通过不断的更新簇质心直到收敛为止,但是这个收敛是局部收敛到了最小值,并没有考虑全局的最小值.</p>
+
+<p>那么一个聚类算法怎么才能称得上效果好呢?要想评价一个算法的好坏,首先需要有一个标准,这也是我们设计算法的时候要首先考虑的,我们设计算法的目的是什么,设计的算法要达到的什么效果,这样才能明确设计算法的目标.一种度量聚类算法效果的指标是SSE(Sum of Squard Error, 误差平方和),也就是前面介绍的计算数据点与质心的欧氏距离的平方和.SSE越小说明数据点越接近它们的质心,聚类效果越好.</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/11/8/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e5%ae%9e%e6%88%98-%e4%ba%8c%e5%88%86k-%e5%9d%87%e5%80%bc%e8%81%9a%e7%b1%bb%e7%ae%97%e6%b3%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">7</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/11/7/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e5%ae%9e%e6%88%98-K-Means%e8%81%9a%e7%b1%bb%e7%ae%97%e6%b3%95.html">机器学习实战:K-Means聚类算法</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="k-means聚类算法">k-means聚类算法</h4>
+
+<blockquote>
+<p>优点: 容易实现
+缺点: 可能收敛到局部最小值,在大规模数据集上收敛较慢
+使用数据类型: 数值型护具</p>
+</blockquote>
+
+<p>k-均值是发现给定数据集的k个簇的算法.k有用户决定.每一个簇通过旗质心,即簇中所有点的中心描述.
+工作流程: 首先随机确定k个初始点作为其质心.然后讲护具集中的每个点分配到一个簇中,也就是分配到距其最近的质心对应的簇.这一步完成时后,每个簇的质心更新为该簇所有点的平均值.
+上述过程的伪代码如下:</p>
+<pre><code>创建k个点作为起始质心(随机选择)
+当任意一个点的簇分配结果改变时:
+    对数据集中的每个数据点
+         对每个质心
+              计算质心到数据点之间的距离
+         讲数据点分配到距其最近的簇
+    对每一个簇,计算簇中所有点的均值幷讲均值作为质心
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/11/7/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e5%ae%9e%e6%88%98-K-Means%e8%81%9a%e7%b1%bb%e7%ae%97%e6%b3%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

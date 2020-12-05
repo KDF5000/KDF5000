@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">学习笔记</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">7</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/5/7/Golang%e7%ac%ac%e5%85%ab%e7%ab%a0-Goroutine%e5%92%8cChannel.html">Golang第八章: Goroutine和Channel</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>并发编程模型
+ - 顺序通信进程(Communicating Sequential Processes) CSP
+  值会在不同的实例(goroutine)中传递
+ - 多线程共享内存</p>
+
+<p><!--more --></p>
+
+<h3 id="goroutines">Goroutines</h3>
+
+<ul>
+<li>Go语言中每一个并发的执行单元叫做一个goroutine</li>
+<li>Go语言中主函数即在一个单独的goroutine中运行</li>
+<li>所有的goroutine在主函数返回时，都会直接打断，程序退出</li>
+</ul>
+
+<p>简单的clock程序<a href="ch8/clock.go">clock.go</a></p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;flag&quot;
+    &quot;fmt&quot;
+    &quot;io&quot;
+    &quot;log&quot;
+    &quot;net&quot;
+    &quot;time&quot;
+)
+
+var (
+    host string
+    port int
+)
+
+func init() {
+    flag.StringVar(&amp;host, &quot;host&quot;, &quot;localhost&quot;, &quot;clock server host&quot;)
+    flag.IntVar(&amp;port, &quot;port&quot;, 8000, &quot;clock server port&quot;)
+    flag.Parse()
+}
+
+func handleCon(c net.Conn) {
+    defer c.Close()
+    // for {
+    _, err := io.WriteString(c, time.Now().Format(&quot;15:04:05\n&quot;))
+    if err != nil {
+        return
+    }
+    time.Sleep(1 * time.Second)
+    // }
+}
+
+func main() {
+    server := fmt.Sprintf(&quot;%s:%d&quot;, host, port)
+    listener, err := net.Listen(&quot;tcp&quot;, server)
+    if err != nil {
+        log.Fatal(err)
+    }
+    for {
+        conn, err := listener.Accept() // 会阻塞
+        if err != nil {
+            log.Print(err)
+            continue
+        }
+        go handleCon(conn)
+    }
+}
+</code></pre>
+
+<p><a href="ch8/netcat.go">client.go</a>：</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;io&quot;
+    &quot;log&quot;
+    &quot;net&quot;
+    &quot;os&quot;
+    &quot;sync&quot;
+)
+
+func main() {
+    servers := []string{&quot;localhost:8001&quot;, &quot;localhost:8002&quot;, &quot;localhost:8003&quot;}
+    var wg sync.WaitGroup
+    for _, s := range servers {
+        wg.Add(1)
+        go func(serv string) {
+            conn, err := net.Dial(&quot;tcp&quot;, serv)
+            if err != nil {
+                log.Fatal(err)
+            }
+
+            if _, err := io.Copy(os.Stdout, conn); err != nil {
+                log.Fatal(err)
+            }
+            conn.Close()
+            wg.Done()
+        }(s)
+    }
+    wg.Wait()
+}
+</code></pre>
+
+<h3 id="channels">Channels</h3>
+
+<ul>
+<li>goroutine是并发单元，可以通channels实现他们之间的通信</li>
+
+<li><p>创建一个channel</p>
+<pre><code class="language-go">ch := make(chan int)
+</code></pre>
+
+<p>channel是一个底层数据结构的引用，当作为参数传递是，是传递的一个引用</p></li>
+
+<li><p>两个channel可以用==运算比较，如果两个channel引用的是相同的对象，那么比较的结果为真，channel的零值是nil</p></li>
+
+<li><p>关闭一个channel后，继续发送会产生panic，但是可以继续接收，此时将不会阻塞，立即返回一个零值</p></li>
+
+<li><p>没有办法直接测试一个channel是否被关闭，但是接收操作有一个变体形式，它可以多接收一个结果，多接收的第二个结果是一个布尔值Ok, true表示成功从channel接收到了值，false便是已经关闭 并且里面没有值可以接收</p>
+<pre><code class="language-go">x,ok := &lt;- ch
+if !ok{
+    //do something
+}
+//使用range简化
+for x := range ch{
+    //do something
+}
+</code></pre></li>
+
+<li><p>channel 可以不用显式的关闭，当他没有被引用时go语言的垃圾回收会自动回收</p></li>
+
+<li><p>单向channel</p>
+
+<ul>
+<li>chan&lt;- int 只用来发送。 向channel发送数据</li>
+<li>&lt;- chan int 只接收。接收channel的数据</li>
+<li>关闭channel用于断言不再向channel发送数据，因此对于一个只接收的channel调用close将是一个编译错误</li>
+</ul></li>
+
+<li><p>可以将一个双向的channel赋值给单向channel变量，会做隐式的转换。但是不能将一个单向的channel转换为双向的channel</p></li>
+</ul>
+
+<h3 id="基于select的多路复用">基于select的多路复用</h3>
+
+<ul>
+<li>select会等待case中能够执行的case时去执行，当条件满足时，才会去通信并执行case之后的语句</li>
+<li>一个没有任何case的select语句写作select{}，会永远等待下去</li>
+
+<li><p>如果多个case同时就绪，select会随机选择一个执行，这样来保证每一个channel都有相等的被select执行的机会,下面的例子中channel的缓冲设为1，这样每次循环的时候ch的状态为空或者满，偶数的时候恰好为空，奇数时候为满，所以输出0，2，4，6，8。如果缓冲区设为大于1的数，那么select就会随机选择，结果就不确定了。</p>
+<pre><code class="language-go">func main() {
+    ch := make(chan int, 1)
+    for i := 0; i &lt; 10; i++ {
+        select {
+        case x := &lt;-ch:
+            fmt.Println(x)
+        case ch &lt;- i:
+            //
+        }
+    }
+}
+</code></pre></li>
+
+<li><p>Time.Tick函数表现的像是它创建一个在循环中调用time.Sleep的goroutine每次被唤醒时发送一个事件，依然会不断的尝试向channel中发送值，如果没有接受方去接受，那么就会造成goroutine泄露，因此只有当程序整个生命周期都需要这个时间时我们使用它才比较合适，否则建议使用下面的模式：</p>
+<pre><code class="language-go">ticker := time.NewTicker(1 * time.Second)
+&lt;-ticker.C    // receive from the ticker's channel
+ticker.Stop() // cause the ticker's goroutine to terminate
+</code></pre></li>
+
+<li><p>对一个nil的channel发送和接受操作会永远阻塞，在select语句中操作nil的channel永远都不会被select到</p></li>
+</ul>
+
+<h3 id="实例-并发的目录遍历">实例 - 并发的目录遍历</h3>
+
+<p>下面是一个并发遍历目录的实例</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;flag&quot;
+    &quot;fmt&quot;
+    &quot;io/ioutil&quot;
+    &quot;os&quot;
+    &quot;path/filepath&quot;
+    &quot;sync&quot;
+    &quot;time&quot;
+)
+
+func walkDir(dir string, wg *sync.WaitGroup, filesize chan&lt;- int64) {
+    defer wg.Done()
+    for _, entry := range dirents(dir) {
+        if entry.IsDir() {
+            wg.Add(1)
+            subdir := filepath.Join(dir, entry.Name())
+            go walkDir(subdir, wg, filesize)
+        } else {
+            filesize &lt;- entry.Size()
+        }
+    }
+}
+
+var sema = make(chan struct{}, 20) //最多打开20个目录
+
+func dirents(dir string) []os.FileInfo {
+    sema &lt;- struct{}{}
+    defer func() { &lt;-sema }()
+    entries, err := ioutil.ReadDir(dir)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, &quot;du1: %v\n&quot;, err)
+        return nil
+    }
+    return entries
+}
+
+var verbose = flag.Bool(&quot;v&quot;, false, &quot;show verbose progress messages&quot;)
+
+func main() {
+    flag.Parse()
+    roots := flag.Args()
+    if len(roots) == 0 {
+        roots = []string{&quot;.&quot;}
+    }
+    filesizes := make(chan int64)
+    var wg sync.WaitGroup
+    for _, dir := range roots {
+        wg.Add(1)
+        go walkDir(dir, &amp;wg, filesizes)
+    }
+
+    go func() {
+        wg.Wait()
+        close(filesizes)
+    }()
+    var tick &lt;-chan time.Time
+    if *verbose {
+        tick = time.Tick(500 * time.Millisecond)
+    }
+    var nfiles, nsize int64
+loop:
+    for {
+        select {
+        case size, ok := &lt;-filesizes:
+            if !ok {
+                break loop
+            }
+            nfiles++
+            nsize += size
+        case &lt;-tick:
+            fmt.Printf(&quot;%d files %1.fG\n&quot;, nfiles, float64(nsize)/1e9)
+        }
+    }
+}
+</code></pre>
+
+<h3 id="并发的退出">并发的退出</h3>
+
+<ul>
+<li>Go语言不提供在一个goroutine里终止另一个goroutine的方法，由于这样会导致goroutine之间共享变量落在未定义的状态上。</li>
+<li>可以通过关闭一个channel进行广播关闭所有goroutine</li>
+</ul>
+
+<h3 id="一个简单的聊天程序">一个简单的聊天程序</h3>
+
+<p><a href="https://github.com/KDF5000/gopl/blob/master/src/ch8/chat.go">聊天服务器</a>+<a href="https://github.com/KDF5000/gopl/blob/master/src/ch8/echoclient.go">客户端</a></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/5/7/Golang%e7%ac%ac%e5%85%ab%e7%ab%a0-Goroutine%e5%92%8cChannel.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">4</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/4/24/Golang%e7%ac%ac%e4%b8%83%e7%ab%a0-%e6%8e%a5%e5%8f%a3.html">Golang第七章:接口</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>接口更像是一种约定，范式满足接口约定的形式的类型都可以作为该接口的实例</li>
+<li>接口类型具体描述了一系列方法的集合，一个实现了这些方法的具体类型是这个接口类型的实例</li>
+
+<li><p>接口类型可以进行组合成新的接口类型，这种也叫接口内嵌</p>
+<pre><code class="language-go">package io
+type Reader interface {
+Read(p []byte) (n int, err error)
+}
+type Closer interface {
+Close() error
+}
+//
+type ReadWriter interface {
+Reader
+Writer }
+type ReadWriteCloser interface {
+Reader
+Writer
+Closer }
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/4/24/Golang%e7%ac%ac%e4%b8%83%e7%ab%a0-%e6%8e%a5%e5%8f%a3.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/28/Golang%e7%ac%ac%e5%8d%81%e4%b8%80%e7%ab%a0-%e6%b5%8b%e8%af%95.html">Golang第十一章-测试</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>命令
+
+<ul>
+<li>go test</li>
+<li>遍历*_test.go 文件中复合规则的函数</li>
+</ul></li>
+<li>类型
+
+<ul>
+<li>测试函数：Test开头用于测试程序逻辑行为的正确性</li>
+<li>基准测试函数：Benchmark开头，用于衡量函数的性能，go test会运行多次取平均的执行时间</li>
+<li>示例函数：Examole开头的函数，提供一个有编译器保证正确性的示例文档</li>
+</ul></li>
+</ul>
+
+<h2 id="测试函数">测试函数</h2>
+
+<ul>
+<li><p>导入的包和形式如下</p>
+<pre><code>import &quot;testing&quot;
+func TestName(t *testing){
+//...
+}
+</code></pre></li>
+
+<li><p>go test -v参数可以打印每个测试函数的名字和运行时间</p></li>
+
+<li><p>go test -run 对应一个正则表达式，只有测试函数名被它正确匹配的测试函数才会被go test测试命令运行。</p></li>
+
+<li><p>t.Error不能终止测试，t.Fatal可以终止测试</p></li>
+
+<li><p>t.Fatal必须和测试函数在同一个groutine里调用才能终止测试</p></li>
+
+<li><p>一般测试失败的信息形式为<code>f(x)=y, want z</code></p></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/28/Golang%e7%ac%ac%e5%8d%81%e4%b8%80%e7%ab%a0-%e6%b5%8b%e8%af%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">15</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/15/Golang%e7%ac%ac%e5%85%ad%e7%ab%a0-%e6%96%b9%e6%b3%95.html">Golang第六章:方法</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>对象其实就是属性和方法的集合，可以认为方法就是意义和特殊类型关联的函数</li>
+<li>在函数声明时，在其名字之前放上一个变量，即是一个方法。这个附加的参数会将该函数附加到这种类型上，即相当于这种类型定义了一个独占的方法。这个附加的参数叫接收器(Receiver)</li>
+<li>方法名不能和对象的字段名一样，编译会报错</li>
+
+<li><p><strong>除了常见的struct类型可以定义方法，slice类型也可以，其实任何类型都可以。这个和很多其他面向对象的语言不同</strong>，看个例子</p>
+<pre><code class="language-go">package main
+import &quot;math&quot;
+import &quot;fmt&quot;
+type Point struct{ X, Y float64 }
+// traditional function
+// same thing, but as a method of the Point type
+func (p Point) Distance(q Point) float64 {
+return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+type Path []Point
+func (p Path) Distance() float64 {
+sum := 0.0
+for i := range p {
+    if i &gt; 0 {
+        sum += p[i-1].Distance(p[i])
+    }
+}
+return sum
+}
+func main() {
+perim := Path{
+    {1, 1},
+    {5, 1},
+    {5, 4},
+    {1, 1},
+}
+fmt.Println(perim.Distance()) // &quot;12&quot;
+}
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/15/Golang%e7%ac%ac%e5%85%ad%e7%ab%a0-%e6%96%b9%e6%b3%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">11</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/11/Golang%e7%ac%ac%e4%ba%94%e7%ab%a0-%e5%87%bd%e6%95%b0.html">Golang第五章:函数</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>函数的类型被称为函数的标识符，如果两个函数的形参列表和返回值列表中的变量类型一一对应，那么这个函数被认为有相同的类型和标识符。形参和返回值的变量名不影响含糊是标识符，也不影响他们是否可以省略参数类型的形式表示。</li>
+<li>Go语言没有默认参数值</li>
+
+<li><p>Go可以有有名返回值，和形参一样作为局部变量，被存储在相同的词法块，一般使用带有变量名的返回值主要为了表示返回值的含义,也可以直接在函数体对这些变量赋值，返回时候可以省略return的操作数</p>
+<pre><code class="language-go">func Size(rect image.Rectangle) (width, height int)
+</code></pre></li>
+
+<li><p>Go的参数传递都是值传递，因此对形参的修改不会影响实参，但是如果实参是指针，slice,map, function,channel等类型，则可以间接的影响实参值。</p></li>
+
+<li><p>下面没有函数体的函数声明，表明该函数不是Go事先的，这样的声明定义了函数标识符</p>
+<pre><code class="language-go">package math
+func Sin(x float64) float //implemented in assembly language
+</code></pre></li>
+</ul>
+
+<h2 id="错误处理">错误处理</h2>
+
+<ul>
+<li>error类，是个接口类型，有nil和non-nil两种</li>
+<li>错误处理策略
+
+<ul>
+<li>传播错误</li>
+<li>将错误err传递给调用者，然后决定怎么处理</li>
+<li>错误信息里最好包含上下文信息，通常是连式组合的形式，所以也要避免大写和换行符</li>
+<li>重试
+设置超时时间，重新尝试操作</li>
+<li>结束进程
+如果错误会导致程序无法继续运行，则输出错误结束程序,os.Exit(1)</li>
+<li>Log记录错误信息，继续运行</li>
+<li>忽略错误<br /></li>
+</ul></li>
+<li>io包提供一个错误io.EOF,保证任何文件结束引起的读取失败错误。</li>
+</ul>
+
+<h2 id="函数值">函数值</h2>
+
+<ul>
+<li><p>Go中函数被看做第一类值(first-class values)： 函数像其他值一样，拥有类型，可以赋值给其他变量，传递给函数，从函数返回</p>
+<pre><code class="language-go">func square(n int) int { return n * n  }
+func negative(n int) int { return -n  }
+func product(m, n int) int { return m * n  }
+f := square
+fmt.Println(f(3)) // &quot;9&quot;
+f = negative
+fmt.Println(f(3))     // &quot;-3&quot;
+fmt.Printf(&quot;%T\n&quot;, f) // &quot;func(int) int&quot;
+f = product // compile error: can't assign func(int, int) int to func(int) int
+</code></pre></li>
+
+<li><p>函数类型的零值为nil, 调用值为nil的函数值会引起panic错误</p></li>
+
+<li><p>函数值不能进行比较，不能作为map的key</p></li>
+
+<li><p>函数可以作为函数的参数</p>
+<pre><code class="language-go">func add(a int , b int) int{return a+b}
+func sub(a int , b int) int {return a-b}
+func compute(a, b int, fun func(int,int)int){
+return fun(a,b)
+
+}
+</code></pre></li>
+</ul>
+
+<h2 id="匿名函数">匿名函数</h2>
+
+<ul>
+<li>匿名函数在Go中称为Function literal, 声明方式和函数类似，但是没有函数名，是一种表达式，他的值被称为匿名函数</li>
+<li>匿名函数可以在使用时定义</li>
+
+<li><p>匿名函数可以访问完整的词法环境，也就是说在一个函数内部定义匿名函数，在匿名函数内部可以访问函数的变量</p>
+<pre><code class="language-go">func squares() func() int {
+var x int
+  return func() int {
+          x++
+                  return x * x
+                          
+  }
+
+}
+func main() {
+f := squares()           //f指向一个匿名函数，该匿名函数里的X是一个变量
+    fmt.Println(f())         //1
+        fmt.Println(f())         //4
+            fmt.Println(f())         //9
+                fmt.Println(squares()()) //1
+                    fmt.Println(squares()()) //1
+
+}
+</code></pre></li>
+</ul>
+
+<p>对squares的一次调用会生成一个局部变量x并返回一个匿名函数，每次调用改匿名函数，该函数都会使x得值加1， 上面f指向匿名函数，是同一个局部变量x。第一次调用squares（）,会生成第二个x变量。并返回一个新的匿名函数</p>
+
+<p>这个例子证明，函数值不仅仅是一串代码，还记录了状态。在square中定义的匿名内部函数可以访问和更新square中的局部变量，这意味着匿名函数和square中，存在变量引用。这就是<strong>函数值属于引用类型和函数值不可比较</strong>的原因。Go使用闭包技术实现函数值，Go程序员也把函数值叫做闭包。</p>
+
+<h3 id="捕获迭代变量">捕获迭代变量</h3>
+
+<p>先看下面的程序</p>
+<pre><code class="language-go">var rmdirs []func()
+    for _, d := range tempDirs() {
+        os.MkdirAll(dir, 0755) // creates parent directories too
+            rmdirs = append(rmdirs, func() {
+                    os.RemoveAll(d)
+                        
+                    })
+
+    }
+    // ...do some work...
+for _, rmdir := range rmdirs {
+    rmdir() // clean up
+
+}
+</code></pre>
+
+<p>上面程序的执行能否达到预期的结果呢？答案是否定的。for循环内部创建一个新的目录的时候，我们使用一个匿名的函数，在循环内部引用了变量d, d其实只是指向变量的内存地址，每一次循环的过程都在发生改变，因此for循环结束后指向的是最后一个变量的地址，所以后面for循环的时候删除的都是同一个目录。解决方法就是在for循环内部对循环变量进行一个copy即可，见下面代码</p>
+<pre><code class="language-go">var rmdirs []func()
+    for _, d := range tempDirs() {
+        dir := d // NOTE: necessary!
+            os.MkdirAll(dir, 0755) // creates parent directories too
+            rmdirs = append(rmdirs, func() {
+                    os.RemoveAll(dir)
+                        
+                    })
+
+    }
+    // ...do some work...
+for _, rmdir := range rmdirs {
+    rmdir() // clean up
+
+}
+</code></pre>
+
+<h3 id="可变参数">可变参数</h3>
+
+<p>声明可变参数函数时，需要在参数列表的最后一个参数类型之前加上省略号&rdquo;&hellip;&ldquo;,这表示该函数会接受任意数量的该类型参数。</p>
+<pre><code class="language-go">func sum(vals...int) int {
+    total := 0
+               for _, val := range vals {
+                       total += val
+
+               }
+                   return total
+
+}
+</code></pre>
+
+<p>对于可变参数，可以直接传递一个切片，然后后面加省略号</p>
+<pre><code class="language-go">values := []int{1, 2, 3, 4}
+fmt.Println(sum(values...)) // &quot;10&quot;
+</code></pre>
+
+<p>interfac{}表示函数的最后一个参数可以接受任意类型</p>
+
+<h3 id="deferred函数">Deferred函数</h3>
+
+<ul>
+<li>defer可以在异常判断的过程中多次执行诸如文件关闭的操作，使用defer可以在return的时候自动执行</li>
+
+<li><p>调试复杂程序时，defer机制也常被用于记录何时进入和退出函数</p>
+<pre><code class="language-go">func bigSlowOperation() {
+defer trace(&quot;bigSlowOperation&quot;)() // don't forget the
+    extra parentheses
+        // ...lots of work...
+            time.Sleep(10 * time.Second) // simulate slow
+                operation by sleeping
+
+}
+func trace(msg string) func() {
+start := time.Now()
+    log.Printf(&quot;enter %s&quot;, msg)
+    return func() {
+            log.Printf(&quot;exit %s (%s)&quot;, msg,time.Since(start))
+                    
+    }
+
+}
+</code></pre></li>
+
+<li><p>defer语句中的函数会在return语句更新返回值后再执行，又因为函数中定义的匿名函数可以访问该函数包括返回值变量在内的所有变量，所以，对匿名函数采用defer机制可以使其观察函数的返回值.</p>
+<pre><code class="language-go">func double(x int) (result int) {
+defer func() { fmt.Printf(&quot;double(%d) = %d\n&quot;, x,result)  }()
+    return x + x
+
+}
+</code></pre></li>
+
+<li><p>被延迟执行的匿名函数甚至可以修改函数返回给调用者的返回值</p>
+<pre><code class="language-go">func triple(x int) (result int) {
+defer func() { result += x  }()
+    return double(x)
+
+}
+fmt.Println(triple(4)) // &quot;12&quot;
+</code></pre></li>
+
+<li><p>对于读写文件信息的操作可能要慎用defer操作，通过os.Create打开的文件进行写入，在关闭文件时，不能采用defer机制。因为对于许多文件系统，尤其是NFS， 写入文件时发生的错误会被延迟到文件关闭时反馈。如果没有检查文件关闭时的反馈信息，可能会导致数据丢失，而我们还误以为写入操作成功。</p></li>
+
+<li><p>延迟函数的调用在释放堆栈信息之前</p></li>
+</ul>
+
+<h3 id="panic异常">Panic异常</h3>
+
+<ul>
+<li>panic函数接受任何值作为参数，当某些不应该发生的场景发生时，我们就应该调用painc。</li>
+
+<li><p>如果在deferred函数中调用了内置函数recover, 并且定义改defer语句的函数发生了panic异常，recover会使程序从panic中恢复，并返回panic value. 导致panic异常的函数不会继续运行，但能整场 返回。在未发生panic时调用recover， recover会返回nil</p>
+<pre><code class="language-go">func Parse(input string) (s *Syntax, err error) {
+defer func() {
+    if p := recover(); p != nil {
+                err = fmt.Errorf(&quot;internal error: %v&quot;, p)
+
+    } 
+}()
+    // ...parser...
+
+}
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/11/Golang%e7%ac%ac%e4%ba%94%e7%ab%a0-%e5%87%bd%e6%95%b0.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e5%9b%9b%e7%ab%a0-%e5%a4%8d%e5%90%88%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Golang第四章:复合数据类型</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>主要介绍数组，slice, map和结构体
+数组和结构体是聚合类型；数组有同构的元素组成，结构体有异构的元素组成，他们都是有固定内存大小的数据结构。
+slice和map是动态的的数据结构，他们根据需要动态增长。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/25/Golang%e7%ac%ac%e5%9b%9b%e7%ab%a0-%e5%a4%8d%e5%90%88%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e4%b8%89%e7%ab%a0-%e5%9f%ba%e7%a1%80%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Golang第三章:基础数据类型</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="整型">整型</h3>
+
+<p>有符号：int8, int16, int32, int64, int
+无符号: uint8, unit16, uint32, uint64, uint</p>
+<pre><code class="language-go">var x uint8 = 1&lt;&lt;1 | 1&lt;&lt;5 //00100010
+var y uint8 = 1&lt;&lt;1 | 1&lt;&lt;2 //00000110
+fmt.Printf(&quot;%08b\n&quot;, x)   // &quot;00100010&quot;, the set {1, 5}
+fmt.Printf(&quot;%08b\n&quot;, y)   // &quot;00000110&quot;, the set {1, 2}
+
+fmt.Printf(&quot;%08b\n&quot;, x&amp;y)  // &quot;00000010&quot;, the intersection {1}
+fmt.Printf(&quot;%08b\n&quot;, x|y)  // &quot;00100110&quot;, the union {1, 2, 5} //或
+fmt.Printf(&quot;%08b\n&quot;, x^y)  // &quot;00100100&quot;, the symmetric difference {2, 5}不同为1
+fmt.Printf(&quot;%08b\n&quot;, x&amp;^y) // &quot;00100000&quot;, the difference {5} 如果y对应的位为1，则为0；否则为x的值
+</code></pre>
+
+<!-- more -->
+
+<p>下面的例子</p>
+<pre><code class="language-go">medals := []string{&quot;gold&quot;, &quot;silver&quot;, &quot;bronze&quot;}
+for i := len(medals) - 1; i &gt;= 0; i-- {
+    fmt.Println(medals[i]) // &quot;bronze&quot;, &quot;silver&quot;, &quot;gold&quot;
+}
+</code></pre>
+
+<p>如果i是一个无符号数，则i--永远不会小于0，因此将会出现out ot index的错误。所以len函数设计时候返回的是有符号的int</p>
+<pre><code class="language-go">o := 0666
+fmt.Printf(&quot;%d %[1]o %#[1]o\n&quot;, o) // &quot;438 666 0666&quot;
+x := int64(0xdeadbeef)
+fmt.Printf(&quot;%d %[1]x %#[1]x %#[1]X\n&quot;, x)
+// Output:
+// 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF
+</code></pre>
+
+<h3 id="浮点数">浮点数</h3>
+
+<p>两种：float32和float64
+max.MaxFloat32: 表示float32能表示的最大数。大约3.4e38
+max.MaxFloat64 大约1.8e308</p>
+
+<h3 id="布尔类型">布尔类型</h3>
+
+<p>布尔值不会隐式的转换为0或者1，需要自己转换。同样不像C语言中，大于0的整数就是true，必须显示的进行转换。</p>
+
+<h3 id="字符串">字符串</h3>
+
+<ul>
+<li>字符串的值不能改变，也就是说字符串只读</li>
+<li>各种编码，ASCII, Unicode, UTF-8</li>
+<li>字符串和Byte切片</li>
+</ul>
+
+<h3 id="常量">常量</h3>
+
+<p>常量表达式的值在编译期计算，不是在运行期，常量的值不可修改。</p>
+<pre><code class="language-go">const pi = 3.14159
+const(
+    e = 2.3232322222242424
+    p = 3.1415926533232323
+)
+</code></pre>
+
+<p>常量间的所有算术运算，逻辑运算和比较结果也是常量，对常量的类型转换或者以下函数的调用结果也是返回常量结果：len, cap, real, imag, complex和unsafe.Sizeof</p>
+
+<p>在一个const声明语句中，在第一个声明的常量所在行，iota将会被置0，然后在每一个有常量声明的行加一</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/25/Golang%e7%ac%ac%e4%b8%89%e7%ab%a0-%e5%9f%ba%e7%a1%80%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e4%ba%8c%e7%ab%a0-%e7%a8%8b%e5%ba%8f%e7%bb%93%e6%9e%84.html">Golang第二章:程序结构</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="命名">命名</h3>
+
+<ul>
+<li>一个名字必须以一个字母（Unicode字母）或下划线开头，后面可以跟任意数量的字母、数字或下划线。</li>
+<li>名字的开头字母的大小写决定了名字在包外的可见性。如果一个名字是大写字母开头的（译注：必须是在函数外部定义的包级名字；包级函数名本身也是包级名字），那么它将是导出的，也就是说可以被外部的包访问，例如fmt包的Printf函数就是导出的，可以在fmt包外部访问。包本身的名字一般总是用小写字母。</li>
+</ul>
+
+<!--more -->
+
+<h3 id="指针">指针</h3>
+
+<ul>
+<li>不仅仅是指针会创建别名，很多其他引用类型也会创建别名，例如slice、map和chan，甚至结构体、数组和接口都会创建所引用变量的别名。</li>
+
+<li><p>程序中的sep和n变量分别是指向对应命令行标志参数变量的指针，因此必须用*sep和*n形式的指针语法间接引用它们。</p>
+<pre><code>var n = flag.Bool(&quot;n&quot;, false, &quot;omit trailing newline&quot;)
+var sep = flag.String(&quot;s&quot;, &quot; &quot;, &quot;separator&quot;)
+</code></pre>
+
+<h3 id="new">new</h3></li>
+
+<li><p>另一个创建变量的方法是调用用内建的new函数。表达式new(T)将创建一个T类型的匿名变量，初始化为T类型的零值，然后返回变量地址，返回的指针类型为*T。</p></li>
+
+<li><p>如果两个类型都是空的，也就是说类型的大小是0，例如struct{}和 [0]int, 有可能有相同的地址（依赖具体的语言实现）（译注：请谨慎使用大小为0的类型，因为如果类型的大小为0的话，可能导致Go语言的自动垃圾回收器有不同的行为，具体请查看runtime.SetFinalizer函数相关文档）。</p></li>
+</ul>
+
+<h3 id="变量的生命周期">变量的生命周期</h3>
+
+<ul>
+<li>变量的生命周期指的是在程序运行期间变量有效存在的时间间隔。对于在包一级声明的变量来说，它们的生命周期和整个程序的运行周期是一致的。而相比之下，局部变量的声明周期则是动态的：每次从创建一个新变量的声明语句开始，直到该变量不再被引用为止，然后变量的存储空间可能被回收。函数的参数变量和返回值变量都是局部变量。它们在函数每次被调用的时候创建。</li>
+
+<li><p>函数的有右小括弧也可以另起一行缩进，同时为了防止编译器在行尾自动插入分号而导致的编译错误，可以在末尾的参数变量后面显式插入逗号</p>
+<pre><code>for t := 0.0; t &lt; cycles*2*math.Pi; t += res {
+x := math.Sin(t)
+y := math.Sin(t*freq + phase)
+img.SetColorIndex(
+    size+int(x*size+0.5), size+int(y*size+0.5),
+    blackIndex, // 最后插入的逗号不会导致编译错误，这是Go编译器的一个特性
+)               // 小括弧另起一行缩进，和大括弧的风格保存一致
+}
+</code></pre></li>
+
+<li><p>那么Go语言的自动垃圾收集器是如何知道一个变量是何时可以被回收的呢？这里我们可以避开完整的技术细节，基本的实现思路是，从每个包级的变量和每个当前运行函数的每一个局部变量开始，通过指针或引用的访问路径遍历，是否可以找到该变量。如果不存在这样的访问路径，那么说明该变量是不可达的，也就是说它是否存在并不会影响程序后续的计算结果。
+因为一个变量的有效周期只取决于是否可达，因此一个循环迭代内部的局部变量的生命周期可能超出其局部作用域。同时，局部变量可能在函数返回之后依然存在。
+编译器会自动选择在栈上还是在堆上分配局部变量的存储空间，但可能令人惊讶的是，这个选择并不是由用var还是new声明变量的方式决定的。</p></li>
+
+<li><p>如果将指向短生命周期对象的指针保存到具有长生命周期的对象中，特别是保存到全局变量时，会阻止对短生命周期对象的垃圾回收（从而可能影响程序的性能)</p></li>
+</ul>
+
+<h3 id="赋值">赋值</h3>
+
+<ul>
+<li>如果将指向短生命周期对象的指针保存到具有长生命周期的对象中，特别是保存到全局变量时，会阻止对短生命周期对象的垃圾回收（从而可能影响程序的性能）。</li>
+
+<li><p>元组赋值是另一种形式的赋值语句，它允许同时更新多个变量的值。在赋值之前，赋值语句右边的所有表达式将会先进行求值，然后再统一更新左边对应变量的值。这对于处理有些同时出现在元组赋值语句左右两边的变量很有帮助，例如我们可以这样交换两个变量的值：</p>
+<pre><code>x, y = y, x
+a[i], a[j] = a[j], a[i]
+</code></pre>
+
+<h3 id="类型">类型</h3></li>
+
+<li><p>类型声明语句一般出现在包一级，因此如果新创建的类型名字的首字符大写，则在外部包也可以使用。</p></li>
+
+<li><p>我们在这个包声明了两种类型：Celsius和Fahrenheit分别对应不同的温度单位。它们虽然有着相同的底层类型float64，但是它们是不同的数据类型，因此它们不可以被相互比较或混在一个表达式运算。刻意区分类型，可以避免一些像无意中使用不同单位的温度混合计算导致的错误；因此需要一个类似Celsius(t)或Fahrenheit(t)形式的显式转型操作才能将float64转为对应的类型。Celsius(t)和Fahrenheit(t)是类型转换操作，它们并不是函数调用。类型转换不会改变值本身，但是会使它们的语义发生变化。另一方面，CToF和FToC两个函数则是对不同温度单位下的温度进行换算，它们会返回不同的值。</p></li>
+
+<li><p>只有当两个类型的底层基础类型相同时，才允许这种转型操作，或者是两者都是指向相同底层结构的指针类型，这些转换只改变类型而不会影响值本身</p></li>
+</ul>
+
+<h3 id="包和文件">包和文件</h3>
+
+<ul>
+<li>在Go语言中，一个简单的规则是：如果一个名字是大写字母开头的，那么该名字是导出的（译注：因为汉字不区分大小写，因此汉字开头的名字是没有导出的）。</li>
+<li>在Go语言程序中，每个包都是有一个全局唯一的导入路径。导入语句中类似&rdquo;gopl.io/ch2/tempconv&rdquo;的字符串对应包的导入路径。Go语言的规范并没有定义这些字符串的具体含义或包来自哪里，它们是由构建工具来解释的。当使用Go语言自带的go工具箱时（第十章），一个导入路径代表一个目录中的一个或多个Go源文件。</li>
+<li>照惯例，一个包的名字和包的导入路径的最后一个字段相同，例如gopl.io/ch2/tempconv包的名字一般是tempconv。</li>
+<li>init初始化函数除了不能被调用或引用外，其他行为和普通函数类似。在每个文件中的init初始化函数，在程序开始执行时按照它们声明的顺序被自动调用。</li>
+<li>初始化工作是自下而上进行的，main包最后被初始化。以这种方式，可以确保在main函数执行之前，所有依赖的包都已经完成初始化工作了。</li>
+
+<li><p>一个有意思的程序，位运算</p>
+<pre><code>package main
+import (
+&quot;fmt&quot;
+)
+var pc [256]byte
+
+func init() {
+for i := range pc {
+    // pc[i] = pc[i/2] + byte(i&amp;1) //除以2相当于右移1位
+    pc[i] = pc[i&gt;&gt;1] + byte(i&amp;1)
+}
+}
+func PopCount(x uint64) int {
+return int(pc[byte(x&gt;&gt;(0*8))] +
+    pc[byte(x&gt;&gt;(1*8))] +
+    pc[byte(x&gt;&gt;(2*8))] +
+    pc[byte(x&gt;&gt;(3*8))] +
+    pc[byte(x&gt;&gt;(4*8))] +
+    pc[byte(x&gt;&gt;(5*8))] +
+    pc[byte(x&gt;&gt;(6*8))] +
+    pc[byte(x&gt;&gt;(7*8))])
+}
+func main() {
+fmt.Println(PopCount(32323))
+}
+</code></pre></li>
+</ul>
+
+<h3 id="作用域">作用域</h3>
+
+<p>声明语句的作用域对应的是一个源代码的文本区域；它是一个编译时的属性。一个变量的生命周期是指程序运行时变量存在的有效时间段，在此时间区域内它可以被程序的其他部分引用；是一个运行时的概念。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/25/Golang%e7%ac%ac%e4%ba%8c%e7%ab%a0-%e7%a8%8b%e5%ba%8f%e7%bb%93%e6%9e%84.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e4%b8%80%e7%ab%a0-%e5%85%a5%e9%97%a8.html">Golang第一章:入门</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="os-args获取参数">os.Args获取参数</h3>
+
+<p>os.Args 是一个字符串的切片，它的第一个元素os.Args[0]是命令本身的名字，其他元素则是程序启动时传给它的参数。</p>
+
+<p>i++ 给i加1，是语句，而在c语言中则是表达式，因此在golang中j = i++ 是非法的。</p>
+
+<h3 id="for循环">for循环</h3>
+<pre><code>for initialization; condition; post {
+    // zero or more statements
+}
+// a traditional &quot;while&quot; loop
+for condition {
+    // ...
+}
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/25/Golang%e7%ac%ac%e4%b8%80%e7%ab%a0-%e5%85%a5%e9%97%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.html">Python学习速记--正则表达式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="字符描述">字符描述</h4>
+
+<p>| 正则式| 字符|
+|:------:||:--------|
+|\s        |空白符|
+|\d        |数字 |
+|\w        |字母或者数字|
+|.           |任意字符        |
+|*          |任意多个字符(包括0个)|
+|+         |至少一个       |
+|?          |0个或1个      |
+|{n}       |n个               |
+|{n,m}   |n到m个         |
+|[]|         []里是精确值|</p>
+
+<h5 id="例子">例子</h5>
+
+<ul>
+<li><code>\d{3}\-\d{3-8}</code>匹配类似<code>010-12345678</code>的字符串</li>
+<li><code>[0-9a-zA-Z\_]</code>匹配一个数字，字母或者下划线</li>
+<li><code>[0-9a-zA-Z\_]+</code>匹配至少有一个数字，字母或者下划线</li>
+<li><code>[a-zA-Z\_][0-9a-zA-Z\_]*</code>字母或者下划线开头 后面接任意的数字，字母或者下划线</li>
+<li><code>[a-zA-Z\_][0-9a-zA-Z\_]{0,19}</code>字母或者下划线开头 后面接0-19个数字，字母或者下划线</li>
+<li><code>A|B</code> 匹配<code>A</code>或者<code>B</code></li>
+<li><code>^</code>标示行的开头,<code>^\d</code>表示以数字开头</li>
+<li><code>$</code>行的结束，<code>\d$</code>数字结尾</li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e7%ba%bf%e7%a8%8b.html">Python学习速记--多线程</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="多线程">多线程</h4>
+
+<p><code>Python</code>支持多线程，使用多线程也比较简单，直接使用<code>threading</code>模块即可</p>
+<pre><code>import time ,threading
+ 
+def my_thread():
+    print('新的线程%s'%threading.current_thread().name)
+    n = 0
+    while n&lt;5:
+        n = n + 1
+        print('线程%s --&gt;  %s'%(threading.current_thread().name,n))
+        time.sleep(1)
+    print('线程%s结束'% threading.current_thread().name)
+
+print('线程 %s 正在运行' % threading.current_thread().name)
+t = threading.Thread(target=my_thread, name='my_thread')
+t.start()
+t.join()
+print('线程 %s 结束' % threading.current_thread().name)
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e7%ba%bf%e7%a8%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e8%bf%9b%e7%a8%8b.html">Python学习速记--多进程</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="多进程">多进程</h4>
+
+<p><code>python</code>封装了操作系统底层的进程函数，<code>Linux</code>下使用<code>fork</code>开辟多进程，<code>windows</code>下使用<code>multiprocessing</code>模块使用多进程</p>
+
+<h5 id="windows-下使用多进程"><code>windows</code>下使用多进程</h5>
+
+<p>需要使用模块<code>multiproccessing</code>中的Process</p>
+<pre><code>from multiprocessing import Process
+import os
+
+def proc_run(name):
+    print('我是子进程%s(%s)' %(name,os.getpid()))
+
+if __name__ == '__main__':
+    print('即将启动一个子进程...')
+    child = Process(target=proc_run,args=('child',))
+    print(&quot;开始启动子进程&quot;)
+    child.start()
+    child.join() #等待子进程结束后再继续往下运行
+    print(&quot;子进程结束&quot;)
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%a4%9a%e8%bf%9b%e7%a8%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%ba%8f%e5%88%97%e5%8c%96.html">Python学习速记--序列化</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="使用-pickle-模块序列化">使用<code>pickle</code>模块序列化</h4>
+<pre><code>#pickle序列化对象
+import pickle
+d = {'name':'tom','age':22}
+print(pickle.dumps(d))
+f = open('seria.txt','wb')
+pickle.dump(d,f)  #序列化到文件
+f.close()
+#反序列化
+f = open('seria.txt','rb')
+d2 = pickle.load(f)
+f.close()
+print(d2)
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e5%ba%8f%e5%88%97%e5%8c%96.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%93%8d%e4%bd%9c%e6%96%87%e4%bb%b6%e5%92%8c%e7%9b%ae%e5%bd%95.html">Python学习速记--操作文件和目录</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="操作文件和目录">操作文件和目录</h4>
+
+<p>python有一个os模块封装了操作与底层相关的函数，比如查看环境变量，系统名字，操作目录等</p>
+
+<h5 id="查看系统参数">查看系统参数</h5>
+<pre><code>import os
+#查看系统参数
+print(os.name) #系统名字
+print(os.environ) #查看环境变量
+print(os.environ.get('PATH')) #获取指定的环境变量值
+</code></pre>
+
+<h5 id="操作文件和目录-1">操作文件和目录</h5>
+
+<p>利用<code>os</code>模块提供的功能可以操控目录，包括查看，添加，删除，遍历</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%93%8d%e4%bd%9c%e6%96%87%e4%bb%b6%e5%92%8c%e7%9b%ae%e5%bd%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-IO%e6%93%8d%e4%bd%9c.html">Python学习速记--IO操作</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="文件读写">文件读写</h4>
+
+<h5 id="读取文本文件">读取文本文件</h5>
+<pre><code>#IO操作--文件读取
+f = open('test.txt','r') # 和c一样打开文件
+#print(f.read())  # read()读取所有内容
+
+#print(f.readline()) # readline 读取一行
+
+#print(f.readlines()) # 读取所有内容到list,每一行一个单位
+
+#异常处理
+try:
+    f = open('test1.txt','r')
+except IOError:
+    print('打开文件失败')
+finally:
+    if f:
+        f.close()
+
+#python提供了更简洁的方式
+with open('test.txt','r') as f:
+    print(f.read())
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-IO%e6%93%8d%e4%bd%9c.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1.html">Python学习速记--面向对象</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>python支持面向对象编程，定义一个类的方式如下:</p>
+<pre><code>class Student(object):
+    pass
+</code></pre>
+
+<p>其中class是类的声明，Student是类名，后面括号里的object是该类继承的类，即父类</p>
+<pre><code>#创建一个类
+stu_instance = Student('jack','male')
+print(stu_instance.name)
+stu_instance.print_info()
+
+#添加私有变量
+class Student2(object):
+    def __init__(self,name,sex):
+        self.__name = name
+        self.__sex = sex
+    def print_info(self):#self必须作为参数
+        print('name:',self.__name,'sex:',self.__sex)
+    
+    def set_name(self,name):
+        self.__name = name
+    def get_name(self):
+        return self__name
+
+    def set_sex(self,sex):
+        self.__sex = sex
+    def get_sex(self):
+        return self.__sex
+
+stu2 = Student2('jack','male')
+print(stu2._Student2__name) #可以这样访问私有变量
+stu2.print_info()
+print(stu2.get_sex())
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-python%e5%87%bd%e6%95%b0%e7%9b%b8%e5%85%b3.html">Python学习速记--python函数相关</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="python数据结构">python数据结构</h4>
+
+<ul>
+<li>list = [1,2,3] 方法：list.append(ele),list.insert(pos,ele),list.pop(),list.pop(pos)</li>
+<li>tuple = (1,2)或(1,2,[3,4])  方法：tuble元素不可变</li>
+<li>dict = {&lsquo;Tom&rsquo;:12,&lsquo;Michael&rsquo;:23}  方法：dict.get(ele),dict.pop(ele)</li>
+<li>set = set([1,2,3])  方法：add, remobe</li>
+</ul>
+
+<h4 id="函数">函数</h4>
+
+<p>函数名其实就是指向一个函数对象的引用，完全可以把函数名赋给一个变量，相当于给这个函数起了一个“别名”</p>
+<pre><code>&gt;&gt;&gt; a = abs #变量a指向abs函数
+&gt;&gt;&gt; a(-1) # 所以也可以通过a调用abs函数
+1
+</code></pre>
+
+<p>python中，自己定义一个函数使用def语句，依次写出函数名、括号、括号中的参数和冒号:，然后，在缩进块中编写函数体，函数的返回值用<code>return</code>语句返回。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-python%e5%87%bd%e6%95%b0%e7%9b%b8%e5%85%b3.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

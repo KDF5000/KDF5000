@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">Hadoop&amp;Hbase</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">16</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/16/%e4%bd%bf%e7%94%a8Docker%e5%8d%95%e6%9c%ba%e6%90%ad%e5%bb%baHadoop%e5%ae%8c%e5%85%a8%e5%88%86%e5%b8%83%e5%bc%8f%e7%8e%af%e5%a2%83.html">使用Docker单机搭建Hadoop完全分布式环境</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="0x01-hydra-hadoop">0x01 Hydra-hadoop</h4>
+
+<p>使用docker在单机部署hadoop和hbase的分布式环境，本项目具有一下特征：
+* 使用serf和dnsmasq 作为集群节点管理和dns解析
+* 可以自定义集群hadoop和hbase的配置，配置完后只需重新build镜像即可
+* ssh远程登录集群节点容器</p>
+
+<p><strong>项目地址</strong>：<a href="https://github.com/KDF5000/hydra-hadoop">https://github.com/KDF5000/hydra-hadoop</a></p>
+
+<h4 id="0x02-项目目录">0x02 项目目录</h4>
+
+<p><strong>serf-dnsmasq</strong>： serf和dnsmasq服务，用于管理集群节点的退出和添加，dnsmasq用于dns的解析
+**hadoop-fake: ** 实现一个伪分布式的hadoop环境
+<strong>hadoop-hydra:</strong> 基于<code>hadoop-fake</code>实现一个完全分布式的集群环境，master和slave均使用该镜像</p>
+
+<h4 id="0x03-使用说明">0x03 使用说明</h4>
+
+<p>默认本机已经安装了docker环境和git工具</p>
+
+<h5 id="0x01-clone">0x01 clone</h5>
+<pre><code>git clone https://github.com/KDF5000/hydra-hadoop
+</code></pre>
+
+<h5 id="0x02-创建镜像">0x02 创建镜像</h5>
+
+<p>按照下面的顺序执行相应操作
+* 进入serf-dnsmasq目录，执行</p>
+<pre><code>sudo docker build -t=&quot;kdf5000/serf-dnsmasq&quot; .
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/16/%e4%bd%bf%e7%94%a8Docker%e5%8d%95%e6%9c%ba%e6%90%ad%e5%bb%baHadoop%e5%ae%8c%e5%85%a8%e5%88%86%e5%b8%83%e5%bc%8f%e7%8e%af%e5%a2%83.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

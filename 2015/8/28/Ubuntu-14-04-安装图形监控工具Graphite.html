@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Ubuntu 14.04 安装图形监控工具Graphite - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Ubuntu-14-04-安装图形监控工具Graphite">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/28/Ubuntu-14-04-%e5%ae%89%e8%a3%85%e5%9b%be%e5%bd%a2%e7%9b%91%e6%8e%a7%e5%b7%a5%e5%85%b7Graphite.html">Ubuntu 14.04 安装图形监控工具Graphite</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Python.html">Python</a>
+                            
+                            <a class="tag label label-info" href="/tags/Linux.html">Linux</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e6%95%b0%e6%8d%ae%e7%9b%91%e6%8e%a7.html">数据监控</a>
+                            
+                            <a class="tag label label-info" href="/tags/Graphite.html">Graphite</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><h3 id="什么是-graphite">什么是<code>graphite</code>?</h3>
+
+<p>先看看百度百科是怎么介绍
+&gt;
+Graphite 是一个Python写的web应用，采用django框架，Graphite用来进行收集服务器所有的即时状态，用户请求信息，Memcached命中率，RabbitMQ消息服务器的状态，Unix操作系统的负载状态，Graphite服务器大约每分钟需要有4800次更新操作，Graphite采用简单的文本协议和绘图功能可以方便地使用在任何操作系统上。</p>
+
+<p>百度百科讲的还算是比较清楚了，<code>Graphite</code>是用来监控系统的， 比如操作系统，缓存服务系统等，但是监控的数据怎么得到呢？<code>Graphite</code>并不负责，它只负责显示，数据哪里来人家不care，你只要按照他的数据格式给它，<code>Graphite</code>就可以机智的用漂亮的页面显示给你，不过不用担心，<code>graphite</code>的安装的一系列套件，提供了<code>API</code>去传数据给它，而且数据如何存储的也不用我们担心，只管发数据给它就行。说的这么好，到底怎么安装呢？</p>
+
+<p>先别急，事情总不是那么完美，<code>Graphite</code>不支持<code>windows</code>，因此对于只使用<code>Windows</code>的<code>Coder</code>就有点小失落了，不过没关系，相信作为程序员都是有办法的，这些都是小事情。</p>
+
+<p>下面就进入<code>Graphite</code>的世界！</p>
+
+<!--more-->
+
+<h3 id="安装">安装</h3>
+
+<p>操作系统：Ubuntu 14.04
+Python ：2.7.6</p>
+
+<h4 id="安装-graphite-的环境">安装<code>graphite</code>的环境</h4>
+
+<p><code>Graphite</code>的需要的支持环境如下：
+* a UNIX-like Operating System
+* Python 2.6 or greater
+* Pycairo
+* Django 1.4 or greater
+* django-tagging 0.3.1 or greater
+* Twisted 8.0 or greater (10.0+ recommended)
+* zope-interface (often included in Twisted package dependency)
+* pytz
+* fontconfig and at least one font package (a system package usually)
+* A WSGI server and web server. Popular choices are:
+    * Apache with mod_wsgi
+    * gunicorn with nginx
+    * uWSGI with nginx</p>
+
+<p><code>Ubuntu</code>已经安装了<code>python</code>，所以不需要安装再安装了，只用确保版本大于等于<strong>2.6</strong>即可。这里我们服务器选择<code>Apache</code>，如果已经安装了就不用安装了，只用安装WSGI的模块<code>libapache2-mod-wsgi</code>。
+下面是安装所有支持环境的命令，建议一个一个安装，可以查看每个安装成功与否。</p>
+<pre><code>$sudo apt-get update
+$ sudo apt-get install apache2 libapache2-mod-wsgi python-django python-twisted python-cairo python-pip python-django-tagging
+</code></pre>
+
+<h4 id="安装-graphite-三大组件">安装<code>Graphite</code>三大组件</h4>
+
+<ul>
+<li>whisper（数据库）</li>
+<li>carbon（监控数据，默认端口2003，外部程序StatsD通过这个端口，向Graphite输送采样的数据）</li>
+<li>graphite-web（网页UI）</li>
+</ul>
+
+<p>使用<code>pip</code>命令可以快速的安装</p>
+<pre><code>$sudo pip install whisper
+$sudo pip install carbon
+$sudo pip install graphite-web
+</code></pre>
+
+<p>安装完成后默认在<strong>/opt/graphite</strong>目录</p>
+
+<p>然后使用<code>Pip</code>安装<code>pytz</code>，用于转换<code>TIME_ZONE</code>，后面会介绍</p>
+<pre><code>$ sudo pip install pytz
+</code></pre>
+
+<h4 id="配置-graphite">配置<code>graphite</code></h4>
+
+<p>进入<strong>/opt/graphite/conf</strong>目录，使用给的<code>example配置</code></p>
+<pre><code>$ sudo cp carbon.conf.example carbon.conf 
+$ sudo cp storage-schemas.conf.example storage-schemas.conf 
+$ sudo cp graphite.wsgi.example graphite.wsgi  
+</code></pre>
+
+<h4 id="为-apache-添加-graphite-的虚拟主机">为<code>apache</code>添加<code>Graphite</code>的虚拟主机</h4>
+
+<p>安装<code>graphite</code>的时候会生成一个<code>/opt/graphite/example</code>的文件夹，里面有一个配置好的虚拟主机文件，将其复制到<code>Apache</code>放置虚拟主机的配置文件的地方，默认是<strong>/etc/apache2/sites-available</strong>文件夹</p>
+<pre><code>$sudo cp /opt/graphite/examples/example-graphite-vhost.conf    /etc/apache2/sites-available/graphite-vhost.conf
+</code></pre>
+
+<p>然后在编辑修改监听端口为8008以及一个WSGISocketPrefix的默认目录，修改后如下：</p>
+
+<p><img src="/media/archive/img_graphite_install_vhost.png" alt="" /></p>
+
+<p>在<strong>/etc/apache2/sites-enable</strong>下建立该配置文件的软链接</p>
+<pre><code>$cd /etc/apache2/sites-enable
+$sudo ln -s ../sites-available/graphite-vhost.conf   graphite-vhost.conf 
+</code></pre>
+
+<h4 id="初始化数据库">初始化数据库</h4>
+
+<p>初始化 <code>graphite</code>需要的数据库，修改 <code>storage</code> 的权限，用拷贝的方式创建 <code>local_settings.py</code>文件（中间会问你是不是要创建一个superuser，选择no，把&lt;用户名&gt;改成你当前的Ubuntu的用户名，这是为了让carbon有权限写入whisper数据库，其实carbon里面也可以指定用户的，更新：graphite需要admin权限的用户才能创建User Graph，所以superuser是很重要的，可以使用 python manage.py createsuperuser创建）：</p>
+<pre><code>$ cd /opt/graphite/webapp/graphite/
+
+$ sudo python manage.py syncdb
+$ sudo chown -R &lt;用户名&gt;:&lt;用户名&gt; /opt/graphite/storage/  
+$ sudo cp local_settings.py.example local_settings.py
+
+$ sudo /etc/init.d/apache2 restart  #重启apache
+</code></pre>
+
+<p>上面代码中的用户名为<code>Apache</code>对应的用户，一般为<code>www-data</code>，可以使用下面的代码获得，在<code>apache</code>的<code>web</code>根目录（默认：<strong>var/www/html</strong>）穿件<code>control.php</code></p>
+<pre><code>&lt;?php
+    echo exec(&quot;whoami&quot;);
+?&gt;
+</code></pre>
+
+<p>在浏览器访问<code>http://localhost/control.php</code>既可以看到对应的用户名</p>
+
+<h4 id="启动carbon">启动Carbon</h4>
+<pre><code>$ cd /opt/graphite/
+
+$ sudo ./bin/carbon-cache.py start
+</code></pre>
+
+<p>此时在浏览器访问<strong><a href="http://localhost:8008">http://localhost:8008</a></strong>，看到下面页面说明配置成功</p>
+
+<p><img src="/media/archive/img_graphite_index_page.png" alt="" /></p>
+
+<p>如果出现没有权限访问的错误页面，可以修改<code>Apache</code>配置文件/etc/pache2/apache2.conf,找到下图中的位置，注释掉<strong>Require  all denied</strong> ，然后重启<code>Apache</code>再次访问。</p>
+
+<p><img src="/media/archive/img_apache_directory.png" alt="" /></p>
+
+<h4 id="修改-graphite-默认的时区">修改<code>Graphite</code>默认的时区</h4>
+
+<p>打开<strong>/opt/graphite/webapp/graphite/setting.py</strong>，找到<code>TIME_ZONE</code>，默认是<strong>UTC</strong>，将其修改为<strong>Asia/Shanghai</strong>
+，然后找到<code>USE_TZ</code>，没有的话自己在文件末尾添加，设置为<strong>True</strong>。</p>
+
+<h3 id="发送数据到-graphite">发送数据到<code>graphite</code></h3>
+
+<p>发送数据的方法比较多，科一参考官方文档<a href="http://graphite.readthedocs.org/en/latest/feeding-carbon.html">Feeding In Your Data</a>，此外，在<strong>/opt/graphite/examples</strong>下提供了一份通过<code>Socket</code>发送数据的例子<strong>examples-client.py</strong>。</p>
+
+<p>Graphite官方文档：<a href="http://graphite.readthedocs.org/en/latest/index.html"><strong>Graphite官方文档</strong></a></p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

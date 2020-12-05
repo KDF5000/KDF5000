@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">java</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">20</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/11/20/%e5%9b%9e%e6%ba%af%e6%b3%95%e8%a7%a3%e6%97%85%e8%a1%8c%e5%95%86%e9%97%ae%e9%a2%98-TSP.html">回溯法解旅行商问题(TSP)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><blockquote>
+<p>旅行商问题,常被成为旅行推销员问题,是指一名推销员要拜访多个地点,如何找到再拜访每个地点一次后再回到起点的最短路径.</p>
+</blockquote>
+
+<p>进一步的抽象,可以转化为图论的问题,将每个城市看成图$G(V,E)$中的一个顶点,则旅行商问题可以转化为从一个顶点s出发,找到一条最短的路径从s出发,经过所有的顶点,最后回到s.最简单的解法就是枚举,枚举所有的路径,计算其每条路径的长度,取最短的即可.枚举最有的路径则其有$(n-1)!$条路径,如果n非常大,则解的空间将非常大,我们可以使用一个棵树,那么这棵树将非常庞大.</p>
+
+<p>既然我们可以用一个树表示类似问题的所有可能解,那么现在的问题就变成了从解空间树中找到最短的路径,也就是树的搜索问题,搜索每一条路,找到最短的路径.但是再进一步思考一下,其实很多分枝,我们在没有搜索到叶子节点的时候就可以通过一些已知的条件就可以判断这条路不可能是最短的路.回溯法就是这个思路,按照深度优先的策略搜索解空间树,通过一些约束条件或者边界条件判断是否继续搜索下去,如果不满足约束条件则直接返回.</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/11/20/%e5%9b%9e%e6%ba%af%e6%b3%95%e8%a7%a3%e6%97%85%e8%a1%8c%e5%95%86%e9%97%ae%e9%a2%98-TSP.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

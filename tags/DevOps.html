@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">DevOps</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Ansible: 自动化管理服务器(2)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="ansible-命令参数">Ansible 命令参数</h3>
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>-v</td>
+<td>详细模式，如果命令执行成功，输出详细的结果</td>
+</tr>
+
+<tr>
+<td>-i Path</td>
+<td>指定host文件的路径，默认是/etc/ansible/hosts</td>
+</tr>
+
+<tr>
+<td>-f Num</td>
+<td>指定一个整数，默认是5，指定fork开启同步进程的个数</td>
+</tr>
+
+<tr>
+<td>-m Name</td>
+<td>指定使用的module名称，默认是command</td>
+</tr>
+
+<tr>
+<td>-M path</td>
+<td>指定module的目录。默认是/usr/share/ansible</td>
+</tr>
+
+<tr>
+<td>-a Module_Args</td>
+<td>指定module的参数</td>
+</tr>
+
+<tr>
+<td>-k</td>
+<td>提示输入ssh密码，而不是基于ssh的密钥认证</td>
+</tr>
+
+<tr>
+<td>-sudo</td>
+<td>指定使用sudo获得root权限</td>
+</tr>
+
+<tr>
+<td>-K</td>
+<td>提示输入sudo密码，与-sudo一起使用</td>
+</tr>
+
+<tr>
+<td>-u Username</td>
+<td>指定被控机器的执行用户</td>
+</tr>
+
+<tr>
+<td>-C</td>
+<td>测试此命令会改变什么内容，不会真正的去执行</td>
+</tr>
+</tbody>
+</table>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-2.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">1</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-1.html">Ansible: 自动化管理服务器(1)</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h2 id="ansible配置">Ansible配置</h2>
+
+<p>Ansible 提供一种最简单的方式用于发布、管理和编排计算机系统的工具，你可在数分钟内搞定</p>
+
+<p>Ansible 是一个模型驱动的配置管理器，支持多节点发布、远程任务执行。默认使用 SSH 进行远程连接。无需在被管理节点上安装附加软件，可使用各种编程语言进行扩展</p>
+
+<p><img src="http://7xtgvp.com2.z0.glb.clouddn.com/blog/images/Ansible.png" alt="Ansible" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/1/12/Ansible-%e8%87%aa%e5%8a%a8%e5%8c%96%e7%ae%a1%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8-1.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

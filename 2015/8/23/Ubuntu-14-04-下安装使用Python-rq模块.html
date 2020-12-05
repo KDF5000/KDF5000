@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Ubuntu 14.04 下安装使用Python rq模块 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Ubuntu-14-04-下安装使用Python-rq模块">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">8</span>
+                            <span class="day">23</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/8/23/Ubuntu-14-04-%e4%b8%8b%e5%ae%89%e8%a3%85%e4%bd%bf%e7%94%a8Python-rq%e6%a8%a1%e5%9d%97.html">Ubuntu 14.04 下安装使用Python rq模块</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Python.html">Python</a>
+                            
+                            <a class="tag label label-info" href="/tags/Ubuntu.html">Ubuntu</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%88%86%e5%b8%83%e5%bc%8f.html">分布式</a>
+                            
+                            <a class="tag label label-info" href="/tags/Python%e9%98%9f%e5%88%97.html">Python队列</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p><code>rq</code> 是<code>Python</code>的一个第三方模块，使用<code>rq</code>可以方便快速的实现<code>Python</code>的队列操作，实现多态电脑的分布式架构。其中 *R*是<code>Redis</code>的意思，*Q*是<code>Queue</code>的首字母，<code>rq</code>使用<code>Redis</code>和<code>Queue</code>实现分布式，分别实现了<code>Master</code>和<code>Worker</code>，通过<code>Redis</code>存储任务队列。</p>
+
+<h4 id="ubuntu14-04-安装rq">Ubuntu14.04 安装rq</h4>
+
+<p>假设已经安装了<code>Python</code>和<code>pip</code>，本文通过`<code>pip</code>来安装<code>rq</code></p>
+<pre><code>$sudo pip install rq 
+</code></pre>
+
+<h4 id="安装-redis">安装<code>Redis</code></h4>
+
+<p><code>rq</code>模块使用<code>redis</code>保存队列信息，因此可以保证多台机器同时读取同一个队列，也就是多个`<code>worker</code>同时工作，这也就达到了我们的目的。在<code>Ubuntu</code> 下安装<code>Redis</code>比较简单，使用下面的命令即可，该命令除了安装 <code>Redis</code>外，也会好心地帮你安装了<code>redis-cli</code>。</p>
+<pre><code>$sudo apt-get install redis-server
+</code></pre>
+
+<!--more-->
+
+<p>安装完成后可以尝试启动一下<code>Reids</code>，检查是否安装成功。</p>
+<pre><code>$ redis-server
+</code></pre>
+
+<p>上面的命令会使用默认的设置启动<code>Redis</code>服务，如果你看到下面漂亮启动界面说明安装成功了。</p>
+
+<p>不过还没完额，使用下面命令看看我们可以看到什么</p>
+<pre><code>$ netstat -an | grep 6379
+</code></pre>
+
+<p>结果：</p>
+
+<p><img src="/media/archive/img_rq-redis-bind.png" alt="" /></p>
+
+<p>因为<code>Redis</code>默认使用的端口是6379，该命令可以查看6379端口监听的ip ，可以看到 <code>Redis</code>默认绑定的是<code>127.0.0.1</code>，可以在<code>/etc/redis/redis.conf</code>中看到该设置。</p>
+
+<p><img src="/media/archive/img_rq-redis-redis-conf.png" alt="" /></p>
+
+<p><code>Redis</code>的默认配置绑定了<code>127.0.0.1</code>，注释掉<strong>bind 127.0.0.1</strong>即可。然后重启<code>Redis</code>。</p>
+<pre><code>$ sudo /etc/init.d/redis-server restart
+</code></pre>
+
+<p>再次执行<code>netstat -an | grep 6379</code></p>
+
+<p><img src="/media/archive/img_rq-redis-redis-netstat.png" alt="" /></p>
+
+<p>可以看到改变了 ，<code>Redis</code>已经可以接受同一个局域网内的<code>redis cli</code>连接了</p>
+
+<h4 id="安装-rq-dashboard">安装<code>rq-dashboard</code></h4>
+
+<p><code>rq-dashboard</code>是一个监控<code>rq</code>执行状况的<code>python</code>库，它可以显示当前有哪些<code>Queue</code>，每个<code>Queue</code>有多少<code>Job</code>，以及有多少<code>Worker</code>处于工作状态，还显示了失败的<code>Job</code>。可以使用<code>pip</code>方便的安装<code>Dashboard</code>.</p>
+<pre><code>$sudo pip install rq-dashboard
+</code></pre>
+
+<p>安装成功后，使用下面的命令启动<code>rq-dashboard</code></p>
+<pre><code>$rq-dashboard -u &quot;redus://192.168.0.107:6379&quot;
+</code></pre>
+
+<p>其中<code>-u</code>参数是需要使用的<code>Redis</code>连接地址，启动成功后可以看到下面的信息</p>
+
+<p><img src="/media/archive/img_rq-rqdashboard-start.png" alt="" /></p>
+
+<p>可以看出<code>Rq dashboard</code>的版本信息，以及运行的地址端口，也就是我们可以通过浏览器访问，默认的端口是*9181*，<code>IP</code>地址是启动<code>rq-dashboard</code>的机器<code>ip</code>，在同一局域网的电脑访问<code>http://192.168.0.107:9181</code>，其中<code>192.168.0.107</code>是启动<code>rq-dashboard</code>的电脑<code>ip</code>。</p>
+
+<p><img src="/media/archive/img_rq-rqdashboard-web.png" alt="" /></p>
+
+<p><code>Rq-dashboard</code>是一个很有用的工具，可以图形化的监控<code>rq</code>的工作状态，但是美中不足，不能控制<code>worker</code>的工作，不过相信应该很快就会支持这些功能了。</p>
+
+<h4 id="rq-的使用"><code>rq</code>的使用</h4>
+
+<p><strong>参考<a href="http://python-rq.org/">官方文档</a></strong></p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

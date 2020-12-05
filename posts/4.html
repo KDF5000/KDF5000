@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 4 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-4">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">4</span>
+                            <span class="day">17</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/4/17/%e5%b8%b8%e8%a7%81%e7%9a%84%e5%87%a0%e7%a7%8dSharding%e7%ad%96%e7%95%a5.html">常见的几种Sharding策略</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="range">Range</h3>
+
+<p>range假设key有序，好处是临近的key经常在一起，比如共同前缀的key,可以很好的支持scan操作，hbase的region就是range策略。缺点是对压力较大的顺序写不太友好，比如日志类型的写入，一般日志的key都是和时间相关的，时间是单调递增的，因此写入的热点永远在最后一个region。</p>
+
+<p>但是对于关系型的数据库，因为经常性的需要<strong>表扫描或者索引扫描</strong>，基本上都会使用range的shard策略。
+<img src="http://static.zybuluo.com/zyytop/5h4vfs0g6t7y3609lbuslozw/屏幕快照_2016-10-13_下午4.40.22.png" alt="" />
+<em>图片来自PingCAP博客</em></p>
+
+<h3 id="hash">Hash</h3>
+
+<p>Hash的策略是将key先做一个hash,然后得到的hash值作为sharding ID, 这样每一个Key的分布都是随机的，因此可以任务是均匀分布的，这样对于写压力较大的系统非常友好，同事随机的读因为会将读的压力均匀分布在不同的节点，因此也是非常友好的。但是对于需要scan的操作几乎是不可能的。
+<img src="http://static.zybuluo.com/zyytop/8kaltq5ww337kgxq63asdbnz/屏幕快照_2016-10-19_下午6.14.37.png" alt="" />
+<em>图片来自PingCAP博客</em></p>
+
+<h4 id="round-robin">Round Robin</h4>
+
+<p>这种hash是最简单的其实也是上面描述的Hash的最朴素的实现方式，Hash首先一般是讲数据进行分片，如果分片后每一片直接对应一个物理节点，一般的实现是直接在hash函数设计的时候将物理节点个数考虑进去，比如对物理节点的个数取余。
+$$H(key) = hash(key) \%  k$$
+这样H(key)的值即为物理节点的编号，这种方式因为讲数据分片和分片与物理节点映射的功能合二为一，因此新增加或者减少一个物理节点re-hash的代价非常高。</p>
+
+<p>对于这个问题有多种解决方案，一种就是想办法解除合二为一的哈希功能，虚拟桶就是这种思路，另一种是一致性哈希所采用的方法。</p>
+
+<h4 id="虚拟通-virtual-buckets">虚拟通(Virtual Buckets)</h4>
+
+<p>虚拟桶的方法就是为了解决上面提到的Round Robin的哈希方法的扩展性问题，其实也是很简单的，就是讲hash的映射分为两部分，首先 根据key做个hash映射到一个虚拟桶(数据分片)，然后维护一个从虚拟桶到物理节点的映射表。当新增加一个节点的时候，将某些虚拟桶从原先的物理节点移动到新的物理节点，然后更新映射表即可，不需要重新对所有的key进行hash.
+<img src="/media/archive/blog/images/sharding.png" alt="sharding.png" /></p>
+
+<h4 id="一致性哈希">一致性哈希</h4>
+
+<p>Cassandra和Twemproxy都是使用了一致性哈希的方法，这个讲起来有点复杂，详情看[待定]()</p>
+
+<h4 id="pre-sharding">Pre-sharding</h4>
+
+<p>Pre-sharding其实就是前面提到的虚拟桶的方法，只要经过两次hash都可以认为是pre-sharding的方式。</p>
+
+<h3 id="动态扩展">动态扩展</h3>
+
+<p>range在动态扩展方面可以通过分裂的方式将一个大的shard分裂成不同大小的shard然后做shard的迁移，但是对于hash来说就必须来进行re-hash，这样的代价是非常大的，比如添加一个物理节点，此时hash的模如果是3，则添加后变成了4, 对于已有系统的抖动非常大。 虽然一致性hash可以一定程度降低系统的抖动，但是并不能彻底避免。</p>
+
+<hr />
+
+<p><strong>参考资料</strong>
+1. <a href="https://pingcap.com/blog-building-distributed-db-with-raft-zh">基于 Raft 构建弹性伸缩的存储系统的一些实践</a>
+2. <a href="http://engineering.xueqiu.com/blog/2014/12/26/redis-capacity-planning/">Redis集群的数据划分与扩容探讨</a>
+3. 《大数据日知录》第一章：数据分片与路由</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/4/17/%e5%b8%b8%e8%a7%81%e7%9a%84%e5%87%a0%e7%a7%8dSharding%e7%ad%96%e7%95%a5.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/28/Golang-RPC-%e6%80%a7%e8%83%bd%e6%b5%8b%e8%af%95.html">Golang RPC 性能测试</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>最近刚好要使用Golang的RPC，因此对Golang标准库的RPC进行了一下测试，看看其性能到底如何。RPC服务端和客户端的实现完全使用RPC的<code>net/rpc</code>标准库，没有经过特殊的优化，主要针对下面三个场景进行测试。测试之前需要先说明一下，Go的rpc连接是支持并发请求的，就是说一个一个连接可以并发的发送很多个请求，不像http协议一问一答的模式。</p>
+
+<h3 id="测试环境">测试环境</h3>
+
+<p>操作系统：Centos 6.8 (Linux 2.6.32)
+内存：32G
+核数：双CPU, 一共12核
+CPU型号：Intel&reg; Xeon&reg; CPU E5645  @ 2.40GHz
+Golang: 1.7.4</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/28/Golang-RPC-%e6%80%a7%e8%83%bd%e6%b5%8b%e8%af%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/28/Golang%e7%ac%ac%e5%8d%81%e4%b8%80%e7%ab%a0-%e6%b5%8b%e8%af%95.html">Golang第十一章-测试</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>命令
+
+<ul>
+<li>go test</li>
+<li>遍历*_test.go 文件中复合规则的函数</li>
+</ul></li>
+<li>类型
+
+<ul>
+<li>测试函数：Test开头用于测试程序逻辑行为的正确性</li>
+<li>基准测试函数：Benchmark开头，用于衡量函数的性能，go test会运行多次取平均的执行时间</li>
+<li>示例函数：Examole开头的函数，提供一个有编译器保证正确性的示例文档</li>
+</ul></li>
+</ul>
+
+<h2 id="测试函数">测试函数</h2>
+
+<ul>
+<li><p>导入的包和形式如下</p>
+<pre><code>import &quot;testing&quot;
+func TestName(t *testing){
+//...
+}
+</code></pre></li>
+
+<li><p>go test -v参数可以打印每个测试函数的名字和运行时间</p></li>
+
+<li><p>go test -run 对应一个正则表达式，只有测试函数名被它正确匹配的测试函数才会被go test测试命令运行。</p></li>
+
+<li><p>t.Error不能终止测试，t.Fatal可以终止测试</p></li>
+
+<li><p>t.Fatal必须和测试函数在同一个groutine里调用才能终止测试</p></li>
+
+<li><p>一般测试失败的信息形式为<code>f(x)=y, want z</code></p></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/28/Golang%e7%ac%ac%e5%8d%81%e4%b8%80%e7%ab%a0-%e6%b5%8b%e8%af%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">15</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/15/Golang%e7%ac%ac%e5%85%ad%e7%ab%a0-%e6%96%b9%e6%b3%95.html">Golang第六章:方法</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>对象其实就是属性和方法的集合，可以认为方法就是意义和特殊类型关联的函数</li>
+<li>在函数声明时，在其名字之前放上一个变量，即是一个方法。这个附加的参数会将该函数附加到这种类型上，即相当于这种类型定义了一个独占的方法。这个附加的参数叫接收器(Receiver)</li>
+<li>方法名不能和对象的字段名一样，编译会报错</li>
+
+<li><p><strong>除了常见的struct类型可以定义方法，slice类型也可以，其实任何类型都可以。这个和很多其他面向对象的语言不同</strong>，看个例子</p>
+<pre><code class="language-go">package main
+import &quot;math&quot;
+import &quot;fmt&quot;
+type Point struct{ X, Y float64 }
+// traditional function
+// same thing, but as a method of the Point type
+func (p Point) Distance(q Point) float64 {
+return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+type Path []Point
+func (p Path) Distance() float64 {
+sum := 0.0
+for i := range p {
+    if i &gt; 0 {
+        sum += p[i-1].Distance(p[i])
+    }
+}
+return sum
+}
+func main() {
+perim := Path{
+    {1, 1},
+    {5, 1},
+    {5, 4},
+    {1, 1},
+}
+fmt.Println(perim.Distance()) // &quot;12&quot;
+}
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/15/Golang%e7%ac%ac%e5%85%ad%e7%ab%a0-%e6%96%b9%e6%b3%95.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/3.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/5.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

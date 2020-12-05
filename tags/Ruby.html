@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">Ruby</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">9</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/9/25/Ubuntu-%e4%b8%8b%e5%ae%89%e8%a3%85Ruby-On-Rails.html">Ubuntu 下安装Ruby On Rails</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="ruby-on-rails的配置">Ruby On Rails的配置</h3>
+
+<p><code>Rails</code>是一个优秀的<code>Ruby</code>框架.结合了<code>PHP</code>快速开发和<code>JAVA</code>程序规整的特点,使用<code>MVC</code>的设计模式,是一个用于开发数据库驱动的网络应用程序的完整框架.</p>
+
+<p><code>Ruby On Rails</code>的官网: <a href="https://www.ruby-lang.org">https://www.ruby-lang.org</a></p>
+
+<p>安装<code>Ruby On Rails</code>需要安装<code>Ruby</code>,<code>gem</code>,<code>Sqlite3</code>,和<code>Rails</code>. 本教程的平台使用的使用的<code>Ubuntu</code>,因此只介绍<code>Ubuntu</code>下的安装.</p>
+
+<h3 id="安装-ruby">安装<code>Ruby</code></h3>
+
+<p>安装<code>Ruby</code>可以参考<code>Ruby</code>的<a href="https://www.ruby-lang.org/en/documentation/installation/">官方教程</a></p>
+
+<p>再<code>Ubuntu</code>下可以使用<code>sudo apt-get install ruby-fully</code>进行快速的安装,但是使用这种方式安装的最新版本是<code>1.9.3</code>,而最新版本的<code>Ruby</code>是<code>2.2.3</code>,因此本教程使用编译源码进行安装.</p>
+
+<p>到<code>Ruby</code>下载最新的<a href="https://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.3.tar.gz">源码</a>,解压到指定的位置,进入解压后的目录,执行下面的命令:</p>
+<pre><code>$./configuren
+$ make 
+$ sudo make install
+</code></pre>
+
+<p>耐心的等待一段时间,执行下面的命令:</p>
+<pre><code>$ ruby -v
+</code></pre>
+
+<p>如果出现下图中的结果,说明安装成功了.</p>
+
+<p><img src="/media/archive/img_ruby-v.png" alt="" /></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/9/25/Ubuntu-%e4%b8%8b%e5%ae%89%e8%a3%85Ruby-On-Rails.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

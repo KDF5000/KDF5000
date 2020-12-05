@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>分布式对象存储系统SeaweedFS - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="分布式对象存储系统SeaweedFS">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">6</span>
+                            <span class="day">13</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/6/13/%e5%88%86%e5%b8%83%e5%bc%8f%e5%af%b9%e8%b1%a1%e5%ad%98%e5%82%a8%e7%b3%bb%e7%bb%9fSeaweedFS.html">分布式对象存储系统SeaweedFS</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Distributed%20System.html">Distributed System</a>
+                            
+                            <a class="tag label label-info" href="/tags/Object%20Storage.html">Object Storage</a>
+                            
+                            <a class="tag label label-info" href="/tags/SeaweedFS.html">SeaweedFS</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>SeaweedFS是Facebook的海量图片存储系统Haystack的一个开源实现，其目标是：
+- 存储数亿张图片
+- 快速响应的文件服务</p>
+
+<p>seaweedfs提供一个Key-&gt; file的k/v服务，不支持POSIX的文件语义。虽然是Haystack的开源实现，但是也有所不同，比如Haystack论文里提到的使用一个中心节点保存所以文件的metadate。Seaweedfs实现中，中心master是负责文件卷标的管理，具体文件的metadata有相应的valume服务器负责。这样可以大大减缓中心节点的并发的压力，并且提供了快速的文件访问<strong>(一次磁盘操作)</strong>。
+<!--more -->
+<strong>每个文件的metadata只有50个字节，因此可以在O(1)的时间内从磁盘读取出来。</strong></p>
+
+<p>额外的功能:
+* 可以选择不同层次的副本策略：不备份，不同机架，不同数据中心
+* 中心节点自动故障恢复 - 无单点问题
+* 根据文件mime类型自动选择Gzip压缩
+* 更新或者删除文件之后自动compaction
+* 同一个集群的服务器可以有不同的磁盘大小，操作系统，文件系统
+* 增加或者移除节点不会导致任何数据的re-balance
+* 可选的Filer Server提供&rdquo;normal&rdquo;的目录和文件服务
+* 可选的文件方向调整修复
+* 支持Etag, Accept-Range, Last-Modified等
+* 支持in-memory/leveldb/boltdb/btree 模式，以便调整性能/内存的平衡</p>
+
+<h2 id="相关术语">相关术语</h2>
+
+<h3 id="save-file-id">Save File Id</h3>
+
+<p>fid的格式是<code>volumeId, filekey+fileCookie</code>, 其中volumeId是一个32位的无符号整数。fileKey是一个64位的无符号整数。fileCookie是一个64位的无符号整数，用来防止url暴力破解。volumeID, fileKey和fileCookie被编码成十六进制，<strong>获得的fid需要保存到应用服务器</strong>。</p>
+
+<h3 id="writefile">WriteFile</h3>
+
+<p>写文件分为两步：
+* 从master获取可以保存的volume信息</p>
+<pre><code class="language-shell">curl -X POST http://localhost:9333/dir/assign
+</code></pre>
+
+<p>可以返回volume node的相关信息，以及相应的fid</p>
+<pre><code class="language-shell">{&quot;fid&quot;:&quot;11,026bfba733&quot;,&quot;url&quot;:&quot;127.0.0.1:8080&quot;,&quot;publicUrl&quot;:&quot;127.0.0.1:8080&quot;,&quot;count&quot;:1}
+</code></pre>
+
+<ul>
+<li><p>保存文件到相应的volume server</p>
+<pre><code class="language-shell">curl -X PUT -F file=@/Users/KDF5000/Documents/2017/Coding/ObjectStorage/SeaweedFS/seaweedfs/weed/vim-key.png http://127.0.0.1:8080/11,026bfba733 
+</code></pre>
+
+<p>成功的话返回上传的文件名和文件大小</p>
+<pre><code>{&quot;name&quot;:&quot;vim-key.png&quot;,&quot;size&quot;:236702}
+</code></pre></li>
+</ul>
+
+<h3 id="readfile">ReadFile</h3>
+
+<p>读文件可以根据fid到任何一个节点(master,volumeserver)去读，他会自动的跳转到实际存储的节点。
+请求的格式可以至此下面的几种格式：</p>
+<pre><code> http://localhost:8080/3/01637037d6/my_preferred_name.jpg
+ http://localhost:8080/3/01637037d6.jpg
+ http://localhost:8080/3,01637037d6.jpg
+ http://localhost:8080/3/01637037d6
+ http://localhost:8080/3,01637037d6
+</code></pre>
+
+<p>也可以对图片进行伸缩</p>
+<pre><code>http://localhost:8080/3/01637037d6.jpg?height=200&amp;width=200
+http://localhost:8080/3/01637037d6.jpg?height=200&amp;width=200&amp;mode=fit
+http://localhost:8080/3/01637037d6.jpg?height=200&amp;width=200&amp;mode=fill
+</code></pre>
+
+<h2 id="架构">架构</h2>
+
+<p>seaweedfs主要有两种服务类型，master server和volume server。</p>
+
+<p>master server可以部署多个节点，使用raft维护一致性，主要负责记录volumeId到volume server的映射关系。</p>
+
+<p>Volume server 是主要的存储节点，有一系列的volume文件(默认32G),每个volume存储很多的小文件，与之对应还有有一个所以文件，记录volume中文件的编号，偏移，大小等信息。Volume server维护本地所有volume的元信息，初始化后保存在内存中，这样当读一个文件的时候只用一次磁盘操作即读出文件的实际内容。</p>
+
+<h3 id="读写文件">读写文件</h3>
+
+<p>写文件的时候需要首先与master server通信，获得可以保存文件的volume信息，master server会返回(volume id, file key, file cookie, volume node url)格式的信息用于保存文件。然后client在请求返回的volume node url以及文件路径保存文件到volume server。</p>
+
+<p>读文件时候client可以根据之前记录的volume server信息，根据(volumeId, file key, file cookie)直接读取文件信息，也可以向master节点查询volume server的url, 然后去读取文件信息。</p>
+
+<h3 id="replication">Replication</h3>
+
+<p>在上传图片的时候，获取fid时候可以指定是否需要保存副本，保存的类型是什么</p>
+<pre><code>curl -X POST http://localhost:9333/dir/assign?replication=001
+</code></pre>
+
+<p>seaweedfs一共有6种副本类型：
+* 000: 没有副本(默认)
+* 001: 在同一个机架保存一份副本
+* 010: 在同一个数据中心的不同机架保存一份副本
+* 100：在不同数据中心保存一份副本
+* 200：在两个不同的数据中心保存两个副本
+* 110：一个副本在不同机架，一个在不同数据中心</p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

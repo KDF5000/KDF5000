@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>编程技巧 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-tag" data-perma="post-tag-编程技巧">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <h2 class="tag text-center">Redis</h2>
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">6</span>
+                            <span class="day">19</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/6/19/%e9%9d%a2%e5%90%91HBase%e7%9a%84%e5%86%85%e5%ad%98key-value%e7%bc%93%e5%ad%98%e7%9a%84%e5%ae%9e%e7%8e%b0.html">面向HBase的内存key-value缓存的实现</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="0x01-背景">0x01 背景</h3>
+
+<p>之所以要实现这个缓存主要原因如下(但是由于不是实际业务场景需求，所以可能不太准确，也可能不存在这个需求):
+* 非结构化数据的爆炸式增长
+* 处理速度的要求越来越高
+* HBase是面向硬盘的
+* 内存容量越来越大
+* 热点数据可以在内存放下</p>
+
+<h3 id="0x02-设计方案">0x02 设计方案</h3>
+
+<p>通常的要实现缓存，主要是在有两个大方向实现，一个是在客户端实现，另一个时在服务端实现
+* 客户端实现
+ - 修改Hbase Client的源码,在Put, Get等关键操作的地方加入缓存机制
+ - 在client端设计一种缓存服务层,并实现一个分布式的Key-value缓存系统, 对Hbase Client进行重新封装
+* 服务端实现
+ - 修改HBase Server端的源码,在Put, Get等关键操作的地方加入缓存机制
+ - 在服务端添加一层代理服务,解析所有client的请求,对Put, Get等关键</p>
+
+<p>两种大方向的第一种方案，都是直接修改hbase的源代码，直接修改源码性能可能会更好一些，但是修改源码，会过于依赖Hbase的版本，对于每一个base的版本更新都可能要重新查看源码，重新修改，除此之外1)中的方案一，由于是在本地客户端进行的缓存，所以没有实现分布式的缓存，因此可能存在缓存命中率低，缓存数据不一致的情况。</p>
+
+<p>客户端实现中的方案二，进行重新地封装，不对源码进行修改，同时使用分布式的缓存，既可以提高缓存的命中率，同时又解决的对hbase过度依赖的问题，但是可能会降低性能。</p>
+
+<p>服务端实现中的方案二，通过设计一个缓存代理服务，同样可以解决对hbase的过度依赖，降低了整个系统的耦合性，但是实现一个代理服务并非那么简单，而且需要对hbase的通信机制以及相关协议比较了解。</p>
+
+<p>通过上面的分析比较，考虑到可行性和技术背景，客户端实现的方案二是最合适的方案，而且其性能和可维护性，扩展性相对来说都是比较好的。分布式缓存系统我们使用Redis实现，并且在client本地实现一个LocalCache，尽可能的提高缓存的命中率，减少通信造成的时间延迟（局部性假设，同一个客户端最有可能访问它put的数据）。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/6/19/%e9%9d%a2%e5%90%91HBase%e7%9a%84%e5%86%85%e5%ad%98key-value%e7%bc%93%e5%ad%98%e7%9a%84%e5%ae%9e%e7%8e%b0.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/PHP%e4%b8%8eRedis%e7%9a%84%e4%bb%bfTwitter%e5%ae%9e%e4%be%8b.html">PHP与Redis的仿Twitter实例</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>译者注：
+原文位于Redis官网<a href="http://redis.io/topics/twitter-clone">http://redis.io/topics/twitter-clone</a>
+Redis是NoSQL数据库中一个知名数据库，在新浪微博中亦有部署，适合固定数据量的热数据的访问。
+作为入门，这是一篇很好的教材，简单描述了如何使用KV数据库进行数据库的设计。新的项目www.xiayucha.com亦采用Redis + MySQL进行开发，考虑Redis文档比较少，故翻译了此文。
+其他参考资料：</p>
+
+<p><a href="http://redis.readthedocs.org/en/latest/index.html">Redis命令参考中文版(Redis Command Reference</a>
+<a href="http://try.redis-db.com/">Try Redis</a></p>
+
+<p>我会在此文中描述如何使用<code>PHP</code>以及仅使用<code>Redis</code>来设计实现一个简单的<code>Twitter</code>克隆。很多编程社区常认为 <code>KV</code> 储存是一个特别的数据库，在 <code>web</code> 应用中不能替代关系数据库。本文尝试证明这恰恰相反。这个<code>twitter</code>克隆名为<code>Retwis</code>，结构简单，性能优异，能很轻易地用<code>N</code><code>个web</code>服务器和<code>Redis</code>服务器以分布式架构。</p>
+
+<p>在此获取源码<a href="http://code.google.com/p/redis/downloads/list">http://code.google.com/p/redis/downloads/list</a>
+我们使用PHP作为例子是因为它能被每个人读懂，也能使用Ruby、Python、Erlang或其他语言获取同样(或者更佳)的效果。</p>
+
+<p>*注意*：<code>Retwis-RB</code>是一个由<code>Daniel Lucraft</code>用<code>Ruby</code>与<code>Sinatra</code>写的<code>Retwis</code>分支！此文全部代码在本页尾部的<code>Git repository</code>链接里。此文以PHP为例，但是<code>Ruby</code>程序员也能检出其他源码。他们很相似。注意<code>Retwis-J</code>是<code>Retwis</code>的一个分支，由<code>Costin Leau</code>以<code>Java</code>和<code>Spring</code>框架写成。源码能在<code>GitHub</code>找到，并且在<code>springsource.org</code>有综合的文档。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/PHP%e4%b8%8eRedis%e7%9a%84%e4%bb%bfTwitter%e5%ae%9e%e4%be%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

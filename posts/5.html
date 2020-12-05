@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 5 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-5">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/12/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f%e9%a1%b5%e8%a1%a8%e7%9a%84%e7%ae%a1%e7%90%86.html">操作系统页表的管理</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>学过操作系统的都知道，在操作系统中存在一个虚拟内存的概念，它用于内存的管理，使得应用程序认为它有一段连续的内存，大大地简化了程序员码代码的难度。程序员只用关注在这个连续的虚拟内存段中怎么使用内存，不用关心在物理内存中到底用那一段内存，进程运行的时候操作系统会自动进行映射。操作系统是怎么做到的呢？实际上操作系统为每一个进程维护了一个从虚拟地址到物理地址的映射关系的数据结构，叫页表，页表的内容就是该进程的虚拟地址到物理地址的一个映射。</p>
+
+<p>那么什么样的数据结构能够表示这个映射关系呢？最容易想到的方法就是用数组保存，虚拟空间中的每一个页都分配一个数组项。该数组指向与之关联的页帧, 但这会引发一个问题, 例如, IA-32体系结构使用4KB大小的页,在虚拟地址空间为4GB的前提下,则需要包含1048576
+(4G/4K=1024*1024=1048576)项的页表，要寻址4G的空间，需要32位,也就是4Bytes, 1048576项需要4M(4 * 1024 * 1024 Bytes=4M)的内存.这个问题在64位体系结构下, 情况会更加糟糕. 而每个进程都需要自身的页表,这会导致系统中大量的内存都用来保存页表.</p>
+
+<p>为了减少页表占用空间，我们可以考虑一个实际情况，对于一个进程的虚拟空间，其实大部分的内存都是没有使用的，因此在页表中其实是不需要这部分的映射的，因此前辈们设计出了多级页表的结构。</p>
+
+<p>那么到底多少级才是最合适的呢？</p>
+
+<h3 id="页表级数的选择和发展">页表级数的选择和发展</h3>
+
+<p>多级页表的设计思想其实就是现实生活中分组的概念，举个例子，我们研究中心有1000个人，现在秘书准备组织一次春游活动，需要统计一下有多少人去春游，如果秘书每个人都问一下记录一下每个人的信息，那么就需要1000行去记录这个信息，但是这样效率就很低而且浪费空间，所以秘书就让每个实验室单独统计，秘书只用要记录每个实验室去春游的人数以及负责人的联系方式即可，假设有五个实验室，则只需要五行即可，然后每个实验室的负责人统计一下自己实验室需要去的人员信息，那么这样效率就比较高了，而且因为只是记录了那些去春游的的人员信息，因此这样既提高了效率，也大大的也省了存储空间，当然你可能回发现一个小问题，如果10000个人都去那么实际上需要10005行统计信息，但是考虑到一些可能也是经常发生的情况，比如我们软件系统实验室春游那天需要加班赶项目，那么实际上我们实验室负责人就不用进行记录了，秘书那里直接记录软件实验室0个人去，甚至不记录也可以，所以一般情况下这样是可以提高效率，并且能够节省空间的。分级的本质其实也是将页表项进行分组管理，考虑到进程内存大部分空闲以及局部性，因此实际记录的时候大部分的记录是没有的，所以相比上面提到的直接使用一个数组（也就是一级页表）大大地节省了存储需要的空间。</p>
+
+<p>我们再来算一笔帐，从Intel 80386开始，默认的页大小是4k, 提供32位的寻址空间。一页4k需要12位进行寻址，因此对于32的寻址空间，还有32-12=20位可以用来页表的索引。因为页表项存储的是物理内存一页的物理地址，因此一个页表项只能指向一页，而硬件的实现是使用CR3寄存器保存了页表的起始地址，因此对于页表我们应该使其只占用一页的内存。4k能够存储的页表项个数为4k/4B=1024, 寻址1024个索引只需要10位即可，因此在这个前提下，用于页表索引的20位自然而然的就分为了两段，也就是页表被分成了两级，十位用来表示一级页表内部偏移，十位用来表示二级页表的内部偏移，一级页表的页表项存储二级页表的物理地址。其实这也是Linux最初采用的两级页表分页机制。</p>
+
+<h4 id="linux的两级分页机制">Linux的两级分页机制</h4>
+
+<p>两级分页机制将32位的虚拟空间分成三段，对就是三段，低十二位表示页内偏移，高20分成两段分别表示两级页表的偏移。
+<img src="/media/archive/blog/images/二级页表.png" alt="二级页表.png" />
+* PGD(Page Global Directory): 最高10位，全局页目录表索引
+* PTE(Page Table Entry)：中间10位，页表入口索引</p>
+
+<p>在进行地址转换时，结合CR3寄存器中存放的全局页表物理地址，然后加上虚拟地址的高10位也就是PGD段，作为页表偏移找到相应的页表项，从改页表项得到二级页表的物理地址，然后结合中间十位即PTE段，作为偏移找到PTE项，即获得了要访问的内存地址所在的物理页，然后结合Page Offset即定位到了需要访问的物理内存，这样就完成了从虚拟地址到物理地址的转换。如果没有缓存的情况下，整个过程需要三次内存访问。</p>
+
+<h4 id="linux的三级页表">Linux的三级页表</h4>
+
+<p>Intel通过在处理器上把管脚数从32增加到36，以提高处理器的寻址能力，使其达到$2^{36}=64GB$，但是linux依然使用32位的虚拟寻址空间，为此，需引入一种新的分页机制。</p>
+
+<p>如果页的大小依然是4k, 64G($2^{34}$)的内存可以分为$2^{24}$个页框，然后页表项的物理地址字段从20位扩展到24位，每个页表项必须包含12个标志位（固定）和24个物理地址位（36-12），共36位，因此，每个页表项须从32位扩展到64位（36位&gt;32位，考虑到对齐，因此应将页表项扩大一倍到64位)。所以原来32位的页表项现在变成了64位后，一页可以存储的页表项从1024变成了512，需要9位进行寻址，高一级的页表也需要9位，加上页内偏移12位，现在32位的地址还剩余2位，因此又引入一级页表，该页表只含有4个页表项。这样就解决了PAE情况下的分页。
+下图是PAE情况下的三级页表情况,图片来自<a href="https://zh.wikipedia.org/wiki/物理地址扩展">维基百科</a>
+<img src="/media/archive/blog/images/三级页表.png" alt="" /></p>
+
+<p><strong>注意(个人观点)：</strong>虽然页表项扩展到了64位，选址达到了36位，即64G的空间，但是实际上一个进程可以使用的虚拟空间大小仍然是4G，因为虚拟地址依然只有32位，即使每个页表项都填满也只能有4G的空间。唯一不同的是物理内存进行分配时候就可以使用超过4G的空间了。</p>
+
+<h4 id="linux的四级页表">Linux的四级页表</h4>
+
+<p>随着硬件的发展，64位的CPU出现了，这个时候基于32位处理器的三级页表又不能使用了，不过现在的硬件已经可以支持四级页表了，可以使用48位的虚拟空间了(虚拟空间的位数和硬件的对应关系理的还不是很清楚)，经过前辈们的<a href="https://github.com/gatieme/LDD-LinuxDeviceDrivers/blob/master/study/kernel/02-memory/02-pagetable/01-develop/README.md">争论</a>，最后确定了下面的四级页表形式:
+<img src="/media/archive/blog/images/四级页表.png" alt="四级页表.png" />
+从图中可以看出，64位的虚拟地址只使用了低48位，每一级的页表项都有64位，其中低12位作为标志位，然后紧接着的40位作为物理寻址使用，加上页内偏移一共52位用于物理地址，但是实际上CPU的引脚并没有52位，一般是40位，46位等。比如我们实验室使用的Intel Xeon E5645 就是40位的物理地址，所以52位只使用了40位($2^{40}=1T$)。
+下面是IA32-e模式下的线性地址映射
+<img src="/media/archive/blog/images/线性地址映射.png" alt="" /></p>
+
+<h3 id="参考资料">参考资料</h3>
+
+<p>[1] <a href="https://github.com/gatieme/LDD-LinuxDeviceDrivers/blob/master/study/kernel/02-memory/02-pagetable/01-develop/README.md">Linux分页机制之概述</a>
+[2] <a href="http://blog.csdn.net/trochiluses/article/details/12853027">物理地址扩展(PAE)的分页机制</a>
+[3] <a href="https://zh.wikipedia.org/wiki/物理地址扩展">物理地址扩展</a>
+[4] <a href="https://book.douban.com/subject/5333562/">《深入理解计算机系统》第九章：虚拟存储器</a>
+[5] <a href="https://book.douban.com/subject/24708145/">《Linux内核设计的艺术》第六章：用户进程与内存管理</a></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/12/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f%e9%a1%b5%e8%a1%a8%e7%9a%84%e7%ae%a1%e7%90%86.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">11</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/11/Golang%e7%ac%ac%e4%ba%94%e7%ab%a0-%e5%87%bd%e6%95%b0.html">Golang第五章:函数</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ul>
+<li>函数的类型被称为函数的标识符，如果两个函数的形参列表和返回值列表中的变量类型一一对应，那么这个函数被认为有相同的类型和标识符。形参和返回值的变量名不影响含糊是标识符，也不影响他们是否可以省略参数类型的形式表示。</li>
+<li>Go语言没有默认参数值</li>
+
+<li><p>Go可以有有名返回值，和形参一样作为局部变量，被存储在相同的词法块，一般使用带有变量名的返回值主要为了表示返回值的含义,也可以直接在函数体对这些变量赋值，返回时候可以省略return的操作数</p>
+<pre><code class="language-go">func Size(rect image.Rectangle) (width, height int)
+</code></pre></li>
+
+<li><p>Go的参数传递都是值传递，因此对形参的修改不会影响实参，但是如果实参是指针，slice,map, function,channel等类型，则可以间接的影响实参值。</p></li>
+
+<li><p>下面没有函数体的函数声明，表明该函数不是Go事先的，这样的声明定义了函数标识符</p>
+<pre><code class="language-go">package math
+func Sin(x float64) float //implemented in assembly language
+</code></pre></li>
+</ul>
+
+<h2 id="错误处理">错误处理</h2>
+
+<ul>
+<li>error类，是个接口类型，有nil和non-nil两种</li>
+<li>错误处理策略
+
+<ul>
+<li>传播错误</li>
+<li>将错误err传递给调用者，然后决定怎么处理</li>
+<li>错误信息里最好包含上下文信息，通常是连式组合的形式，所以也要避免大写和换行符</li>
+<li>重试
+设置超时时间，重新尝试操作</li>
+<li>结束进程
+如果错误会导致程序无法继续运行，则输出错误结束程序,os.Exit(1)</li>
+<li>Log记录错误信息，继续运行</li>
+<li>忽略错误<br /></li>
+</ul></li>
+<li>io包提供一个错误io.EOF,保证任何文件结束引起的读取失败错误。</li>
+</ul>
+
+<h2 id="函数值">函数值</h2>
+
+<ul>
+<li><p>Go中函数被看做第一类值(first-class values)： 函数像其他值一样，拥有类型，可以赋值给其他变量，传递给函数，从函数返回</p>
+<pre><code class="language-go">func square(n int) int { return n * n  }
+func negative(n int) int { return -n  }
+func product(m, n int) int { return m * n  }
+f := square
+fmt.Println(f(3)) // &quot;9&quot;
+f = negative
+fmt.Println(f(3))     // &quot;-3&quot;
+fmt.Printf(&quot;%T\n&quot;, f) // &quot;func(int) int&quot;
+f = product // compile error: can't assign func(int, int) int to func(int) int
+</code></pre></li>
+
+<li><p>函数类型的零值为nil, 调用值为nil的函数值会引起panic错误</p></li>
+
+<li><p>函数值不能进行比较，不能作为map的key</p></li>
+
+<li><p>函数可以作为函数的参数</p>
+<pre><code class="language-go">func add(a int , b int) int{return a+b}
+func sub(a int , b int) int {return a-b}
+func compute(a, b int, fun func(int,int)int){
+return fun(a,b)
+
+}
+</code></pre></li>
+</ul>
+
+<h2 id="匿名函数">匿名函数</h2>
+
+<ul>
+<li>匿名函数在Go中称为Function literal, 声明方式和函数类似，但是没有函数名，是一种表达式，他的值被称为匿名函数</li>
+<li>匿名函数可以在使用时定义</li>
+
+<li><p>匿名函数可以访问完整的词法环境，也就是说在一个函数内部定义匿名函数，在匿名函数内部可以访问函数的变量</p>
+<pre><code class="language-go">func squares() func() int {
+var x int
+  return func() int {
+          x++
+                  return x * x
+                          
+  }
+
+}
+func main() {
+f := squares()           //f指向一个匿名函数，该匿名函数里的X是一个变量
+    fmt.Println(f())         //1
+        fmt.Println(f())         //4
+            fmt.Println(f())         //9
+                fmt.Println(squares()()) //1
+                    fmt.Println(squares()()) //1
+
+}
+</code></pre></li>
+</ul>
+
+<p>对squares的一次调用会生成一个局部变量x并返回一个匿名函数，每次调用改匿名函数，该函数都会使x得值加1， 上面f指向匿名函数，是同一个局部变量x。第一次调用squares（）,会生成第二个x变量。并返回一个新的匿名函数</p>
+
+<p>这个例子证明，函数值不仅仅是一串代码，还记录了状态。在square中定义的匿名内部函数可以访问和更新square中的局部变量，这意味着匿名函数和square中，存在变量引用。这就是<strong>函数值属于引用类型和函数值不可比较</strong>的原因。Go使用闭包技术实现函数值，Go程序员也把函数值叫做闭包。</p>
+
+<h3 id="捕获迭代变量">捕获迭代变量</h3>
+
+<p>先看下面的程序</p>
+<pre><code class="language-go">var rmdirs []func()
+    for _, d := range tempDirs() {
+        os.MkdirAll(dir, 0755) // creates parent directories too
+            rmdirs = append(rmdirs, func() {
+                    os.RemoveAll(d)
+                        
+                    })
+
+    }
+    // ...do some work...
+for _, rmdir := range rmdirs {
+    rmdir() // clean up
+
+}
+</code></pre>
+
+<p>上面程序的执行能否达到预期的结果呢？答案是否定的。for循环内部创建一个新的目录的时候，我们使用一个匿名的函数，在循环内部引用了变量d, d其实只是指向变量的内存地址，每一次循环的过程都在发生改变，因此for循环结束后指向的是最后一个变量的地址，所以后面for循环的时候删除的都是同一个目录。解决方法就是在for循环内部对循环变量进行一个copy即可，见下面代码</p>
+<pre><code class="language-go">var rmdirs []func()
+    for _, d := range tempDirs() {
+        dir := d // NOTE: necessary!
+            os.MkdirAll(dir, 0755) // creates parent directories too
+            rmdirs = append(rmdirs, func() {
+                    os.RemoveAll(dir)
+                        
+                    })
+
+    }
+    // ...do some work...
+for _, rmdir := range rmdirs {
+    rmdir() // clean up
+
+}
+</code></pre>
+
+<h3 id="可变参数">可变参数</h3>
+
+<p>声明可变参数函数时，需要在参数列表的最后一个参数类型之前加上省略号&rdquo;&hellip;&ldquo;,这表示该函数会接受任意数量的该类型参数。</p>
+<pre><code class="language-go">func sum(vals...int) int {
+    total := 0
+               for _, val := range vals {
+                       total += val
+
+               }
+                   return total
+
+}
+</code></pre>
+
+<p>对于可变参数，可以直接传递一个切片，然后后面加省略号</p>
+<pre><code class="language-go">values := []int{1, 2, 3, 4}
+fmt.Println(sum(values...)) // &quot;10&quot;
+</code></pre>
+
+<p>interfac{}表示函数的最后一个参数可以接受任意类型</p>
+
+<h3 id="deferred函数">Deferred函数</h3>
+
+<ul>
+<li>defer可以在异常判断的过程中多次执行诸如文件关闭的操作，使用defer可以在return的时候自动执行</li>
+
+<li><p>调试复杂程序时，defer机制也常被用于记录何时进入和退出函数</p>
+<pre><code class="language-go">func bigSlowOperation() {
+defer trace(&quot;bigSlowOperation&quot;)() // don't forget the
+    extra parentheses
+        // ...lots of work...
+            time.Sleep(10 * time.Second) // simulate slow
+                operation by sleeping
+
+}
+func trace(msg string) func() {
+start := time.Now()
+    log.Printf(&quot;enter %s&quot;, msg)
+    return func() {
+            log.Printf(&quot;exit %s (%s)&quot;, msg,time.Since(start))
+                    
+    }
+
+}
+</code></pre></li>
+
+<li><p>defer语句中的函数会在return语句更新返回值后再执行，又因为函数中定义的匿名函数可以访问该函数包括返回值变量在内的所有变量，所以，对匿名函数采用defer机制可以使其观察函数的返回值.</p>
+<pre><code class="language-go">func double(x int) (result int) {
+defer func() { fmt.Printf(&quot;double(%d) = %d\n&quot;, x,result)  }()
+    return x + x
+
+}
+</code></pre></li>
+
+<li><p>被延迟执行的匿名函数甚至可以修改函数返回给调用者的返回值</p>
+<pre><code class="language-go">func triple(x int) (result int) {
+defer func() { result += x  }()
+    return double(x)
+
+}
+fmt.Println(triple(4)) // &quot;12&quot;
+</code></pre></li>
+
+<li><p>对于读写文件信息的操作可能要慎用defer操作，通过os.Create打开的文件进行写入，在关闭文件时，不能采用defer机制。因为对于许多文件系统，尤其是NFS， 写入文件时发生的错误会被延迟到文件关闭时反馈。如果没有检查文件关闭时的反馈信息，可能会导致数据丢失，而我们还误以为写入操作成功。</p></li>
+
+<li><p>延迟函数的调用在释放堆栈信息之前</p></li>
+</ul>
+
+<h3 id="panic异常">Panic异常</h3>
+
+<ul>
+<li>panic函数接受任何值作为参数，当某些不应该发生的场景发生时，我们就应该调用painc。</li>
+
+<li><p>如果在deferred函数中调用了内置函数recover, 并且定义改defer语句的函数发生了panic异常，recover会使程序从panic中恢复，并返回panic value. 导致panic异常的函数不会继续运行，但能整场 返回。在未发生panic时调用recover， recover会返回nil</p>
+<pre><code class="language-go">func Parse(input string) (s *Syntax, err error) {
+defer func() {
+    if p := recover(); p != nil {
+                err = fmt.Errorf(&quot;internal error: %v&quot;, p)
+
+    } 
+}()
+    // ...parser...
+
+}
+</code></pre></li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/3/11/Golang%e7%ac%ac%e4%ba%94%e7%ab%a0-%e5%87%bd%e6%95%b0.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e5%9b%9b%e7%ab%a0-%e5%a4%8d%e5%90%88%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Golang第四章:复合数据类型</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>主要介绍数组，slice, map和结构体
+数组和结构体是聚合类型；数组有同构的元素组成，结构体有异构的元素组成，他们都是有固定内存大小的数据结构。
+slice和map是动态的的数据结构，他们根据需要动态增长。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/25/Golang%e7%ac%ac%e5%9b%9b%e7%ab%a0-%e5%a4%8d%e5%90%88%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">2</span>
+                            <span class="day">25</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/2/25/Golang%e7%ac%ac%e4%b8%89%e7%ab%a0-%e5%9f%ba%e7%a1%80%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Golang第三章:基础数据类型</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="整型">整型</h3>
+
+<p>有符号：int8, int16, int32, int64, int
+无符号: uint8, unit16, uint32, uint64, uint</p>
+<pre><code class="language-go">var x uint8 = 1&lt;&lt;1 | 1&lt;&lt;5 //00100010
+var y uint8 = 1&lt;&lt;1 | 1&lt;&lt;2 //00000110
+fmt.Printf(&quot;%08b\n&quot;, x)   // &quot;00100010&quot;, the set {1, 5}
+fmt.Printf(&quot;%08b\n&quot;, y)   // &quot;00000110&quot;, the set {1, 2}
+
+fmt.Printf(&quot;%08b\n&quot;, x&amp;y)  // &quot;00000010&quot;, the intersection {1}
+fmt.Printf(&quot;%08b\n&quot;, x|y)  // &quot;00100110&quot;, the union {1, 2, 5} //或
+fmt.Printf(&quot;%08b\n&quot;, x^y)  // &quot;00100100&quot;, the symmetric difference {2, 5}不同为1
+fmt.Printf(&quot;%08b\n&quot;, x&amp;^y) // &quot;00100000&quot;, the difference {5} 如果y对应的位为1，则为0；否则为x的值
+</code></pre>
+
+<!-- more -->
+
+<p>下面的例子</p>
+<pre><code class="language-go">medals := []string{&quot;gold&quot;, &quot;silver&quot;, &quot;bronze&quot;}
+for i := len(medals) - 1; i &gt;= 0; i-- {
+    fmt.Println(medals[i]) // &quot;bronze&quot;, &quot;silver&quot;, &quot;gold&quot;
+}
+</code></pre>
+
+<p>如果i是一个无符号数，则i--永远不会小于0，因此将会出现out ot index的错误。所以len函数设计时候返回的是有符号的int</p>
+<pre><code class="language-go">o := 0666
+fmt.Printf(&quot;%d %[1]o %#[1]o\n&quot;, o) // &quot;438 666 0666&quot;
+x := int64(0xdeadbeef)
+fmt.Printf(&quot;%d %[1]x %#[1]x %#[1]X\n&quot;, x)
+// Output:
+// 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF
+</code></pre>
+
+<h3 id="浮点数">浮点数</h3>
+
+<p>两种：float32和float64
+max.MaxFloat32: 表示float32能表示的最大数。大约3.4e38
+max.MaxFloat64 大约1.8e308</p>
+
+<h3 id="布尔类型">布尔类型</h3>
+
+<p>布尔值不会隐式的转换为0或者1，需要自己转换。同样不像C语言中，大于0的整数就是true，必须显示的进行转换。</p>
+
+<h3 id="字符串">字符串</h3>
+
+<ul>
+<li>字符串的值不能改变，也就是说字符串只读</li>
+<li>各种编码，ASCII, Unicode, UTF-8</li>
+<li>字符串和Byte切片</li>
+</ul>
+
+<h3 id="常量">常量</h3>
+
+<p>常量表达式的值在编译期计算，不是在运行期，常量的值不可修改。</p>
+<pre><code class="language-go">const pi = 3.14159
+const(
+    e = 2.3232322222242424
+    p = 3.1415926533232323
+)
+</code></pre>
+
+<p>常量间的所有算术运算，逻辑运算和比较结果也是常量，对常量的类型转换或者以下函数的调用结果也是返回常量结果：len, cap, real, imag, complex和unsafe.Sizeof</p>
+
+<p>在一个const声明语句中，在第一个声明的常量所在行，iota将会被置0，然后在每一个有常量声明的行加一</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2017/2/25/Golang%e7%ac%ac%e4%b8%89%e7%ab%a0-%e5%9f%ba%e7%a1%80%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/4.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/6.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

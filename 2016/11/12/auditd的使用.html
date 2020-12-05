@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>auditd的使用 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="auditd的使用">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">11</span>
+                            <span class="day">12</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/11/12/auditd%e7%9a%84%e4%bd%bf%e7%94%a8.html">auditd的使用</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Linux.html">Linux</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ae%89%e5%85%a8.html">安全</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><p>linux系统中用户空间的组件，负责系统安全审计，将审计的记录写入磁盘</p>
+
+<h4 id="安装">安装</h4>
+
+<p>ubuntu可以直接使用apt-get安装，centos使用yum安装</p>
+
+<p>安装后有下面相关的工具：</p>
+
+<ul>
+<li><strong>auditctl :</strong> 即时控制审计守护进程的行为的工具，比如如添加规则等等。</li>
+<li><strong>/etc/audit/audit.rules :</strong> 记录审计规则的文件。</li>
+<li><strong>aureport :</strong> 查看和生成审计报告的工具。</li>
+<li><strong>ausearch :</strong> 查找审计事件的工具</li>
+<li><strong>auditspd :</strong> 转发事件通知给其他应用程序，而不是写入到审计日志文件中。</li>
+<li><strong>autrace :</strong> 一个用于跟踪进程的命令。</li>
+<li><strong>/etc/audit/auditd.conf :</strong> auditd工具的配置文件。</li>
+</ul>
+
+<p>首次安装auditd后，审计规则是空的，使用下面的命令查看</p>
+<pre><code class="language-shell">$auditctl -l
+</code></pre>
+
+<!-- more -->
+
+<h4 id="添加auditd规则">添加auditd规则</h4>
+
+<p>监控文件和目录的更改</p>
+<pre><code class="language-shell">$sudo auditctl -w /etc/passwd -p rwxa
+</code></pre>
+
+<p>选项：</p>
+
+<ul>
+<li>-w path: 指定监控的路径，上面指定监控的文件路径/etc/passwd</li>
+<li>-p: 指定出发审计的文件/目录的访问权限</li>
+<li>rwxa: 指定的触发条件，r读，w写，x执行权限，a属性</li>
+</ul>
+
+<p>如果不加-p参数，-w参数后面指定的是目录，则将会对指定目录所有访问进行监控。默认的权限是rwax，可以使用<code>auditctl -l</code>查看已经添加的规则</p>
+
+<p><img src="/media/archive/blog/image/auditd-0.png" alt="" /></p>
+
+<h4 id="查看审计日志">查看审计日志</h4>
+
+<p>使用ausearch可以查看auditd的审计日志。比如上面已经对/etc/passwd文件添加了审计，那么使用下面的命令可以查看审计日志。</p>
+<pre><code class="language-shell">$sudo ausearch - f/etc/passwd
+</code></pre>
+
+<p><code>-f</code>需要查找的审计目标的日志</p>
+
+<p>输出可能如下</p>
+
+<blockquote>
+<hr />
+
+<p>time-&gt;Wed Sep 21 15:07:51 2016
+type=PATH msg=audit(1474441671.907:881): item=1 name=&ldquo;/root/kongdefei/.test.swp&rdquo; inode=44826697 dev=08:03 mode=0100600 ouid=0 ogid=0 rdev=00:00
+type=PATH msg=audit(1474441671.907:881): item=0 name=&ldquo;/root/kongdefei/&rdquo; inode=80856866 dev=08:03 mode=040755 ouid=0 ogid=0 rdev=00:00
+type=CWD msg=audit(1474441671.907:881):  cwd=&ldquo;/root/kongdefei&rdquo;
+type=SYSCALL msg=audit(1474441671.907:881): arch=c000003e syscall=87 success=yes exit=0 a0=699f130 a1=1 a2=1 a3=2 items=2 ppid=18763 pid=18798 auid=4294967295 uid=0 gid=0 euid=0 s
+uid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts1 ses=4294967295 comm=&ldquo;vi&rdquo; exe=&ldquo;/bin/vi&rdquo; key=(null)</p>
+</blockquote>
+
+<ul>
+<li>time: 审计时间</li>
+<li>name: 审计对象</li>
+<li>cwd: 当前路径</li>
+<li>sys call：系统调用</li>
+<li>auid: 设计用户id</li>
+<li>uid和gid：访问文件的用户id和用户组id,uid=0 gid=0表明是root用户</li>
+<li>comm: 用户访问文件的命令</li>
+<li>exe: 上面命令的执行文件路径</li>
+</ul>
+
+<p>上面内容表示/root/kongdefei/.test.swp文件被root用户使用vi命令编辑过</p>
+
+<h4 id="查看审计报告">查看审计报告</h4>
+
+<p>一旦定义规则后，他会自动运行，过一段时间后，可以使用auditd的工具aureport生成简要的日志报告。直接使用下面命令即可</p>
+<pre><code class="language-shell">$sudo aureport
+</code></pre>
+
+<p><img src="/media/archive/blog/image/auditd-1.png" alt="" /></p>
+
+<p>可以看出有51次授权失败，102次登录。可以使用下面命令查看授权失败的详细信息</p>
+<pre><code class="language-shell">$sudo aureport -au
+</code></pre>
+
+<p><img src="/media/archive/blog/image/auditd-4.png" alt="" /></p>
+
+<p>凡是no（如2，5）的都是授权失败。可以看出是root用户ssh登录的时候失败。</p>
+
+<p><code>-m</code>可以查看所有账户修改相关的事件</p>
+<pre><code class="language-shell">$sudo aureport -m
+</code></pre>
+
+<p><img src="/media/archive/blog/image/auditd-2.png" alt="" /></p>
+
+<h4 id="auditd配置文件">auditd配置文件</h4>
+
+<p>上面使用-w添加审计规则只是暂时的，系统重启后就会消失，可以修改/etc/audit/audit.rules文件是规则持久有效。上面添加的规则可以直接写入/etc/audit/audit.rules文件中</p>
+
+<p>如下：</p>
+
+<p><img src="/media/archive/blog/image/auditd-3.png" alt="" /></p>
+
+<p>然后重启auditd即可</p>
+<pre><code class="language-shell">$ service auditd restart #或者/etc/init.d/auditd restart
+</code></pre>
+
+<h4 id="总结">总结</h4>
+
+<p>Auditd是Linux上的一个审计工具。你可以阅读auidtd文档获取更多使用auditd和工具的细节。例如，输入 <strong>man auditd</strong> 去看auditd的详细说明，或者键入 <strong>man ausearch</strong> 去看有关 ausearch 工具的详细说明。</p>
+
+<p><strong>请谨慎创建规则</strong>。太多规则会使得日志文件急剧增大！</p>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

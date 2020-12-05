@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 18 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-18">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/%e6%8f%90%e9%ab%98PHP%e6%95%88%e7%8e%87%e7%9a%8450%e4%b8%aa%e7%bc%96%e7%a8%8b%e6%8a%80%e5%b7%a7.html">提高PHP效率的50个编程技巧</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><ol>
+<li><p>用单引号代替双引号来包含字符串，这样做会更快一些。因为PHP会在双引号包围的字符串中搜寻变量， 单引号则不会，注意：只有echo能这么做，它是一种可以把多个字符串当作参数的”函数”(译注：PHP手册中说echo是语言结构，不是真正的函数，故 把函数加上了双引号)。</p></li>
+
+<li><p>如果能将类的方法定义成static，就尽量定义成static，它的速度会提升将近4倍。</p></li>
+
+<li><p>$row[&lsquo;id&rsquo;] 的速度是$row[id]的7倍。</p></li>
+
+<li><p>echo 比 print 快，并且使用echo的多重参数(译注：指用逗号而不是句点)代替字符串连接，比如echo $str1,$str2。</p></li>
+
+<li><p>在执行for循环之前确定最大循环数，不要每循环一次都计算最大值，最好运用foreach代替。</p></li>
+
+<li><p>注销那些不用的变量尤其是大数组，以便释放内存。</p></li>
+
+<li><p>尽量避免使用<strong>get，</strong>set，__autoload。</p></li>
+
+<li><p>require_once()代价昂贵。</p></li>
+</ol>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/%e6%8f%90%e9%ab%98PHP%e6%95%88%e7%8e%87%e7%9a%8450%e4%b8%aa%e7%bc%96%e7%a8%8b%e6%8a%80%e5%b7%a7.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/%e5%8d%81%e4%b8%aa%e4%b8%8d%e9%94%99%e7%9a%84C%e5%bc%80%e6%ba%90%e9%a1%b9%e7%9b%ae.html">十个不错的C开源项目</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="1-webbench">1. Webbench</h3>
+
+<p>　　Webbench 是一个在 linux 下使用的非常简单的网站压测工具。它使用 fork ()模拟多个客户端同时访问我们设定的 URL，测试网站在压力下工作的性能，最多可以模拟 3 万个并发连接去测试网站的负载能力。Webbench 使用C语言编写， 代码实在太简洁，源码加起来不到 600 行。
+　　下载链接：<a href="http://home.tiscali.cz/~cz210552/webbench.html">http://home.tiscali.cz/~cz210552/webbench.html</a></p>
+
+<h3 id="2-tinyhttpd">2. Tinyhttpd</h3>
+
+<p>　　tinyhttpd 是一个超轻量型 Http Server，使用C语言开发，全部代码只有 502 行(包括注释)，附带一个简单的 Client，可以通过阅读这段代码理解一个 Http Server 的本质。
+　　载链接：<a href="http://sourceforge.net/projects/tinyhttpd/">http://sourceforge.net/projects/tinyhttpd/</a></p>
+
+<h3 id="3-cjson">3. cJSON</h3>
+
+<p>　　cJSON 是C语言中的一个 JSON 编解码器，非常轻量级，C文件只有 500 多行，速度也非常理想。
+　　cJSON 也存在几个弱点，虽然功能不是非常强大，但 cJSON 的小身板和速度是最值得赞赏的。其代码被非常好地维护着，结构也简单易懂，可以作为一个非常好的C语言项目进行学习。
+　　项目主页: <a href="http://sourceforge.net/projects/cjson/">http://sourceforge.net/projects/cjson/</a></p>
+
+<h3 id="4-cmockery">4. CMockery</h3>
+
+<p>　　cmockery 是 google 发布的用于C单元测试的一个轻量级的框架。它很小巧，对其他开源包没有依赖，对被测试代码侵入性小。cmockery 的源代码行数不到 3K，你阅读一下 will_return 和 mock 的源代码就一目了然了。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/%e5%8d%81%e4%b8%aa%e4%b8%8d%e9%94%99%e7%9a%84C%e5%bc%80%e6%ba%90%e9%a1%b9%e7%9b%ae.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">24</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/24/%e9%99%84%e8%bf%91%e7%9a%84%e4%ba%ba-PHP%e8%ae%a1%e7%ae%97%e4%b8%a4%e7%82%b9%e7%90%83%e9%9d%a2%e8%b7%9d%e7%a6%bb.html">附近的人-PHP计算两点球面距离</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><pre><code>public static double getDistance(double lat1,double longt1 , double lat2,double longt2
+            ) {
+        double PI = 3.14159265358979323; // 圆周率
+        double R = 6371229; // 地球的半径
+
+        double x, y, distance;
+        x = (longt2 - longt1) * PI * R
+                * Math.cos(((lat1 + lat2) / 2) * PI / 180) / 180;
+        y = (lat2 - lat1) * PI * R / 180;
+        distance = Math.hypot(x, y);
+
+        return distance;
+    }
+</code></pre>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/24/%e9%99%84%e8%bf%91%e7%9a%84%e4%ba%ba-PHP%e8%ae%a1%e7%ae%97%e4%b8%a4%e7%82%b9%e7%90%83%e9%9d%a2%e8%b7%9d%e7%a6%bb.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">7</span>
+                            <span class="day">21</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.html">Python学习速记--正则表达式</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="字符描述">字符描述</h4>
+
+<p>| 正则式| 字符|
+|:------:||:--------|
+|\s        |空白符|
+|\d        |数字 |
+|\w        |字母或者数字|
+|.           |任意字符        |
+|*          |任意多个字符(包括0个)|
+|+         |至少一个       |
+|?          |0个或1个      |
+|{n}       |n个               |
+|{n,m}   |n到m个         |
+|[]|         []里是精确值|</p>
+
+<h5 id="例子">例子</h5>
+
+<ul>
+<li><code>\d{3}\-\d{3-8}</code>匹配类似<code>010-12345678</code>的字符串</li>
+<li><code>[0-9a-zA-Z\_]</code>匹配一个数字，字母或者下划线</li>
+<li><code>[0-9a-zA-Z\_]+</code>匹配至少有一个数字，字母或者下划线</li>
+<li><code>[a-zA-Z\_][0-9a-zA-Z\_]*</code>字母或者下划线开头 后面接任意的数字，字母或者下划线</li>
+<li><code>[a-zA-Z\_][0-9a-zA-Z\_]{0,19}</code>字母或者下划线开头 后面接0-19个数字，字母或者下划线</li>
+<li><code>A|B</code> 匹配<code>A</code>或者<code>B</code></li>
+<li><code>^</code>标示行的开头,<code>^\d</code>表示以数字开头</li>
+<li><code>$</code>行的结束，<code>\d$</code>数字结尾</li>
+</ul>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2015/7/21/Python%e5%ad%a6%e4%b9%a0%e9%80%9f%e8%ae%b0-%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/17.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/19.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

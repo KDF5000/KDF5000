@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 9 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-9">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">9</span>
+                            <span class="day">7</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/9/7/snort%e8%a7%84%e5%88%99%e5%85%a5%e9%97%a8.html">snort规则入门</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="snort规则">snort规则</h3>
+
+<p>一种简单的，轻量级的规则描述语言，包括连个逻辑部分：格则头和规则选项。</p>
+
+<p><strong>规则头</strong>：规则的动作，协议，源和目标ip与网络掩码，源和目标端口信息</p>
+
+<p><strong>规则选项</strong>: 报警信息内容和要检查的包的具体部分</p>
+<pre><code>alert tcp any any -&gt; 192.168.1.0/24 111 (content:&quot;|00 01 86 a5|&quot;; msg: &quot;mountd access&quot;;)
+</code></pre>
+
+<p>第一个括号前的部分是规则头（rule header），包含的括号内的部分是规则选项（rule options）。规则选项部分中冒号前的单词称为选项关键字（option keywords）。注意，不是所有规则都必须包含规则选项部分，选项部分只是为了使对要收集或报警，或丢弃的包的定义更加严格。组成一个规则的所有元素 对于指定的要采取的行动都必须是真的。当多个元素放在一起时，可以认为它们组成了一个逻辑与（AND）语句。同时，snort规则库文件中的不同规则可以 认为组成了一个大的逻辑或（OR）语句</p>
+
+<!-- more -->
+
+<h4 id="规则头">规则头</h4>
+
+<p>规则的头包含了定义一个包的who，where和what信息，以及当满足规则定义的所有属性的包出现时要采取的行动</p>
+
+<ul>
+<li>规则动作</li>
+</ul>
+
+<p>snort中有五种动作： alert, log, pass, activate. dynamic</p>
+
+<p>1、Alert-使用选择的报警方法生成一个警报，然后记录（log）这个包。
+  2、Log-记录这个包。
+  3、Pass-丢弃（忽略）这个包。
+  4、activate-报警并且激活另一条dynamic规则。
+  5、dynamic-保持空闲直到被一条activate规则激活，被激活后就作为一条log规则执行。</p>
+
+<ul>
+<li>协议</li>
+</ul>
+
+<p>四种： tcp, ump, icmp, ip</p>
+
+<ul>
+<li>ip地址</li>
+</ul>
+
+<p>表示处理一个给定规则的ip地址和端口信息。 any用来定义任何地址。snort没有提供ip地址查询域名的机制。地址直接有数字型ip地址和一个cidr块组成。Cidr块只是作用在规则地址和要检查的进入任何包的网络掩码。/24表示c类网络， /16表示b类网络，/32表示一个特定的机器的地址。</p>
+
+<p>例如，192.168.1.0/24代表从192.168.1.1到192.168.1.255的 地址块。在这个地址范围的任何地址都匹配使用这个192.168.1.0/24标志的规则。这种记法给我们提供了一个很好的方法来表示一个很大的地址空间。</p>
+
+<p>有一个操作符可以应用在ip地址上，它是否定运算符（negation operator）。这个操作符告诉snort匹配除了列出的ip地址以外的所有ip地址。否定操作符用&rdquo;！&rdquo;表示。下面这条规则对任何来自本地网络以外的流都进行报警。</p>
+<pre><code>  alert tcp !192.168.1.0/24 any -&gt; 192.168.1.0/24 111 (content: &quot;|00 01 86 a5|&quot;; msg: &quot;external mountd access&quot;;)
+</code></pre>
+
+<p>这个规则的ip地址代表&rdquo;任何源ip地址不是来自内部网络而目标地址是内部网络的tcp包&rdquo;。
+  你也可以指定ip地址列表，一个ip地址列表由逗号分割的ip地址和CIDR块组成，并且要放在方括号内“[”，“]”。此时，ip列表可以不包含空格在ip地址之间。下面是一个包含ip地址列表的规则的例子。</p>
+<pre><code>  alert tcp ![192.168.1.0/24,10.1.1.0/24] any -&gt; [192.168.1.0/24,10.1.1.0/24] 111 (content: &quot;|00 01 86 a5|&quot;; msg: &quot;external mountd access&quot;;)
+</code></pre>
+
+<ul>
+<li>端口号</li>
+</ul>
+
+<p>端口号可以用几种方法表示，包括&rdquo;any&rdquo;端口、静态端口定义、范围、以及通过否定操作符。&rdquo;any&rdquo;端口是一个通配符，表示任何端口。静态端口定 义表示一个单个端口号，例如111表示portmapper，23表示telnet，80表示http等等。端口范围用范围操作符&rdquo;：&rdquo;表示。范围操作符 可以有数种使用方法，如下所示：</p>
+
+<blockquote>
+<p>log udp any any -&gt; 192.168.1.0/24 1:1024</p>
+</blockquote>
+
+<p>记录来自任何端口的，目标端口范围在1到1024的udp流</p>
+
+<blockquote>
+<p>log tcp any any -&gt; 192.168.1.0/24 :6000</p>
+</blockquote>
+
+<p>记录来自任何端口，目标端口小于等于6000的tcp流</p>
+
+<blockquote>
+<p>log tcp any :1024 -&gt; 192.168.1.0/24 500:</p>
+</blockquote>
+
+<p>记录来自任何小于等于1024的特权端口，目标端口大于等于500的tcp流</p>
+
+<p>端口否定操作符用&rdquo;！&rdquo;表示。它可以用于任何规则类型（除了any，这表示没有，呵呵）。例如，由于某个古怪的原因你需要记录除x windows端口以外的所有一切，你可以使用类似下面的规则：</p>
+
+<blockquote>
+<p>log tcp any any -&gt; 192.168.1.0/24 !6000:6010</p>
+</blockquote>
+
+<h4 id="方向操作符">方向操作符</h4>
+
+<p>方向操作符&rdquo;-&gt;&ldquo;表示规则所施加的流的方向。方向操作符左边的ip地址和端口号被认为是流来自的源主机，方向操作符右边的ip地址和端口信 息是目标主机，还有一个双向操作符&rdquo;&lt;&gt;&ldquo;。它告诉snort把地址/端口号对既作为源，又作为目标来考虑。这对于记录/分析双向对话很方 便，例如telnet或者pop3会话。用来记录一个telnet会话的两侧的流的范例如下：</p>
+
+<blockquote>
+<p>log !192.168.1.0/24 any &lt;&gt; 192.168.1.0/24 23</p>
+</blockquote>
+
+<h4 id="activate和dynamic规则">Activate和dynamic规则</h4>
+
+<p>注：Activate 和 dynamic 规则将被tagging 所代替。在snort的将来版本，Activate 和 dynamic 规则将完全被功能增强的tagging所代替。</p>
+
+<p>Activate 和 dynamic 规则对给了snort更强大的能力。你现在可以用一条规则来激活另一条规则，当这条规则适用于一些数据包时。在一些情况下这是非常有用的，例如你想设置一 条规则：当一条规则结束后来完成记录。Activate规则除了包含一个选择域：activates外就和一条alert规则一样。Dynamic规则除 了包含一个不同的选择域：activated_by 外就和log规则一样，dynamic规则还包含一个count域。</p>
+
+<p>Actevate规则除了类似一条alert规则外，当一个特定的网络事件发生时还能告诉snort加载一条规则。Dynamic规则和log规则类似，但它是当一个activate规则发生后被动态加载的。把他们放在一起如下图所示：</p>
+
+<blockquote>
+<p>activate tcp !$HOME_NET any -&gt; $HOME_NET 143 (flags: PA; content: &ldquo;|E8C0FFFFFF|/bin&rdquo;; activates: 1; msg: &ldquo;IMAP buffer overflow!&rdquo;;)</p>
+
+<p>dynamic tcp !$HOME_NET any -&gt; $HOME_NET 143 (activated_by: 1; count: 50;)</p>
+</blockquote>
+
+<h4 id="规则选项">规则选项</h4>
+
+<p>规则选项组成了snort入侵检测引擎的核心，既易用又强大还灵活。所有的snort规则选项用分号&rdquo;；&rdquo;隔开。规则选项关键字和它们的参数用冒号&rdquo;：&rdquo;分开。按照这种写法，snort中有42个规则选项关键字。</p>
+
+<p>msg - 在报警和包日志中打印一个消息。
+logto - 把包记录到用户指定的文件中而不是记录到标准输出。
+ttl - 检查ip头的ttl的值。
+tos 检查IP头中TOS字段的值。
+id - 检查ip头的分片id值。
+ipoption 查看IP选项字段的特定编码。
+fragbits 检查IP头的分段位。
+dsize - 检查包的净荷尺寸的值 。
+flags -检查tcp flags的值。
+seq - 检查tcp顺序号的值。
+ack - 检查tcp应答（acknowledgement）的值。
+window 测试TCP窗口域的特殊值。
+itype - 检查icmp type的值。
+icode - 检查icmp code的值。
+icmp_id - 检查ICMP ECHO ID的值。
+icmp_seq - 检查ICMP ECHO 顺序号的值。
+content - 在包的净荷中搜索指定的样式。
+content-list 在数据包载荷中搜索一个模式集合。
+offset - content选项的修饰符，设定开始搜索的位置 。
+depth - content选项的修饰符，设定搜索的最大深度。
+nocase - 指定对content字符串大小写不敏感。
+session - 记录指定会话的应用层信息的内容。
+rpc - 监视特定应用/进程调用的RPC服务。
+resp - 主动反应（切断连接等）。
+react - 响应动作（阻塞web站点）。
+reference - 外部攻击参考ids。
+sid - snort规则id。
+rev - 规则版本号。
+classtype - 规则类别标识。
+priority - 规则优先级标识号。
+uricontent - 在数据包的URI部分搜索一个内容。
+tag - 规则的高级记录行为。
+ip_proto - IP头的协议字段值。
+sameip - 判定源IP和目的IP是否相等。
+stateless - 忽略刘状态的有效性。
+regex - 通配符模式匹配。
+distance - 强迫关系模式匹配所跳过的距离。
+within - 强迫关系模式匹配所在的范围。
+byte_test - 数字模式匹配。
+byte_jump - 数字模式测试和偏移量调整。</p>
+
+<hr />
+
+<h4 id="参考">参考</h4>
+
+<p>Snort 中文手册: <a href="http://man.chinaunix.net/network/snort/Snortman.htm">http://man.chinaunix.net/network/snort/Snortman.htm </a></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/9/7/snort%e8%a7%84%e5%88%99%e5%85%a5%e9%97%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">6</span>
+                            <span class="day">20</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/6/20/Jstrom%e5%ae%89%e8%a3%85%e9%97%ae%e9%a2%98%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88%e6%b1%87%e6%80%bb.html">Jstrom安装问题解决方案汇总</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="jstrom-2-1-1安装错误">jstrom 2.1.1安装错误</h4>
+
+<h5 id="the-hostname-which-supervisor-get-is-localhost"><strong>the hostname which  supervisor get is localhost</strong></h5>
+
+<p>查看[源码(<a href="https://github.com/alibaba/jstorm/blob/master/jstorm-core/src/main/java/com/alibaba/jstorm/schedule/FollowerRunnable.java)81行">https://github.com/alibaba/jstorm/blob/master/jstorm-core/src/main/java/com/alibaba/jstorm/schedule/FollowerRunnable.java)81行</a></p>
+<pre><code>this.data = data;
+        this.sleepTime = sleepTime;
+        boolean isLocaliP;
+        if (!ConfigExtension.isNimbusUseIp(data.getConf())) {
+            this.hostPort = NetWorkUtils.hostname() + &quot;:&quot; + String.valueOf(Utils.getInt(data.getConf().get(Config.NIMBUS_THRIFT_PORT)));
+            isLocaliP = NetWorkUtils.hostname().equals(&quot;localhost&quot;);
+        } else {
+            this.hostPort = NetWorkUtils.ip() + &quot;:&quot; + String.valueOf(Utils.getInt(data.getConf().get(Config.NIMBUS_THRIFT_PORT)));
+            isLocaliP = NetWorkUtils.ip().equals(&quot;127.0.0.1&quot;);
+        }
+        try {
+            if (isLocaliP) {
+                throw new Exception(&quot;the hostname which Nimbus get is localhost&quot;);
+            }
+        } catch (Exception e1) {
+            LOG.error(&quot;get nimbus host error!&quot;, e1);
+            throw new RuntimeException(e1);
+        }
+</code></pre>
+
+<p>可以看出Nimbus的ip设置不能为localhost和127.0.0.1，而启动nimbus server的脚本start.sh如下，使用的是<code>hostname -i</code>然后匹配storm.yaml文件找到用户设置的地址，而<code>hostname -i</code>输出的时候主机名对应的ip地址，因为不能用127.0.0.1和localhost,因此只能将主机名映射到本机ip地址，所以就要在/etc/hosts文件添加映射关系，例如本机的主机名为kdf5000，ip地址为10.30.5.64，　则需要添加下面信息</p>
+<pre><code>10.30.5.64　kdf5000
+</code></pre>
+
+<p>重新启动即可。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/6/20/Jstrom%e5%ae%89%e8%a3%85%e9%97%ae%e9%a2%98%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88%e6%b1%87%e6%80%bb.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">6</span>
+                            <span class="day">19</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/6/19/%e9%9d%a2%e5%90%91HBase%e7%9a%84%e5%86%85%e5%ad%98key-value%e7%bc%93%e5%ad%98%e7%9a%84%e5%ae%9e%e7%8e%b0.html">面向HBase的内存key-value缓存的实现</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h3 id="0x01-背景">0x01 背景</h3>
+
+<p>之所以要实现这个缓存主要原因如下(但是由于不是实际业务场景需求，所以可能不太准确，也可能不存在这个需求):
+* 非结构化数据的爆炸式增长
+* 处理速度的要求越来越高
+* HBase是面向硬盘的
+* 内存容量越来越大
+* 热点数据可以在内存放下</p>
+
+<h3 id="0x02-设计方案">0x02 设计方案</h3>
+
+<p>通常的要实现缓存，主要是在有两个大方向实现，一个是在客户端实现，另一个时在服务端实现
+* 客户端实现
+ - 修改Hbase Client的源码,在Put, Get等关键操作的地方加入缓存机制
+ - 在client端设计一种缓存服务层,并实现一个分布式的Key-value缓存系统, 对Hbase Client进行重新封装
+* 服务端实现
+ - 修改HBase Server端的源码,在Put, Get等关键操作的地方加入缓存机制
+ - 在服务端添加一层代理服务,解析所有client的请求,对Put, Get等关键</p>
+
+<p>两种大方向的第一种方案，都是直接修改hbase的源代码，直接修改源码性能可能会更好一些，但是修改源码，会过于依赖Hbase的版本，对于每一个base的版本更新都可能要重新查看源码，重新修改，除此之外1)中的方案一，由于是在本地客户端进行的缓存，所以没有实现分布式的缓存，因此可能存在缓存命中率低，缓存数据不一致的情况。</p>
+
+<p>客户端实现中的方案二，进行重新地封装，不对源码进行修改，同时使用分布式的缓存，既可以提高缓存的命中率，同时又解决的对hbase过度依赖的问题，但是可能会降低性能。</p>
+
+<p>服务端实现中的方案二，通过设计一个缓存代理服务，同样可以解决对hbase的过度依赖，降低了整个系统的耦合性，但是实现一个代理服务并非那么简单，而且需要对hbase的通信机制以及相关协议比较了解。</p>
+
+<p>通过上面的分析比较，考虑到可行性和技术背景，客户端实现的方案二是最合适的方案，而且其性能和可维护性，扩展性相对来说都是比较好的。分布式缓存系统我们使用Redis实现，并且在client本地实现一个LocalCache，尽可能的提高缓存的命中率，减少通信造成的时间延迟（局部性假设，同一个客户端最有可能访问它put的数据）。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/6/19/%e9%9d%a2%e5%90%91HBase%e7%9a%84%e5%86%85%e5%ad%98key-value%e7%bc%93%e5%ad%98%e7%9a%84%e5%ae%9e%e7%8e%b0.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">6</span>
+                            <span class="day">2</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/6/2/Public-Speaking-Work-Overtime.html">Public Speaking: Work Overtime</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>　　   Overtime is the amount of time someone works beyond normal working hours. But in IT companies, working overtime seems to be a standard ingredient in cooperate culture. The last few years, programmer has been highly controversial.They earn much money but spend less and die earlier than people in other careers.It does not mean that they don`t like shopping. It is just because they work all day and don`t have time to shop. So why do they always work overtime? Do they always have so much tasks to do ? According to my own internship experience and my friends`s experiences, there are always three reasons: the manager allocates task based on 10 or more working hours rather than 8 hours one day; The employee are busy with meetings, communication with their colleagues and surfing social websites, like weibo, wechat; The last reason is that they really enjoy their job. Today I won`t talk about how to arrange tasks and manage your time, I will give you some reasons to stop working overtime.</p>
+
+<p>　</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/6/2/Public-Speaking-Work-Overtime.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/8.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/10.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

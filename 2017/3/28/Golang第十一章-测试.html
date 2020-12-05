@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Golang第十一章-测试 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content=""/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post" data-perma="Golang第十一章-测试">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-single">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">28</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2017/3/28/Golang%e7%ac%ac%e5%8d%81%e4%b8%80%e7%ab%a0-%e6%b5%8b%e8%af%95.html">Golang第十一章-测试</a>
+                            </h3>
+                        </header>
+                        <aside class="aside clearfix">
+                            
+                            <a class="tag label label-info" href="/tags/Golang.html">Golang</a>
+                            
+                            <a class="tag label label-info" href="/tags/%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.html">学习笔记</a>
+                            
+                            
+                        </aside>
+                        <section class="brief"><ul>
+<li>命令
+
+<ul>
+<li>go test</li>
+<li>遍历*_test.go 文件中复合规则的函数</li>
+</ul></li>
+<li>类型
+
+<ul>
+<li>测试函数：Test开头用于测试程序逻辑行为的正确性</li>
+<li>基准测试函数：Benchmark开头，用于衡量函数的性能，go test会运行多次取平均的执行时间</li>
+<li>示例函数：Examole开头的函数，提供一个有编译器保证正确性的示例文档</li>
+</ul></li>
+</ul>
+
+<h2 id="测试函数">测试函数</h2>
+
+<ul>
+<li><p>导入的包和形式如下</p>
+<pre><code>import &quot;testing&quot;
+func TestName(t *testing){
+//...
+}
+</code></pre></li>
+
+<li><p>go test -v参数可以打印每个测试函数的名字和运行时间</p></li>
+
+<li><p>go test -run 对应一个正则表达式，只有测试函数名被它正确匹配的测试函数才会被go test测试命令运行。</p></li>
+
+<li><p>t.Error不能终止测试，t.Fatal可以终止测试</p></li>
+
+<li><p>t.Fatal必须和测试函数在同一个groutine里调用才能终止测试</p></li>
+
+<li><p>一般测试失败的信息形式为<code>f(x)=y, want z</code></p></li>
+</ul>
+
+<!--more-->
+
+<h3 id="随机测试">随机测试</h3>
+
+<h3 id="白盒测试">白盒测试</h3>
+
+<ul>
+<li><p>在测试一些诸如邮件发送函数的时候，我们并不想真正的发送邮件，因此可以将发送函数作为一个包级的私有函数值，然后在测试代码里先用修改该函数值，进行同等效果的测试</p>
+<pre><code class="language-go">//fakefunc.go
+package ch11
+import (
+&quot;fmt&quot;
+)
+var realFunc = func(data string) {
+fmt.Printf(&quot;Real Func:%s\n&quot;, data)
+}
+func CheckInfo(data string) {
+realFunc(data)
+}
+//
+//fakefunc_test
+package ch11
+import (
+&quot;testing&quot;
+)
+func TestFakeFunc(t *testing.T) {
+var data string
+saved := realFunc //保存原来的realfunc
+defer func() { realFunc = saved }()
+realFunc = func(d string) {
+    data = d + &quot;demo&quot;
+}
+CheckInfo(&quot;demo&quot;)
+if data != &quot;demo&quot; {
+    t.Errorf(`data=%s want &quot;demo&quot;`, data)
+}
+}
+</code></pre></li>
+</ul>
+
+<h3 id="测试扩展包">测试扩展包</h3>
+
+<p>一个测试包想要使用，调用了该包的函数，这样讲形成一个包循环，go是不允许的，因此可以在被调用包的目录创建一个<code>&lt;path&gt;/&lt;package&gt;_test</code>的目录。告诉go test工具应该建立一个额外的包运行测试。这样就可以在该包内倒入测试代码依赖的其他的辅助包</p>
+
+<ul>
+<li><p>go list 可以查看哪些是Go源文件产品代码，哪些是包测试，哪些是测试扩展包。</p>
+
+<ul>
+<li>go list -f={ {.GoFiles} } fmt。GoFiles表示产品代码对应的Go源文件列表；也就是go build命令要编译的部分</li>
+<li>go list -f={ {.TestGoFiles} } fmt fmt。TestGoFiles表示包内部测试代码，以_test.go为后缀文件名，不过只是在测试时被构建</li>
+<li>go list -f={ {.XTestGoFiles} } fmt。XTestGoFiles表示属于测试扩展包的测试代码，也就是fmt_test</li>
+</ul></li>
+
+<li><p>测试覆盖率</p>
+
+<ul>
+<li>go test -coverprofile=c.out</li>
+<li>coverprofile参数通过在测试代码中插入生成钩子来统计覆盖率数据。也就是说在运行每个测试前。他会修改测试代码的副本，在每个词法块都会设置一个布尔标志变量。当被修改后的的被测试代码运行退出时，讲统计日志数据写入到c.out文件，并打印一部分执行的语句的一个总结。如果你需要的是摘要使用go test -cover</li>
+<li>-covermod=count可以在每个代码块插入计数器。统计每个块的执行次数，从而可以知道执行的热点代码</li>
+<li>go tool cover -html=c.out可以生成一个HTML报告</li>
+</ul></li>
+</ul>
+
+<h2 id="基准测试">基准测试</h2>
+
+<ul>
+<li><p>Benchmark开头，参数是b *testing.B,其中b有一个变量N，用于指定操作循环的次数。系统自己指定,会自己调整</p>
+<pre><code>import &quot;testing&quot;
+func BenchmarkIsPalindrome(b *testing.B) {
+for i := 0; i &lt; b.N; i++ {
+    IsPalindrome(&quot;A man, a plan, a canal: Panama&quot;)
+}
+}
+</code></pre>
+
+<p>循环放在测试函数内部，而不是放在测试框架内实现，这样可以让每个基准测试函数有机会在循环启动前执行初始化代码，这样并不会显著影响每次迭代的平均运行时间</p></li>
+
+<li><p>go test -bench=. 需要通过bench标志指定要运行的基准测试函数。支持正则，默认是空。<code>.</code>表示匹配所有基准测试函数</p></li>
+
+<li><p>-benchmem命令行标志参数可以在报告中包含内存的分配数据统计</p></li>
+
+<li><p>可以通过go tool pprof对操作系统信息进行采样，比如cpu,内存占用.可以参考<a href="https://blog.golang.org/profiling-go-programs">Profiling Go Programs</a></p></li>
+</ul>
+
+<h2 id="示例函数">示例函数</h2>
+
+<ul>
+<li><p>以Example开头，没有参数</p>
+<pre><code>func ExampleIsPalindrome() {
+fmt.Println(IsPalindrome(&quot;A man, a plan, a canal: Panama&quot;))
+fmt.Println(IsPalindrome(&quot;palindrome&quot;))
+// Output:
+// true
+// false
+}
+</code></pre></li>
+
+<li><p>作为文档，godoc会根据示例函数的后缀名部分，将一个示例函数关联到某个具体函数或包本身</p>
+
+<ul>
+<li>go test会运行示例函数，如果含有上面Output的注释，那么测试工具会比较输出结果和注释是否一致</li>
+<li>提供一个真实的演练场，像<a href="http://golang.org">http://golang.org</a>一样就是有godoc提供的文档服务，他使用了Go Playground提高的技术让用户可以在浏览器中在线编辑和运行每个示例函数</li>
+</ul></li>
+</ul>
+</section>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+<section id="comment">
+    
+    
+</section>
+
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Page 11 - OpenHex</title>
+    <meta name="keywords" content="golang,c&#43;&#43;,distributed system,storage system,对象存储,分布式存储"/>
+    <meta name="description" content="A place to rock the distributed world!"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/prism.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="post-list" data-perma="post-page-11">
+<header id="header">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 id="site-title">
+                <a href="/">OpenHex <sup>Just For Fun</sup></a>
+            </h3>
+            <nav id="site-nav">
+                <ul class="nav nav-inverse nav-pills">
+                    <li role="presentation" class="">
+                        <a href="/" >Home
+                        </a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="/archive" >Archive
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<section id="main">
+    <div class="container">
+        <div id="article-list">
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">5</span>
+                            <span class="day">2</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/5/2/Public-Speaking-Work-Conformity.html">Public Speaking: Conformity</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="conformity">Conformity</h4>
+
+<p>Last week, when I was waiting for the green man at a pedestrian crossing, a phenomenon attracted me. Because there were not so much cars, somebody crossed the street before the light changed green. Somebody else began to cross the street. We broken the rules. One or two individuals broken the rule, before long, everyone did this. Why? because others broken the rule. This psychology is called Conformity.</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/5/2/Public-Speaking-Work-Conformity.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">4</span>
+                            <span class="day">30</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/4/30/awk%e7%9a%84%e4%bd%bf%e7%94%a8%e5%85%a5%e9%97%a8.html">awk的使用入门</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><h4 id="简介">简介</h4>
+
+<p><code>awk</code>是一个强大的文本分析工具，在对数据分析生成报告时，特别枪弹。<code>awk</code>的原理是把文件以行读入，以指定的分隔符对每行分片，提供一些函数或者自己写程序逻辑，可以对每片进行出来。</p>
+
+<h4 id="使用方法">使用方法</h4>
+<pre><code>awk [options] 'script' var=value file(s) 
+awk [options] -f scriptfile var=value file(s)
+</code></pre>
+
+<h5 id="常用命令选项">常用命令选项</h5>
+
+<ul>
+<li><strong>-F field_separator</strong> 制定每行文本的域分隔符，可以是字符串也可以是正则表达式</li>
+<li><strong>-v var=value</strong> 赋值一个用户变量，将外部变量值传入awk</li>
+<li><strong>-f</strong> 制定awk脚本文件</li>
+</ul>
+
+<h4 id="awk的模式和操作">awk的模式和操作</h4>
+
+<p>awk 脚本，也就是上一节中的script部分，格式遵循下面的形式
+&gt; awk &ldquo;pattern action&rdquo;  files</p>
+
+<h5 id="模式-pattern">模式(Pattern)</h5>
+
+<p>模式可以是下面的任意一个:
+* /正则表达式/: 使用//包围的正则表达式
+* 关系表达式：使用运算符进行操作，可以是字符串或数字的比较测试
+* 模式匹配表达式： 用运算符<code>~</code>(匹配)和<code>~!</code>(不匹配)
+*  BEGIN语句块，pattern匹配块，END语句块</p>
+
+<!-- more -->
+
+<h5 id="操作">操作</h5>
+
+<p>操作有一个或者多个命令，函数，表达式组成，有换行符或者分毫分开，必须位于大括号内部，主要有下面操作：
+* 变量或数组赋值
+* 输出命令
+* 内置函数
+* 控制流程语句</p>
+
+<p>awk操作中的变量或者数组可以直接使用，不用进行初始化，其他语法和c风格比较像</p>
+
+<h4 id="入门实例">入门实例</h4>
+
+<p>假设last -n 5的输出如下：</p>
+<pre><code>hadoop@kdf5000:~$ last -n 5
+hadoop   pts/9        :1               Sat Apr 30 15:18   still logged in   
+hadoop   pts/22       :1               Sat Apr 30 14:49 - 14:49  (00:00)    
+hadoop   :1           :1               Sat Apr 30 14:48   still logged in   
+hust-lh  :0           :0               Sat Apr 30 14:46   still logged in   
+hadoop   pts/1        :0               Sat Apr 30 14:03 - 14:46  (00:43)    
+</code></pre>
+
+<p>如果只显示最近登陆的5个账号</p>
+<pre><code>hadoop@hust-lh:~$ last -n 5 | awk '{print $1}'
+hadoop
+hadoop
+hadoop
+hust-lh
+hadoop
+</code></pre>
+
+<p>awk工作流程是这样的：读入有<code>\n</code>换行符分割的一条记录，然后将记录按指定的域分隔符划分域，填充域，<code>$0</code> 则表示所有域,<code>$1</code>表示第一个域,<code>$n</code>表示第n个域。默认域分隔符是&rdquo;空白键&rdquo; 或 &ldquo;[tab]键&rdquo;,所以<code>$1</code>表示登录用户，<code>$3</code>表示登录用户ip,以此类推。</p>
+
+<p>如果只是显示/etc/passwd的账户</p>
+<pre><code>hadoop@hust-lh:~$ cat /etc/passwd |awk  -F ':'  '{print $1}'  
+root
+daemon
+bin
+sys
+sync
+games
+man
+</code></pre>
+
+<p>这种是<code>awk+action</code>的示例，每行都会执行<code>action{print $1}</code>。<code>-F</code>指定域分隔符为<code>':'</code>。
+如果只是显示<code>/etc/passwd</code>的账户和账户对应的<code>shell</code>,而账户与<code>shell</code>之间以逗号分割,而且在所有行添加列名<code>name</code>,<code>shell</code>,在最后一行添加<code>&quot;blue,/bin/nosh&quot;</code>。</p>
+<pre><code>hadoop@hust-lh:~$ cat /etc/passwd |awk  -F ':'  'BEGIN {print &quot;name,shell&quot;}  {print $1&quot;,&quot;$7} END {print &quot;blue,/bin/nosh&quot;}'
+name,shell
+root,/bin/bash
+daemon,/usr/sbin/nologin
+bin,/usr/sbin/nologin
+sys,/usr/sbin/nologin
+sync,/bin/sync
+blue,/bin/nosh
+</code></pre>
+
+<p>awk工作流程是这样的：先执行<code>BEGING</code>，然后读取文件，读入有<code>\n</code>换行符分割的一条记录，然后将记录按指定的域分隔符划分域，填充域，<code>$0</code>则表示所有域,<code>$1</code>表示第一个域,<code>$n</code>表示第<code>n</code>个域,随后开始执行模式所对应的动作<code>action</code>。接着开始读入第二条记录······直到所有的记录都读完，最后执行<code>END</code>操作。</p>
+
+<p>搜索/etc/passwd有root关键字的所有行</p>
+<pre><code>hadoop@hust-lh:~$ awk -F: '/root/' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+</code></pre>
+
+<p>这种是<code>pattern</code>的使用示例，匹配了<code>pattern</code>(这里是<code>root</code>)的行才会执行<code>action</code>(没有指定<code>action</code>，默认输出每行的内容)。</p>
+
+<p>搜索支持正则，例如找<code>root</code>开头的: <code>awk -F: '/^root/' /etc/passwd</code>
+搜索/etc/passwd有root关键字的所有行，并显示对应的<code>shell</code></p>
+<pre><code>hadoop@hust-lh:~$ awk -F: '/root/{print $7}' /etc/passwd          
+/bin/bash
+</code></pre>
+
+<p>这里指定了action{print $7}</p>
+
+<h4 id="脚本编程">脚本编程</h4>
+
+<p>awk可是将脚本写到文件中，然后使用-f调用脚本文件
+下面是一个统计一个文件中对应的单词出现的次数，文件的每一行有两个字段，一个是单词，一个是次数，每个单词可能出现多次，求每个单词后面每个数组的和
+下面是输入文件示例：</p>
+<pre><code>hello 1
+world 2
+hello 2
+world 1
+haha  4
+demo  3
+</code></pre>
+
+<p>脚本如下：</p>
+<pre><code>#!/bin/awk
+BEGIN{
+    print &quot;word&quot;, &quot;count&quot;
+    count=0
+}
+{
+    word[$1] = word[$1] + $2;
+    count = count + $2
+}
+END{
+   for (v in word){
+      print v, word[v]
+   }
+   print &quot;Total Count:&quot;, count
+}
+</code></pre>
+
+<p>执行脚本</p>
+<pre><code>hadoop@hust-lh:~/BigData/Homework/Hw2/GraphLite/GraphLite-0.20/res$ awk -f count.awk word
+word count
+demo 3
+haha 4
+hello 3
+world 3
+Total Count: 13
+</code></pre>
+
+<p>其实和c语言的风格时一样的，程序控制语句支持if, for, while, do while。</p>
+
+<h5 id="awk内置变量">awk内置变量</h5>
+
+<p>下面是awk的内置变量，这些变量时可以直接在脚本里使用的
+&gt;
+ARGC ：命令行参数个数
+ARGV  ：命令行参数排列
+ENVIRON   ：支持队列中系统环境变量的使用
+FILENAME   ：awk浏览的文件名
+FNR     ： 浏览文件的记录数
+FS    ：设置输入域分隔符，等价于命令行 -F选项
+NF  ：浏览记录的域的个数
+NR：已读的记录数
+OFS ：输出域分隔符
+ORS ：输出记录分隔符
+RS ：控制记录分隔符</p>
+
+<h4 id="结语">结语</h4>
+
+<p><code>awk</code>是一个非常强大好用的文本处理工具，<code>awk</code>的更多使用方法参考<a href="http://www.gnu.org/software/gawk/manual/gawk.html">http://www.gnu.org/software/gawk/manual/gawk.html</a></p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/4/30/awk%e7%9a%84%e4%bd%bf%e7%94%a8%e5%85%a5%e9%97%a8.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">4</span>
+                            <span class="day">15</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/4/15/%e5%b2%9b%e4%b8%8a%e4%b9%a6%e5%ba%97-%e6%9c%89%e6%84%9f.html">《岛上书店》有感</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p><img src="/media/archive/blog/image/daoshangshudian.jpg" alt="岛上书店" />
+并没有看书的习惯，知道这本书是因为年前一个朋友遇到了诸多不顺，前来诉苦，我就随口说了一句“人总会有艰难的时候，一切都会好起来了”，然后朋友就给我回了一句“每个人的生命中，都有最艰难的那一年，将人生变得美好而辽阔”，两句话真的好像，他告诉我这句话来自《岛上书店》，当时心里窃喜，我还挺能说出来这么富有哲理 的话。百度了一下，《岛上书店》竟然是各大商城的畅销书，由于向来对畅销，热销之类的词比较反感，于是不了了之。</p>
+
+<p>今年是本命年，可能是因为没有买红色饰品的缘故，刚过完春节就诸事不顺，借钱的朋友竟然搞起了传销，电脑歇菜，kindle碎屏，跟喜欢的妹子莫名的吵架，于是想起了《岛上书店》，心想也许喝点鸡汤能够让自己好受点。</p>
+
+<!-- more -->
+
+<p>岛上书店讲的是一个中年男子A.J.的故事。A.J.和妻子妮可放弃博士学位，回到妮可的家乡，一个孤独的小岛，开了一家小岛书店，只为追求读书的乐趣。可是老天总是不会眷顾那些追求平凡的人，没过几年，妮可就不幸车祸去世，A.J.因为失去世上唯一的爱人，从此借酒消愁。可是“灾难”似乎并没有停止的意思，A.J.有天喝醉了，忘记锁门，早上醒来，发现自己收藏的价值几十万的藏书不见了，一个2岁孤儿被遗弃在书店门口，孤儿的母亲希望小女孩能够在书店的氛围下长大，留信嘱托A.J.抚养其长大。而且神奇的A.J.竟然特别喜欢小女孩（玛雅），于是决定收养她。本以为这样两个人会相依为命，知道玛雅长大。可是一个出版社的推销员艾米，闯入了A.J.的生活。A.J.四年前就已经认识了艾米，并且第一次见面特别讨厌艾米，可以说是一场相当不愉快的见面。可是因为一本书，A.J.爱上了艾米，但是艾米已经有一个美国英雄式的未婚夫，虽然A.J.依然鼓起勇气向艾米表达了爱意，但是他心里很清楚他们两个人是不可能的。知道有一天，艾米摔伤了，A.J.借口去拿书，去艾米家里见她。艾米告诉他，自己不想和一个没有共同兴趣爱好的人在一起，想找一个能够分享激情的人常伴一生。就这样两个人在一起了！两个人幸福的举办了婚礼，共同经营着小岛书店，女儿玛雅由于从小就在书店长大，成了一个优秀的小作家。直到有一天A.J.被诊断得了脑瘤，这个幸福的生活无情的被打破了。虽然做了手术可是A.J.依然没有挺过去，丢下了艾米和玛雅，两个深爱着的女人，离开了世界。小岛书店面临着即将关闭的命运， 但是大家认为小岛不能没有书店，没有书店的小镇不能算一个小镇，于是A.J.的好友亚斯兰特和A.J.的妻妹，亚斯兰特的妻子决定接管书店，继续经营。</p>
+
+<p>小岛上的居民在小岛书店的影响下，大家都喜欢上了读书，虽然大家品味不尽相同，但是都能从读书中知道自己那片世界。《岛上书店》看似是在希望人们回归书店，鼓励大家去读书，并且讲述了一个本来命运糟糕，厄运不断的男子，近乎放弃自己的生活，可是最后有找到了爱情和亲情，从此生活发生了翻天腹地的变化，一个原本孤僻的中年男人，变得乐观开朗起来，甚至影响了整个小镇的居民，成为了小镇不可或缺的一部分。可能是因为最近自己的遭遇，读这本书的时候有很多共鸣，比如A.J.喜欢上艾米却不能在一起的时候跟自己是多么的相似。整个故事场景就是在一个小岛上，在一个普通的书店里，认为只有那么几个，故事也没有那么多跌宕起伏，却给我印象特别深刻。</p>
+
+<p>我们每个人的生活难道不也是这样吗，总是遭遇不幸，但是没有什么大不了的，用书中的话说就是“生活中每一桩糟糕事，几乎都是时机不当的结果，每件好事，都是时机恰到好处的结果”，一切的不幸都会过去的，这些不幸之后，回头来看总是教会了我们很多，自己也会成长许多。</p>
+
+<p><strong>好句摘录：</strong>
+&gt;
+&gt; 无人为孤岛，一书一世界
+&gt;
+&gt; 大多数人如果能给更多事情一个机会的话，他们的问题都能解决。
+&gt;
+&gt; 没有人会漫无目的的旅行，那些迷路者是希望迷路。
+&gt;
+&gt; 生活中每一桩糟糕事，几乎都是时机不当的结果，每件好事，都是时机恰到好处的结果。
+&gt;
+&gt; 一个人无法自成孤单，要么至少，一个人无法自成最理想的孤岛。
+&gt;
+&gt; 我们读书而后知道自己并不孤单。我们读书，因为我们孤单;我们读书，然后就不孤单。</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/4/15/%e5%b2%9b%e4%b8%8a%e4%b9%a6%e5%ba%97-%e6%9c%89%e6%84%9f.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <article class="article">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 panel panel-default">
+                        <header class="header">
+                            <div class="meta">
+                        <span class="date">
+                            <span class="month">3</span>
+                            <span class="day">29</span>
+                        </span>
+                            </div>
+                            <h3 class="title">
+                                <a href="/2016/3/29/How-to-finish-a-Ph-D.html">How to finish a Ph.D.</a>
+                            </h3>
+                        </header>
+                        <section class="brief"><p>A few years ago I was asked by several Ph.D. students what advice I could give to finish a Ph.D. While I don&rsquo;t think there is only one answer I do have some principles that worked well for me- if you are a current PhD student hopefully you will find this useful also. If you have any comments or suggestions, I&rsquo;d love to hear from you.</p>
+
+<p>Over the years I have received many positive comments from Ph.D. students from the U.S., Canada, and as far as China and Korea. Several students have linked this site form their sites. Thank you so much for your feedback. It means a lot to me that some of my thoughts made a difference to you.</p>
+</section>
+                        <aside class="aside clearfix">
+                            <a class="btn btn-primary btn-lg pull-right" href="/2016/3/29/How-to-finish-a-Ph-D.html">Read More</a>
+                        </aside>
+                    </div>
+                </div>
+            </article>
+            
+            <div class="article-pager text-center">
+                <a class="btn btn-lg btn-info" href="/posts/10.html">Prev</a>
+                <a class="btn btn-lg btn-info" href="/posts/12.html">Next</a>
+            </div>
+        </div>
+    </div>
+</section>
+<footer id="footer">
+    <div class="container text-center">
+        <p>© 2015 OpenHex.
+            <a href="http://creativecommons.org/licenses/by/3.0/">Some rights reserved </a> |
+            <a href="/feed.xml">Feed</a> |
+            <a href="/sitemap.xml">Sitemap</a>
+        </p>
+        <p>Powered by <a href="https://github.com/go-xiaohei/pugo">PuGo 0.10.10 (beta)</a>. Theme by Default.
+        </p>
+        
+    
+    
+
+    </div>
+</footer>
+<script src="/js/jquery-2.1.4.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/prism.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("pre code").addClass("line-numbers")
+    });
+</script>
+</body>
+</html>
